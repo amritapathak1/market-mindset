@@ -51,26 +51,37 @@ The application will start on `http://127.0.0.1:8050/`
 
 ## File Structure
 
-- `app.py` (302 lines): Main Dash application with callbacks and routing logic
-- `pages.py` (324 lines): All page rendering functions (consent, demographics, tasks, etc.)
-- `stock_data.py` (163 lines): Stock information for all 7 tasks and amount adjustments
-- `config.py` (144 lines): Configuration constants, error messages, and UI settings
-- `utils.py` (240 lines): Utility functions for validation, data processing, and flow control
-- `components.py` (230 lines): Reusable UI components for consistent design
+- `app.py`: Main Dash application with database integration and routing logic
+- `application.py`: WSGI entry point for production deployment
+- `callbacks.py`: All callback functions for UI interactions and data collection
+- `pages.py`: All page rendering functions (consent, demographics, tasks, etc.)
+- `components.py`: Reusable UI components for consistent design
+- `config.py`: Configuration constants, error messages, and UI settings
+- `utils.py`: Utility functions for validation, data processing, and flow control
+- `database.py`: PostgreSQL database operations
+- `file_logger.py`: File-based logging fallback when database unavailable
+- `tasks_data.json`: Stock information for all 7 tasks and investment scenarios
+- `schema.sql`: PostgreSQL database schema
 - `requirements.txt`: Python dependencies
+- `deploy.sh`: Deployment script for AWS EC2
+- `nginx.conf`: Nginx reverse proxy configuration
+- `investment-study.service`: Systemd service file for Gunicorn
+- `DEPLOYMENT.md`: Complete AWS deployment guide
 - `README.md`: This file
-- `REFACTORING_PLAN.md`: Detailed refactoring plan and implementation notes
 
 ## Customization
 
 ### Modifying Stock Data
-Edit `stock_data.py` to change stock information, number of tasks, or amount adjustments.
+Edit `tasks_data.json` to change stock information, investment scenarios, or add/remove tasks. Each task contains:
+- Stock details (name, ticker, images, descriptions)
+- Past week performance and return percentages
+- Weekly and monthly analysis text
 
 ### Changing Initial Amount
 In `config.py`, modify the `INITIAL_AMOUNT` constant (default: 1000).
 
 ### Adjusting Number of Tasks
-Update `NUM_TASKS` in `config.py` and add/remove task data in `stock_data.py`.
+Update `NUM_TASKS` in `config.py` and add/remove task objects in `tasks_data.json`.
 
 ### Modifying Confidence/Risk Checkpoint
 Change `CONFIDENCE_RISK_CHECKPOINT` in `config.py` (default: 3).
