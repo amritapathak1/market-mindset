@@ -26,7 +26,7 @@
 8. Multi-AZ: NO (required for free tier)
 9. Public Access: YES (for initial setup)
 10. VPC Security Group: Create new (allow port 5432)
-11. Database name: investment_study
+11. Database name: market-mindset
 12. Master username: postgres
 13. Master password: [strong password]
 
@@ -153,7 +153,7 @@ nano .env
 # Edit with your RDS details:
 DB_HOST=your-rds-endpoint.us-east-1.rds.amazonaws.com
 DB_PORT=5432
-DB_NAME=investment_study
+DB_NAME=market-mindset
 DB_USER=postgres
 DB_PASSWORD=your-rds-password
 SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
@@ -162,14 +162,14 @@ SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
 ### Initialize Database
 ```bash
 # First, test the connection from EC2 to RDS:
-psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d investment_study -c "SELECT version();"
+psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d market-mindset -c "SELECT version();"
 # You'll be prompted for the password you set during RDS creation
 
 # If connection works, initialize the database schema:
-psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d investment_study -f schema.sql
+psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d market-mindset -f schema.sql
 
 # Verify tables were created:
-psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d investment_study -c "\dt"
+psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d market-mindset -c "\dt"
 # You should see: participants, demographics, task_responses, portfolio, confidence_risk, feedback, page_visits, events
 ```
 
@@ -295,7 +295,7 @@ The app needs modifications to integrate with the database. I'll create those fi
    ```
 3. **Database Check:**
    ```bash
-   psql -h your-rds-endpoint -U postgres -d investment_study -c "SELECT COUNT(*) FROM participants;"
+   psql -h your-rds-endpoint -U postgres -d market-mindset -c "SELECT COUNT(*) FROM participants;"
    ```
 
 ---
@@ -316,7 +316,7 @@ sudo journalctl -u nginx -n 100 -f
 ### Database Backup
 ```bash
 # Automated daily backup script
-pg_dump -h your-rds-endpoint -U postgres investment_study > backup_$(date +%Y%m%d).sql
+pg_dump -h your-rds-endpoint -U postgres market-mindset > backup_$(date +%Y%m%d).sql
 ```
 
 ### Check Free Tier Usage
@@ -353,32 +353,32 @@ ssh -i your-key.pem ubuntu@your-elastic-ip
 cd /home/ubuntu/app
 
 # All participants summary
-psql -h your-rds-endpoint -U postgres -d investment_study -c "
+psql -h your-rds-endpoint -U postgres -d market-mindset -c "
 COPY (SELECT * FROM participant_summary ORDER BY created_at) 
 TO STDOUT WITH CSV HEADER" > participants_export.csv
 
 # Demographics data
-psql -h your-rds-endpoint -U postgres -d investment_study -c "
+psql -h your-rds-endpoint -U postgres -d market-mindset -c "
 COPY (SELECT p.participant_id, p.created_at, d.* FROM participants p 
 LEFT JOIN demographics d ON p.participant_id = d.participant_id 
 ORDER BY p.created_at) 
 TO STDOUT WITH CSV HEADER" > demographics_export.csv
 
 # Task responses (investment decisions)
-psql -h your-rds-endpoint -U postgres -d investment_study -c "
+psql -h your-rds-endpoint -U postgres -d market-mindset -c "
 COPY (SELECT p.participant_id, p.created_at, tr.* FROM participants p 
 JOIN task_responses tr ON p.participant_id = tr.participant_id 
 ORDER BY p.created_at, tr.task_id) 
 TO STDOUT WITH CSV HEADER" > task_responses_export.csv
 
 # Confidence and risk ratings
-psql -h your-rds-endpoint -U postgres -d investment_study -c "
+psql -h your-rds-endpoint -U postgres -d market-mindset -c "
 COPY (SELECT p.participant_id, p.created_at, cr.* FROM participants p 
 LEFT JOIN confidence_risk cr ON p.participant_id = cr.participant_id) 
 TO STDOUT WITH CSV HEADER" > confidence_risk_export.csv
 
 # Portfolio performance
-psql -h your-rds-endpoint -U postgres -d investment_study -c "
+psql -h your-rds-endpoint -U postgres -d market-mindset -c "
 COPY (SELECT * FROM portfolio ORDER BY participant_id, task_id) 
 TO STDOUT WITH CSV HEADER" > portfolio_export.csv
 
@@ -392,7 +392,7 @@ scp -i your-key.pem ubuntu@your-elastic-ip:/home/ubuntu/app/*_export.csv ./study
 ```bash
 # 1. Export all data (full database backup)
 ssh -i your-key.pem ubuntu@your-elastic-ip
-pg_dump -h your-rds-endpoint -U postgres investment_study > final_backup_$(date +%Y%m%d).sql
+pg_dump -h your-rds-endpoint -U postgres market-mindset > final_backup_$(date +%Y%m%d).sql
 
 # 2. Export CSVs (see Data Export section above)
 
