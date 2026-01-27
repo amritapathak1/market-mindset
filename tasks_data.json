@@ -1,0 +1,219 @@
+[
+  {
+    "task_id": 1,
+    "stocks": [
+      {
+        "name": "TechCorp Inc.",
+        "ticker": "TECH",
+        "image": "https://via.placeholder.com/150?text=TECH",
+        "past_week_percent": 5.2,
+        "return_percent": -5.0,
+        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=TECH+Weekly+Chart+%E2%86%91",
+        "month_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=TECH+Monthly+Chart",
+        "week_analysis": "Over the past week, TechCorp showed strong upward momentum with a 5.2% gain. Trading volume increased significantly following their AI product announcement. Technical indicators suggest continued strength with the stock breaking above key resistance levels. Institutional buying has been heavy.",
+        "month_analysis": "Monthly performance shows volatility with an overall upward trend. The stock gained 8.3% over the past month despite some mid-month corrections. Strong earnings beat and positive analyst revisions have driven investor confidence. The 50-day moving average crossed above the 200-day, signaling a bullish pattern.",
+        "short_description": "Leading technology company specializing in cloud computing and AI solutions.",
+        "detailed_description": "TechCorp Inc. is a multinational technology company that focuses on cloud infrastructure, artificial intelligence, and enterprise software solutions. Founded in 2010, the company has shown consistent growth with strong quarterly earnings. Recent product launches in the AI space have positioned them as a market leader. The company has a strong balance sheet with low debt and high cash reserves. Analysts predict continued growth due to increasing demand for cloud services."
+      },
+      {
+        "name": "GreenEnergy Co.",
+        "ticker": "GREN",
+        "image": "https://via.placeholder.com/150?text=GREN",
+        "past_week_percent": -2.1,
+        "return_percent": 3.5,
+        "week_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=GREN+Weekly+Chart+%E2%86%93",
+        "month_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=GREN+Monthly+Chart",
+        "week_analysis": "The stock experienced a 2.1% decline this week due to regulatory concerns and profit-taking after recent gains. Support levels held at $45, preventing further downside. Despite the weekly dip, renewable energy sector sentiment remains positive. Analysts view this as a buying opportunity.",
+        "month_analysis": "Monthly trend shows resilience with a 4.5% gain despite weekly fluctuations. New government subsidies for renewable energy announced mid-month boosted the sector. The stock has formed a consolidation pattern near recent highs. Long-term outlook remains strong with multiple utility contracts pending.",
+        "short_description": "Renewable energy company with focus on solar and wind power generation.",
+        "detailed_description": "GreenEnergy Co. is a leading renewable energy provider operating solar and wind farms across North America. Despite the recent week's decline, the company has strong long-term prospects driven by government incentives and growing environmental awareness. They recently secured major contracts with utility companies. However, short-term volatility is expected due to regulatory changes and commodity price fluctuations. The company is investing heavily in next-generation battery storage technology."
+      }
+    ]
+  },
+  {
+    "task_id": 2,
+    "stocks": [
+      {
+        "name": "HealthPlus Systems",
+        "ticker": "HLTH",
+        "image": "https://via.placeholder.com/150?text=HLTH",
+        "past_week_percent": 3.8,
+        "return_percent": 7.5,
+        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=HLTH+Weekly+Chart+%E2%86%91",
+        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=HLTH+Monthly+Chart+%E2%86%91",
+        "week_analysis": "Strong weekly performance with 3.8% gains driven by FDA approval news for their AI diagnostic platform. Volume surged to twice the average, indicating strong institutional interest. The stock broke through resistance at $82, opening room for further upside. Momentum indicators are bullish.",
+        "month_analysis": "Exceptional monthly performance with 12.1% gains as the company announced multiple strategic partnerships. The stock has been on a steady uptrend with minimal pullbacks. New mental health services platform exceeded user adoption targets. Technical setup suggests continuation of the upward trend.",
+        "short_description": "Healthcare technology company providing telemedicine and digital health solutions.",
+        "detailed_description": "HealthPlus Systems has revolutionized telemedicine with its innovative platform connecting patients with healthcare providers. The company experienced accelerated growth during the pandemic and has maintained strong user engagement. They recently received FDA approval for their AI-powered diagnostic tools. The company has partnerships with major insurance providers, ensuring steady revenue streams. Market analysts are optimistic about their expansion into mental health services and remote patient monitoring."
+      },
+      {
+        "name": "RetailMax Group",
+        "ticker": "RMAX",
+        "image": "https://via.placeholder.com/150?text=RMAX",
+        "past_week_percent": -4.5,
+        "return_percent": -8.0,
+        "week_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=RMAX+Weekly+Chart+%E2%86%93",
+        "month_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=RMAX+Monthly+Chart",
+        "week_analysis": "Challenging week with a 4.5% decline following disappointing same-store sales data. Increased competition from online retailers pressured margins. The stock tested support at $28 but held above critical levels. Bearish sentiment dominated, though some value investors started accumulating.",
+        "month_analysis": "Monthly chart shows a 6.8% decline as retail sector faces headwinds. Holiday sales missed expectations, and rising labor costs pressured profitability. However, e-commerce initiatives showed 22% growth. The stock is approaching oversold territory on monthly RSI, which could attract bargain hunters.",
+        "short_description": "Large retail chain adapting to e-commerce with omnichannel strategy.",
+        "detailed_description": "RetailMax Group operates over 500 stores nationwide and has been investing heavily in e-commerce infrastructure. The recent week's decline reflects investor concerns about rising operational costs and competition from online retailers. However, the company's omnichannel strategy has shown promising early results. They've launched same-day delivery services in major cities and integrated AR shopping experiences. The company has a loyal customer base and strong brand recognition, though margins remain under pressure."
+      }
+    ]
+  },
+  {
+    "task_id": 3,
+    "stocks": [
+      {
+        "name": "FinTech Solutions",
+        "ticker": "FINT",
+        "image": "https://via.placeholder.com/150?text=FINT",
+        "past_week_percent": 7.3,
+        "return_percent": -12.0,
+        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=FINT+Weekly+Chart+%E2%86%91",
+        "month_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=FINT+Monthly+Chart+%E2%86%93",
+        "week_analysis": "Impressive 7.3% weekly gain following announcement of major retail partnerships. Transaction volume data exceeded expectations. Technical breakout above $95 resistance confirmed by strong volume. Short-term momentum is very strong, though some consolidation may be needed.",
+        "month_analysis": "Mixed monthly performance with early-month weakness followed by recent strength, resulting in a modest 1.2% monthly gain. Regulatory concerns weighed on sentiment initially, but partnership announcements reversed the trend. The stock remains volatile with wide trading ranges. Long-term uptrend is still intact.",
+        "short_description": "Digital payment processing and mobile banking platform provider.",
+        "detailed_description": "FinTech Solutions has become a dominant player in digital payments and mobile banking. The company processes billions of transactions monthly and has expanded into cryptocurrency services. Recent partnerships with major retailers have boosted transaction volumes. The company benefits from the shift away from cash and traditional banking. However, regulatory scrutiny in the fintech space poses potential risks. Strong network effects and high customer switching costs provide competitive advantages."
+      },
+      {
+        "name": "AutoDrive Motors",
+        "ticker": "AUTO",
+        "image": "https://via.placeholder.com/150?text=AUTO",
+        "past_week_percent": -1.8,
+        "return_percent": 4.2,
+        "week_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=AUTO+Weekly+Chart+%E2%86%93",
+        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=AUTO+Monthly+Chart+%E2%86%91",
+        "week_analysis": "Minor 1.8% weekly decline due to autonomous driving safety review announcement. Despite negative headlines, the stock showed resilience and held key support levels. Production numbers released mid-week were strong. Institutional holders appear to be maintaining positions, limiting downside.",
+        "month_analysis": "Strong monthly performance with 9.7% gains driven by record vehicle deliveries and new manufacturing capacity coming online. Battery technology breakthroughs announced early in the month. The stock formed a bullish flag pattern suggesting further upside potential. Order backlog continues to grow quarter-over-quarter.",
+        "short_description": "Electric vehicle manufacturer with autonomous driving technology.",
+        "detailed_description": "AutoDrive Motors is an innovative electric vehicle manufacturer developing autonomous driving capabilities. The company has delivered impressive vehicle production numbers but faces intense competition in the EV market. Recent safety concerns with their autonomous features led to this week's stock decline. However, they have a strong order backlog and are expanding manufacturing capacity. The company's battery technology offers longer range than competitors. Long-term growth depends on successful deployment of self-driving features and regulatory approvals."
+      }
+    ]
+  },
+  {
+    "task_id": 4,
+    "stocks": [
+      {
+        "name": "BioPharm Industries",
+        "ticker": "BIOP",
+        "image": "https://via.placeholder.com/150?text=BIOP",
+        "past_week_percent": 12.5,
+        "return_percent": 20.0,
+        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=BIOP+Weekly+Chart+%E2%86%91%E2%86%91",
+        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=BIOP+Monthly+Chart+%E2%86%91%E2%86%91",
+        "week_analysis": "Explosive 12.5% weekly gain following breakthrough Phase III trial results announcement. Trading volume spiked to 10x normal levels. The positive data significantly increases probability of FDA approval. Multiple analysts raised price targets. Gap-up opening suggests strong continuation potential.",
+        "month_analysis": "Outstanding monthly performance with 28.4% gains as clinical trial milestones were achieved. Institutional accumulation has been aggressive throughout the month. The stock broke out from a multi-month consolidation pattern. Additional pipeline drugs showing promise in early trials. Risk/reward remains favorable despite the strong rally.",
+        "short_description": "Biotechnology company developing innovative cancer treatments.",
+        "detailed_description": "BioPharm Industries specializes in oncology treatments with several promising drugs in late-stage clinical trials. This week's surge followed positive Phase III trial results for their flagship cancer treatment. The company has a robust pipeline with potential blockbuster drugs. Partnership agreements with larger pharmaceutical companies provide financial stability. However, the biotech sector is inherently risky due to regulatory uncertainties and clinical trial outcomes. If approved, their lead drug could generate billions in annual revenue."
+      },
+      {
+        "name": "Global Logistics",
+        "ticker": "GLOG",
+        "image": "https://via.placeholder.com/150?text=GLOG",
+        "past_week_percent": 1.2,
+        "return_percent": 1.5,
+        "week_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=GLOG+Weekly+Chart+%E2%86%92",
+        "month_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=GLOG+Monthly+Chart+%E2%86%92",
+        "week_analysis": "Modest 1.2% weekly gain reflecting the stock's stable, defensive nature. Low volatility persisted throughout the week with tight trading ranges. Fuel cost data came in better than expected. The stock continues its slow, steady appreciation pattern that has characterized it for years.",
+        "month_analysis": "Steady monthly performance with 2.8% gains. The stock moved in a narrow channel with low drama. Dividend announcement maintained at previous levels. Global shipping rates showed slight improvement. For conservative investors, the consistent performance and reliable dividend make this an attractive holding despite limited upside.",
+        "short_description": "International shipping and logistics company with global operations.",
+        "detailed_description": "Global Logistics operates one of the world's largest shipping fleets and logistics networks. The company has shown steady but unspectacular growth. They benefit from global trade expansion but face challenges from fuel costs and port congestion. Recent investments in automation and route optimization are improving margins. The company pays consistent dividends, making it attractive for income-focused investors. Geopolitical tensions and trade disputes present ongoing risks to international shipping operations."
+      }
+    ]
+  },
+  {
+    "task_id": 5,
+    "stocks": [
+      {
+        "name": "CyberShield Security",
+        "ticker": "CYBER",
+        "image": "https://via.placeholder.com/150?text=CYBER",
+        "past_week_percent": 6.7,
+        "return_percent": -8.0,
+        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=CYBER+Weekly+Chart+%E2%86%91",
+        "month_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=CYBER+Monthly+Chart",
+        "week_analysis": "Strong 6.7% weekly performance driven by news of major enterprise contract wins. High-profile data breaches at competitors highlighted the company's superior security platform. Volume increased notably on the upside days. Technical momentum has shifted positive with MACD crossing bullish.",
+        "month_analysis": "Mixed monthly results with 3.2% gains overall but significant intra-month volatility. Early-month weakness on competitive concerns was reversed by contract announcements. Subscription renewal rates exceeded expectations. The stock is consolidating after a strong prior quarter, forming a base for potential continuation.",
+        "short_description": "Cybersecurity software and services provider for enterprises.",
+        "detailed_description": "CyberShield Security provides comprehensive cybersecurity solutions to Fortune 500 companies. Growing cyber threats have driven increased demand for their services. The company has a subscription-based model ensuring predictable recurring revenue. Recent high-profile data breaches at competing firms have highlighted the importance of robust security. They're expanding into cloud security and threat intelligence. The cybersecurity market is expected to grow significantly, positioning CyberShield favorably. Competition is intense, but their reputation and client relationships provide advantages."
+      },
+      {
+        "name": "FoodChain Markets",
+        "ticker": "FOOD",
+        "image": "https://via.placeholder.com/150?text=FOOD",
+        "past_week_percent": -3.2,
+        "return_percent": 5.5,
+        "week_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=FOOD+Weekly+Chart+%E2%86%93",
+        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=FOOD+Monthly+Chart+%E2%86%91",
+        "week_analysis": "3.2% weekly decline on concerns about consumer discretionary spending. Economic data suggesting potential slowdown weighed on premium retailers. However, same-store sales data released mid-week was better than feared. Support held at $52, preventing deeper losses. Selling appears to be stabilizing.",
+        "month_analysis": "Positive monthly performance with 4.7% gains despite recent weakness. Meal kit subscription service exceeded growth targets. Private label expansion improving margins. The stock has shown resilience compared to broader retail sector. Premium positioning and loyal customer base provide downside protection during market volatility.",
+        "short_description": "Organic and specialty food retailer with premium market positioning.",
+        "detailed_description": "FoodChain Markets operates premium grocery stores focusing on organic and locally-sourced products. The recent decline reflects broader concerns about consumer spending in a potential economic slowdown. However, the company has a dedicated customer base willing to pay premium prices. They've successfully launched meal kit services and expanded private label offerings. Real estate costs and competition from conventional grocers entering the organic space pose challenges. The company maintains strong same-store sales growth despite overall market headwinds."
+      }
+    ]
+  },
+  {
+    "task_id": 6,
+    "stocks": [
+      {
+        "name": "AeroSpace Dynamics",
+        "ticker": "AERO",
+        "image": "https://via.placeholder.com/150?text=AERO",
+        "past_week_percent": 4.1,
+        "return_percent": 15.0,
+        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=AERO+Weekly+Chart+%E2%86%91",
+        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=AERO+Monthly+Chart+%E2%86%91",
+        "week_analysis": "Solid 4.1% weekly advance following announcement of new defense contract awards. Government spending on military modernization remains robust. The stock pushed to new 52-week highs on strong volume. Aerospace sector showing broad strength. Momentum indicators suggest the rally has room to run.",
+        "month_analysis": "Excellent monthly performance with 11.3% gains as defense budget priorities aligned with company capabilities. Commercial space ventures showing progress with successful test flights. The stock has been in a strong uptrend for three consecutive months. Institutional ownership increased. Combination of growth and dividends attracts diverse investor base.",
+        "short_description": "Aerospace and defense contractor with government and commercial contracts.",
+        "detailed_description": "AeroSpace Dynamics designs and manufactures aircraft components and defense systems. The company has a diverse portfolio of government contracts providing stable revenue. Recent wins in military modernization programs boosted investor confidence. They're also expanding into commercial space ventures and urban air mobility. Long development cycles and government budget uncertainties create timing risks. The company has strong engineering capabilities and benefits from high barriers to entry in aerospace. Dividend payments have been consistent for decades."
+      },
+      {
+        "name": "MediaStream Networks",
+        "ticker": "MDIA",
+        "image": "https://via.placeholder.com/150?text=MDIA",
+        "past_week_percent": -5.8,
+        "return_percent": -10.0,
+        "week_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=MDIA+Weekly+Chart+%E2%86%93",
+        "month_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=MDIA+Monthly+Chart+%E2%86%93",
+        "week_analysis": "Difficult 5.8% weekly decline following disappointing subscriber metrics. Analysts downgraded the stock citing increased competition and pricing pressure. Support at $38 was broken, opening potential for further downside to $35. Selling volume was elevated. Negative sentiment dominates the near-term outlook.",
+        "month_analysis": "Challenging monthly performance with 9.2% decline as streaming competition intensified. Multiple competitors announced aggressive pricing strategies. Content spending concerns weighed on profitability outlook. The stock formed a bearish head-and-shoulders pattern. However, international subscriber growth remained solid, providing some optimism for longer-term investors.",
+        "short_description": "Streaming entertainment platform with original content production.",
+        "detailed_description": "MediaStream Networks operates a popular streaming service with millions of subscribers globally. This week's decline came after disappointing subscriber growth numbers. The company is investing heavily in original content to differentiate from competitors. They face intense competition in the crowded streaming market with pricing pressure. International expansion offers growth opportunities, though content costs remain high. The company is exploring ad-supported tiers to boost revenue. Success depends on maintaining subscriber growth while managing content spending."
+      }
+    ]
+  },
+  {
+    "task_id": 7,
+    "stocks": [
+      {
+        "name": "SmartHome Tech",
+        "ticker": "SMRT",
+        "image": "https://via.placeholder.com/150?text=SMRT",
+        "past_week_percent": 8.9,
+        "return_percent": -10.0,
+        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=SMRT+Weekly+Chart+%E2%86%91%E2%86%91",
+        "month_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=SMRT+Monthly+Chart",
+        "week_analysis": "Outstanding 8.9% weekly surge after announcing integration partnerships with all major voice assistant platforms. Holiday sales data exceeded expectations significantly. The stock gapped higher and held gains throughout the week. Ecosystem strategy showing powerful network effects. Technical breakout suggests momentum continuation.",
+        "month_analysis": "Strong monthly gains of 14.8% as smart home adoption accelerated. New product launches received enthusiastic consumer response. However, some concerns about data privacy regulations emerged late in the month, causing minor pullback. Overall trend remains bullish with the stock making higher highs and higher lows consistently.",
+        "short_description": "IoT and smart home device manufacturer with ecosystem approach.",
+        "detailed_description": "SmartHome Tech manufactures connected home devices including smart thermostats, security cameras, and lighting systems. The company has built a comprehensive ecosystem encouraging customers to buy multiple products. Strong brand loyalty and positive reviews drive sales growth. They recently announced integration with major voice assistants. Privacy concerns around connected devices present reputational risks. The smart home market is expanding rapidly, and SmartHome Tech is well-positioned. Gross margins have improved as manufacturing scales up."
+      },
+      {
+        "name": "BasicMaterials Corp",
+        "ticker": "BMAT",
+        "image": "https://via.placeholder.com/150?text=BMAT",
+        "past_week_percent": -0.5,
+        "return_percent": 2.0,
+        "week_image": "https://via.placeholder.com/600x300/9E9E9E/FFFFFF?text=BMAT+Weekly+Chart+%E2%86%92",
+        "month_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=BMAT+Monthly+Chart+%E2%86%91",
+        "week_analysis": "Minimal 0.5% weekly decline as commodity prices held steady. The stock showed typical low-volatility behavior characteristic of the materials sector. Manufacturing data was mixed, providing no clear directional catalyst. Trading volume was below average. The stock continues to trade within its established range.",
+        "month_analysis": "Moderate monthly gain of 3.4% supported by rising copper prices and strong demand from EV manufacturers. Rare earth element prices increased on supply constraints. The stock provides defensive characteristics with its dividend yield while offering exposure to clean energy trends. Chart shows steady accumulation by long-term investors.",
+        "short_description": "Mining and materials company producing industrial metals and minerals.",
+        "detailed_description": "BasicMaterials Corp mines and processes copper, aluminum, and rare earth elements. The company's performance is closely tied to commodity prices and global economic conditions. Slight decline reflects concerns about manufacturing slowdown in key markets. However, long-term demand for materials needed in renewable energy and electric vehicles supports growth prospects. The company has low-cost mining operations and strong reserves. Environmental regulations pose compliance costs and operational challenges. Dividend yield is attractive compared to the broader market."
+      }
+    ]
+  }
+]
