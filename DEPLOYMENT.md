@@ -57,12 +57,12 @@
 ```bash
 # Via AWS Console:
 1. Go to EC2 → Launch Instance
-2. Name: investment-study-server
+2. Name: market-mindset-server
 3. AMI: Ubuntu Server 22.04 LTS (free tier eligible)
 4. Instance Type: **t2.micro** (750 hrs/month free)
 5. Key Pair: Create new or use existing (download .pem file)
 6. Network Settings:
-   - Create security group: investment-study-sg
+   - Create security group: market-mindset-sg
    - Allow SSH (port 22) from your IP
    - Allow HTTP (port 80) from anywhere (0.0.0.0/0)
    - Allow HTTPS (port 443) from anywhere (0.0.0.0/0)
@@ -179,13 +179,13 @@ psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d investment_
 
 ### Create Gunicorn Service File
 ```bash
-sudo nano /etc/systemd/system/investment-study.service
+sudo nano /etc/systemd/system/market-mindset.service
 ```
 
 ### Add this content:
 ```ini
 [Unit]
-Description=Investment Study Gunicorn Service
+Description=Market Mindset Gunicorn Service
 After=network.target
 
 [Service]
@@ -214,9 +214,9 @@ mkdir -p /home/ubuntu/app/logs
 ### Start Service
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl start investment-study
-sudo systemctl enable investment-study
-sudo systemctl status investment-study
+sudo systemctl start market-mindset
+sudo systemctl enable market-mindset
+sudo systemctl status market-mindset
 ```
 
 ---
@@ -225,7 +225,7 @@ sudo systemctl status investment-study
 
 ### Create Nginx Config
 ```bash
-sudo nano /etc/nginx/sites-available/investment-study
+sudo nano /etc/nginx/sites-available/market-mindset
 ```
 
 ### Add this content:
@@ -258,7 +258,7 @@ server {
 
 ### Enable Site
 ```bash
-sudo ln -s /etc/nginx/sites-available/investment-study /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/market-mindset /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
@@ -290,7 +290,7 @@ The app needs modifications to integrate with the database. I'll create those fi
 1. **Access App:** http://your-elastic-ip (or https://yourdomain.com)
 2. **Check Logs:** 
    ```bash
-   sudo journalctl -u investment-study -f
+   sudo journalctl -u market-mindset -f
    tail -f /home/ubuntu/app/logs/error.log
    ```
 3. **Database Check:**
@@ -309,7 +309,7 @@ tail -f /home/ubuntu/app/logs/access.log
 tail -f /home/ubuntu/app/logs/error.log
 
 # System logs
-sudo journalctl -u investment-study -n 100 -f
+sudo journalctl -u market-mindset -n 100 -f
 sudo journalctl -u nginx -n 100 -f
 ```
 

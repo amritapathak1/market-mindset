@@ -1,4 +1,4 @@
--- PostgreSQL Schema for Stock Investment Study
+-- PostgreSQL Schema for Stock Market Mindset
 -- Optimized for AWS RDS Free Tier (db.t2.micro)
 
 -- Participants table

@@ -1,5 +1,5 @@
 """
-Stock Investment Study - Main Application
+Stock Market Mindset - Main Application
 
 A Dash-based research application for studying investment decision-making.
 Participants make investment decisions across multiple scenarios with stock information.
@@ -94,7 +94,7 @@ from config import INITIAL_AMOUNT, PAGES, MODAL_SIZE
 
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
-app.title = "Stock Investment Study"
+app.title = "Stock Market Mindset"
 
 # App layout
 app.layout = dbc.Container([

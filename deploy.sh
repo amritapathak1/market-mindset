@@ -31,12 +31,12 @@ fi
 
 # Restart services
 echo "🔄 Restarting services..."
-sudo systemctl restart investment-study
+sudo systemctl restart market-mindset
 sudo systemctl restart nginx
 
 # Check status
 echo "✅ Checking service status..."
-sudo systemctl status investment-study --no-pager -l
+sudo systemctl status market-mindset --no-pager -l
 
 echo "✨ Deployment complete!"
-echo "📊 View logs: sudo journalctl -u investment-study -f"
+echo "📊 View logs: sudo journalctl -u market-mindset -f"

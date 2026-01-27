@@ -1,5 +1,5 @@
 """
-Reusable UI components for the Stock Investment Study application.
+Reusable UI components for the Stock Market Mindset application.
 """
 
 import dash_bootstrap_components as dbc

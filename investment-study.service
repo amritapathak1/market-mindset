@@ -1,5 +1,5 @@
 [Unit]
-Description=Investment Study Gunicorn Service
+Description=Market Mindset Gunicorn Service
 After=network.target
 
 [Service]

@@ -1,5 +1,5 @@
 """
-Configuration constants for the Stock Investment Study application.
+Configuration constants for the Stock Market Mindset application.
 """
 
 import json

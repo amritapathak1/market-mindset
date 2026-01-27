@@ -1,5 +1,5 @@
 """
-Callback functions for the Stock Investment Study app.
+Callback functions for the Stock Market Mindset app.
 
 This module contains all Dash callback functions that handle:
 - Participant initialization

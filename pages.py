@@ -1,5 +1,5 @@
 """
-Page rendering functions for the Stock Investment Study app.
+Page rendering functions for the Stock Market Mindset app.
 
 This module contains all page rendering functions that generate the UI
 for different stages of the study: consent, demographics, tasks,

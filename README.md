@@ -1,4 +1,4 @@
-# Stock Investment Study - Dash Application
+# Stock Market Mindset - Dash Application
 
 A Python Dash web application for conducting investment decision research studies.
 
@@ -65,7 +65,7 @@ The application will start on `http://127.0.0.1:8050/`
 - `requirements.txt`: Python dependencies
 - `deploy.sh`: Deployment script for AWS EC2
 - `nginx.conf`: Nginx reverse proxy configuration
-- `investment-study.service`: Systemd service file for Gunicorn
+- `market-mindset.service`: Systemd service file for Gunicorn
 - `DEPLOYMENT.md`: Complete AWS deployment guide
 - `README.md`: This file
 

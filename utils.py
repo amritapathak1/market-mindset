@@ -1,5 +1,5 @@
 """
-Utility functions for the Stock Investment Study application.
+Utility functions for the Stock Market Mindset application.
 """
 
 from config import ERROR_MESSAGES, MAX_DECIMAL_PLACES, MIN_INVESTMENT, TASKS_DATA

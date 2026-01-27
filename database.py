@@ -1,5 +1,5 @@
 """
-Database operations for the Stock Investment Study.
+Database operations for the Stock Market Mindset.
 Handles PostgreSQL connections and all data persistence.
 """
 
