@@ -112,12 +112,12 @@ app.layout = dbc.Container([
     
     # Modal for stock details
     dbc.Modal([
-        dbc.ModalHeader(dbc.ModalTitle(id='modal-title')),
+        dbc.ModalHeader(dbc.ModalTitle(id='modal-title'), close_button=False),
         dbc.ModalBody(id='modal-body'),
         dbc.ModalFooter(
             dbc.Button("Close", id="close-modal", className="ms-auto", n_clicks=0)
         ),
-    ], id="stock-modal", size=MODAL_SIZE, is_open=False),
+    ], id="stock-modal", size=MODAL_SIZE, is_open=False, backdrop="static"),
     
     # Main content area
     dcc.Loading(
