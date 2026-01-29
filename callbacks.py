@@ -285,22 +285,24 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('stock-modal', 'is_open'),
         Output('modal-title', 'children'),
         Output('modal-body', 'children'),
+        Output('modal-context', 'data'),
         Input({'type': 'show-more', 'task': ALL, 'stock': ALL}, 'n_clicks'),
         Input('close-modal', 'n_clicks'),
         State('stock-modal', 'is_open'),
         State('current-task', 'data'),
         State('participant-id', 'data'),
+        State('modal-context', 'data'),
         prevent_initial_call=True
     )
-    def toggle_modal(show_clicks, close_clicks, is_open, current_task, participant_id):
+    def toggle_modal(show_clicks, close_clicks, is_open, current_task, participant_id, modal_context):
         """Handle opening/closing of stock details modal."""
         if not ctx.triggered:
-            return dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         triggered_id = ctx.triggered[0]['prop_id']
         
         if 'close-modal' in triggered_id:
-            if participant_id:
+            if participant_id and modal_context:
                 try:
                     log_event(
                         participant_id=participant_id,
@@ -308,13 +310,15 @@ def register_callbacks(app, db_enabled, db_functions):
                         event_category='interaction',
                         page_name='task',
                         task_id=current_task,
-                        element_id='close-modal',
+                        element_id=modal_context.get('element_id', 'close-modal'),
                         element_type='button',
-                        action='click'
+                        action='click',
+                        stock_ticker=modal_context.get('stock_ticker'),
+                        metadata=modal_context.get('metadata')
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
-            return False, "", ""
+            return False, "", "", {}
         
         if 'show-more' in triggered_id and ctx.triggered_id:
             button_id = ctx.triggered_id
@@ -334,6 +338,13 @@ def register_callbacks(app, db_enabled, db_functions):
                 
                 stock = task_data['stocks'][stock_index]
                 
+                # Store modal context for close event
+                modal_ctx = {
+                    'element_id': f'show-more-{stock_index}',
+                    'stock_ticker': stock['ticker'],
+                    'metadata': {'stock_name': stock['name'], 'stock_index': stock_index}
+                }
+                
                 if participant_id:
                     try:
                         log_event(
@@ -342,11 +353,11 @@ def register_callbacks(app, db_enabled, db_functions):
                             event_category='interaction',
                             page_name='task',
                             task_id=task_id,
-                            element_id=f'show-more-{stock_index}',
+                            element_id=modal_ctx['element_id'],
                             element_type='button',
                             action='click',
-                            stock_ticker=stock['ticker'],
-                            metadata={'stock_name': stock['name'], 'stock_index': stock_index}
+                            stock_ticker=modal_ctx['stock_ticker'],
+                            metadata=modal_ctx['metadata']
                         )
                     except Exception as e:
                         print(f"Error logging event: {e}")
@@ -393,15 +404,16 @@ def register_callbacks(app, db_enabled, db_functions):
                         ], bordered=True, hover=True, striped=True, className="mb-0")
                     )
                 
-                return True, stock['name'], html.Div(modal_content)
+                return True, stock['name'], html.Div(modal_content), modal_ctx
         
-        return dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
     
     
     @app.callback(
         Output('stock-modal', 'is_open', allow_duplicate=True),
         Output('modal-title', 'children', allow_duplicate=True),
         Output('modal-body', 'children', allow_duplicate=True),
+        Output('modal-context', 'data', allow_duplicate=True),
         Input({'type': 'show-week', 'task': ALL, 'stock': ALL}, 'n_clicks'),
         State('current-task', 'data'),
         State('participant-id', 'data'),
@@ -410,24 +422,31 @@ def register_callbacks(app, db_enabled, db_functions):
     def show_week_analysis(week_clicks, current_task, participant_id):
         """Show weekly chart and analysis for a stock."""
         if not ctx.triggered or not ctx.triggered_id:
-            return dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         button_id = ctx.triggered_id
         if not isinstance(button_id, dict):
-            return dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         if week_clicks and any(clicks and clicks > 0 for clicks in week_clicks if clicks is not None):
             task_id = button_id.get('task')
             stock_index = button_id.get('stock')
             
             if task_id is None or stock_index is None:
-                return dash.no_update, dash.no_update, dash.no_update
+                return dash.no_update, dash.no_update, dash.no_update, dash.no_update
             
             task_data, error = get_task_data_safe(task_id)
             if error:
-                return True, "Error", html.P(error, className="text-danger")
+                return True, "Error", html.P(error, className="text-danger"), {}
             
             stock = task_data['stocks'][stock_index]
+            
+            # Store modal context for close event
+            modal_ctx = {
+                'element_id': f'show-week-{stock_index}',
+                'stock_ticker': stock['ticker'],
+                'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'week'}
+            }
             
             if participant_id:
                 try:
@@ -437,11 +456,11 @@ def register_callbacks(app, db_enabled, db_functions):
                         event_category='interaction',
                         page_name='task',
                         task_id=task_id,
-                        element_id=f'show-week-{stock_index}',
+                        element_id=modal_ctx['element_id'],
                         element_type='button',
                         action='click',
-                        stock_ticker=stock['ticker'],
-                        metadata={'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'week'}
+                        stock_ticker=modal_ctx['stock_ticker'],
+                        metadata=modal_ctx['metadata']
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
@@ -455,15 +474,16 @@ def register_callbacks(app, db_enabled, db_functions):
                 ),
                 html.H6("Weekly Performance Analysis", className="mb-2"),
                 html.P(stock.get('week_analysis', 'Weekly performance data for this stock.'))
-            ])
+            ]), modal_ctx
         
-        return dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
     
     
     @app.callback(
         Output('stock-modal', 'is_open', allow_duplicate=True),
         Output('modal-title', 'children', allow_duplicate=True),
         Output('modal-body', 'children', allow_duplicate=True),
+        Output('modal-context', 'data', allow_duplicate=True),
         Input({'type': 'show-month', 'task': ALL, 'stock': ALL}, 'n_clicks'),
         State('current-task', 'data'),
         State('participant-id', 'data'),
@@ -472,24 +492,31 @@ def register_callbacks(app, db_enabled, db_functions):
     def show_month_analysis(month_clicks, current_task, participant_id):
         """Show monthly chart and analysis for a stock."""
         if not ctx.triggered or not ctx.triggered_id:
-            return dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         button_id = ctx.triggered_id
         if not isinstance(button_id, dict):
-            return dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         if month_clicks and any(clicks and clicks > 0 for clicks in month_clicks if clicks is not None):
             task_id = button_id.get('task')
             stock_index = button_id.get('stock')
             
             if task_id is None or stock_index is None:
-                return dash.no_update, dash.no_update, dash.no_update
+                return dash.no_update, dash.no_update, dash.no_update, dash.no_update
             
             task_data, error = get_task_data_safe(task_id)
             if error:
-                return True, "Error", html.P(error, className="text-danger")
+                return True, "Error", html.P(error, className="text-danger"), {}
             
             stock = task_data['stocks'][stock_index]
+            
+            # Store modal context for close event
+            modal_ctx = {
+                'element_id': f'show-month-{stock_index}',
+                'stock_ticker': stock['ticker'],
+                'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'month'}
+            }
             
             if participant_id:
                 try:
@@ -499,11 +526,11 @@ def register_callbacks(app, db_enabled, db_functions):
                         event_category='interaction',
                         page_name='task',
                         task_id=task_id,
-                        element_id=f'show-month-{stock_index}',
+                        element_id=modal_ctx['element_id'],
                         element_type='button',
                         action='click',
-                        stock_ticker=stock['ticker'],
-                        metadata={'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'month'}
+                        stock_ticker=modal_ctx['stock_ticker'],
+                        metadata=modal_ctx['metadata']
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
@@ -517,9 +544,9 @@ def register_callbacks(app, db_enabled, db_functions):
                 ),
                 html.H6("Monthly Performance Analysis", className="mb-2"),
                 html.P(stock.get('month_analysis', 'Monthly performance data for this stock.'))
-            ])
+            ]), modal_ctx
         
-        return dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
     
     
     # ============================================

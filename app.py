@@ -109,6 +109,7 @@ app.layout = dbc.Container([
     dcc.Store(id='portfolio', data=[], storage_type='memory'),
     dcc.Store(id='confidence-risk', data={}, storage_type='memory'),
     dcc.Store(id='feedback', data='', storage_type='memory'),
+    dcc.Store(id='modal-context', data={}, storage_type='memory'),
     
     # Modal for stock details
     dbc.Modal([
