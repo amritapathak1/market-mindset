@@ -94,7 +94,7 @@ def get_task_data_safe(task_id):
         
         # Validate stock data structure
         for i, stock in enumerate(task_data['stocks']):
-            required_fields = ['name', 'ticker', 'past_week_percent', 
+            required_fields = ['name', 'ticker',
                              'short_description', 'detailed_description']
             for field in required_fields:
                 if field not in stock:

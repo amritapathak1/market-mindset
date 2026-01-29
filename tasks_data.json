@@ -3,30 +3,28 @@
     "task_id": 1,
     "stocks": [
       {
-        "name": "TechCorp Inc.",
-        "ticker": "TECH",
-        "image": "https://via.placeholder.com/150?text=TECH",
-        "past_week_percent": 5.2,
-        "return_percent": -5.0,
-        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=TECH+Weekly+Chart+%E2%86%91",
-        "month_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=TECH+Monthly+Chart",
-        "week_analysis": "Over the past week, TechCorp showed strong upward momentum with a 5.2% gain. Trading volume increased significantly following their AI product announcement. Technical indicators suggest continued strength with the stock breaking above key resistance levels. Institutional buying has been heavy.",
-        "month_analysis": "Monthly performance shows volatility with an overall upward trend. The stock gained 8.3% over the past month despite some mid-month corrections. Strong earnings beat and positive analyst revisions have driven investor confidence. The 50-day moving average crossed above the 200-day, signaling a bullish pattern.",
-        "short_description": "Leading technology company specializing in cloud computing and AI solutions.",
-        "detailed_description": "TechCorp Inc. is a multinational technology company that focuses on cloud infrastructure, artificial intelligence, and enterprise software solutions. Founded in 2010, the company has shown consistent growth with strong quarterly earnings. Recent product launches in the AI space have positioned them as a market leader. The company has a strong balance sheet with low debt and high cash reserves. Analysts predict continued growth due to increasing demand for cloud services."
+        "name": "Company A1",
+        "ticker": "A1",
+        "image": "/assets/images/a1_intraday.png",
+        "return_percent": 14.48,
+        "week_image": "/assets/images/a1_week.png",
+        "month_image": "/assets/images/a1_month.png",
+        "week_analysis": "Strong initial momentum pushed prices from mid-560s to mid-580s, but recent sessions showed profit-taking with a pullback to around 577. Mixed volume patterns suggest consolidation after the rally.",
+        "month_analysis": "High volatility with wide trading range between 545 and 585. Choppy sideways movement with no clear directional trend. Mixed sentiment reflected in alternating strong up and down sessions.",
+        "short_description": "Large-cap aerospace and defense technology company operating in the industrials sector.",
+        "detailed_description": "Company A1 operates as a major aerospace and defense technology firm with diversified operations across multiple segments. The company provides advanced technology systems and solutions, including aircraft systems, defense platforms, electronics, and space systems. With a significant market capitalization and established market presence, the company serves government and commercial customers. The firm maintains operations across different geographic regions and benefits from long-term contracts, though it faces typical industry challenges related to program timing and budget cycles."
       },
       {
-        "name": "GreenEnergy Co.",
-        "ticker": "GREN",
-        "image": "https://via.placeholder.com/150?text=GREN",
-        "past_week_percent": -2.1,
-        "return_percent": 3.5,
-        "week_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=GREN+Weekly+Chart+%E2%86%93",
-        "month_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=GREN+Monthly+Chart",
-        "week_analysis": "The stock experienced a 2.1% decline this week due to regulatory concerns and profit-taking after recent gains. Support levels held at $45, preventing further downside. Despite the weekly dip, renewable energy sector sentiment remains positive. Analysts view this as a buying opportunity.",
-        "month_analysis": "Monthly trend shows resilience with a 4.5% gain despite weekly fluctuations. New government subsidies for renewable energy announced mid-month boosted the sector. The stock has formed a consolidation pattern near recent highs. Long-term outlook remains strong with multiple utility contracts pending.",
-        "short_description": "Renewable energy company with focus on solar and wind power generation.",
-        "detailed_description": "GreenEnergy Co. is a leading renewable energy provider operating solar and wind farms across North America. Despite the recent week's decline, the company has strong long-term prospects driven by government incentives and growing environmental awareness. They recently secured major contracts with utility companies. However, short-term volatility is expected due to regulatory changes and commodity price fluctuations. The company is investing heavily in next-generation battery storage technology."
+        "name": "Company A2",
+        "ticker": "A2",
+        "image": "/assets/images/a2_intraday.png",
+        "return_percent": 20.42,
+        "week_image": "/assets/images/a2_week.png",
+        "month_image": "/assets/images/a2_month.png",
+        "week_analysis": "Strong upward progression from low-to-mid 470s to near 490, showing consistent bullish momentum. Recent sessions saw minor profit-taking with pullback to mid-480s.",
+        "month_analysis": "Impressive rally from 450 to 490 range with steady upward progression. Mid-month consolidation followed by strong breakout to new highs. Overall trend remains strongly bullish despite recent profit-taking.",
+        "short_description": "Large-cap aerospace and defense company with diversified operations in the industrials sector.",
+        "detailed_description": "Company A2 operates as a major aerospace and defense firm with operations across multiple business segments including aircraft systems, missile systems, naval and land systems, and space operations. The company serves government and commercial customers with technology systems and services. With a significant market presence and diversified portfolio, the firm benefits from long-term contracts and strategic positioning. Operations span multiple segments focused on defense systems, aviation platforms, and space technologies."
       }
     ]
   },
@@ -34,30 +32,28 @@
     "task_id": 2,
     "stocks": [
       {
-        "name": "HealthPlus Systems",
-        "ticker": "HLTH",
-        "image": "https://via.placeholder.com/150?text=HLTH",
-        "past_week_percent": 3.8,
-        "return_percent": 7.5,
-        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=HLTH+Weekly+Chart+%E2%86%91",
-        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=HLTH+Monthly+Chart+%E2%86%91",
-        "week_analysis": "Strong weekly performance with 3.8% gains driven by FDA approval news for their AI diagnostic platform. Volume surged to twice the average, indicating strong institutional interest. The stock broke through resistance at $82, opening room for further upside. Momentum indicators are bullish.",
-        "month_analysis": "Exceptional monthly performance with 12.1% gains as the company announced multiple strategic partnerships. The stock has been on a steady uptrend with minimal pullbacks. New mental health services platform exceeded user adoption targets. Technical setup suggests continuation of the upward trend.",
-        "short_description": "Healthcare technology company providing telemedicine and digital health solutions.",
-        "detailed_description": "HealthPlus Systems has revolutionized telemedicine with its innovative platform connecting patients with healthcare providers. The company experienced accelerated growth during the pandemic and has maintained strong user engagement. They recently received FDA approval for their AI-powered diagnostic tools. The company has partnerships with major insurance providers, ensuring steady revenue streams. Market analysts are optimistic about their expansion into mental health services and remote patient monitoring."
+        "name": "Company A3",
+        "ticker": "A3",
+        "image": "/assets/images/a3_intraday.png",
+        "return_percent": 4.84,
+        "week_image": "/assets/images/a3_week.png",
+        "month_image": "/assets/images/a3_month.png",
+        "week_analysis": "Strong upward progression from 179 to 186 range with mid-week spike reaching near 188. Recent sessions show consolidation around 185-186 level with mixed trading. Overall positive momentum sustained throughout the period.",
+        "month_analysis": "Volatile month with wide swings between 167 and 186. Early weakness followed by choppy mid-month trading. Strong late-month rally pushed prices to 186 range, showing overall positive trajectory despite significant fluctuations.",
+        "short_description": "Large-cap aerospace and defense company with diversified operations in the industrials sector.",
+        "detailed_description": "Company A3 operates as a major aerospace and defense corporation with operations across multiple business segments. The company provides commercial and military aerospace systems, aircraft engines, and defense technologies. Serving both commercial and government customers globally, the firm has significant scale and market presence. Operations include aircraft components, propulsion systems, and defense platforms with established positions in key markets."
       },
       {
-        "name": "RetailMax Group",
-        "ticker": "RMAX",
-        "image": "https://via.placeholder.com/150?text=RMAX",
-        "past_week_percent": -4.5,
-        "return_percent": -8.0,
-        "week_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=RMAX+Weekly+Chart+%E2%86%93",
-        "month_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=RMAX+Monthly+Chart",
-        "week_analysis": "Challenging week with a 4.5% decline following disappointing same-store sales data. Increased competition from online retailers pressured margins. The stock tested support at $28 but held above critical levels. Bearish sentiment dominated, though some value investors started accumulating.",
-        "month_analysis": "Monthly chart shows a 6.8% decline as retail sector faces headwinds. Holiday sales missed expectations, and rising labor costs pressured profitability. However, e-commerce initiatives showed 22% growth. The stock is approaching oversold territory on monthly RSI, which could attract bargain hunters.",
-        "short_description": "Large retail chain adapting to e-commerce with omnichannel strategy.",
-        "detailed_description": "RetailMax Group operates over 500 stores nationwide and has been investing heavily in e-commerce infrastructure. The recent week's decline reflects investor concerns about rising operational costs and competition from online retailers. However, the company's omnichannel strategy has shown promising early results. They've launched same-day delivery services in major cities and integrated AR shopping experiences. The company has a loyal customer base and strong brand recognition, though margins remain under pressure."
+        "name": "Company A4",
+        "ticker": "A4",
+        "image": "/assets/images/a4_intraday.png",
+        "return_percent": 6.24,
+        "week_image": "/assets/images/a4_week.png",
+        "month_image": "/assets/images/a4_month.png",
+        "week_analysis": "Choppy trading between 338 and 346 with mid-week spike to 347. Mixed sessions with alternating green and red candles show lack of clear direction. Recent consolidation around 343-345 range.",
+        "month_analysis": "Gradual upward trend from 332 to 345 range despite significant volatility. Mid-month selloff to lows around 332-336 followed by steady recovery. Recent strength pushing toward 345-347 levels shows positive momentum overall.",
+        "short_description": "Large-cap aerospace and defense company with diversified operations in the industrials sector.",
+        "detailed_description": "Company A4 operates as a major aerospace and defense corporation with operations across multiple business segments including aerospace, marine systems, combat systems, and technology solutions. The company provides defense platforms, naval vessels, land combat systems, and information technology services. Serving government and commercial customers, the firm has an established market presence with diverse revenue streams. Operations span defense manufacturing, shipbuilding, and technology services with long-term government contracts."
       }
     ]
   },
@@ -65,30 +61,28 @@
     "task_id": 3,
     "stocks": [
       {
-        "name": "FinTech Solutions",
-        "ticker": "FINT",
-        "image": "https://via.placeholder.com/150?text=FINT",
-        "past_week_percent": 7.3,
-        "return_percent": -12.0,
-        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=FINT+Weekly+Chart+%E2%86%91",
-        "month_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=FINT+Monthly+Chart+%E2%86%93",
-        "week_analysis": "Impressive 7.3% weekly gain following announcement of major retail partnerships. Transaction volume data exceeded expectations. Technical breakout above $95 resistance confirmed by strong volume. Short-term momentum is very strong, though some consolidation may be needed.",
-        "month_analysis": "Mixed monthly performance with early-month weakness followed by recent strength, resulting in a modest 1.2% monthly gain. Regulatory concerns weighed on sentiment initially, but partnership announcements reversed the trend. The stock remains volatile with wide trading ranges. Long-term uptrend is still intact.",
-        "short_description": "Digital payment processing and mobile banking platform provider.",
-        "detailed_description": "FinTech Solutions has become a dominant player in digital payments and mobile banking. The company processes billions of transactions monthly and has expanded into cryptocurrency services. Recent partnerships with major retailers have boosted transaction volumes. The company benefits from the shift away from cash and traditional banking. However, regulatory scrutiny in the fintech space poses potential risks. Strong network effects and high customer switching costs provide competitive advantages."
+        "name": "Company A5",
+        "ticker": "A5",
+        "image": "/assets/images/a5_intraday.png",
+        "return_percent": 3.13,
+        "week_image": "/assets/images/a5_week.png",
+        "month_image": "/assets/images/a5_month.png",
+        "week_analysis": "Volatile week with initial selloff followed by strong rally to 16.75 range. Mid-week pullback to 16.2 level followed by recovery to 16.5 area. Mixed trading reflects uncertainty despite net positive movement.",
+        "month_analysis": "Strong rally from 15.3 to 17.2 range followed by choppy consolidation. Multiple pullbacks and recoveries show high volatility. Recent trading around 16.4-16.5 suggests settling into a range after the initial surge.",
+        "short_description": "Micro-cap government service provider specializing in secure facilities and support services in the industrials sector.",
+        "detailed_description": "Company A5 operates as a diversified government service provider with operations focused on secure facilities and support services. The company provides facility management, transportation services, electronic monitoring, community-based programs, and healthcare services. With a micro-cap market capitalization and operations across multiple regions, the firm serves government clients through contracted services. The company maintains a significant operational footprint with facilities and workforce supporting various government programs and services."
       },
       {
-        "name": "AutoDrive Motors",
-        "ticker": "AUTO",
-        "image": "https://via.placeholder.com/150?text=AUTO",
-        "past_week_percent": -1.8,
-        "return_percent": 4.2,
-        "week_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=AUTO+Weekly+Chart+%E2%86%93",
-        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=AUTO+Monthly+Chart+%E2%86%91",
-        "week_analysis": "Minor 1.8% weekly decline due to autonomous driving safety review announcement. Despite negative headlines, the stock showed resilience and held key support levels. Production numbers released mid-week were strong. Institutional holders appear to be maintaining positions, limiting downside.",
-        "month_analysis": "Strong monthly performance with 9.7% gains driven by record vehicle deliveries and new manufacturing capacity coming online. Battery technology breakthroughs announced early in the month. The stock formed a bullish flag pattern suggesting further upside potential. Order backlog continues to grow quarter-over-quarter.",
-        "short_description": "Electric vehicle manufacturer with autonomous driving technology.",
-        "detailed_description": "AutoDrive Motors is an innovative electric vehicle manufacturer developing autonomous driving capabilities. The company has delivered impressive vehicle production numbers but faces intense competition in the EV market. Recent safety concerns with their autonomous features led to this week's stock decline. However, they have a strong order backlog and are expanding manufacturing capacity. The company's battery technology offers longer range than competitors. Long-term growth depends on successful deployment of self-driving features and regulatory approvals."
+        "name": "Company A6",
+        "ticker": "A6",
+        "image": "/assets/images/a6_intraday.png",
+        "return_percent": -11.26,
+        "week_image": "/assets/images/a6_week.png",
+        "month_image": "/assets/images/a6_month.png",
+        "week_analysis": "Initial rally from 187 to 195 quickly reversed with sharp rejection. Mid-week consolidation around 193-194 failed to hold. Final session saw heavy selling pressure pushing prices down to 189 range. Overall bearish week with failed breakout attempt.",
+        "month_analysis": "Strong rally from 160 to 199 range with steady upward progression throughout most of the month. Multiple consolidation phases followed by continued advances. Sharp late-month selloff erased recent gains, pulling prices back to 195 area. Overall positive month despite the weakness in final sessions.",
+        "short_description": "Mega-cap software and data analytics company operating in the information technology sector.",
+        "detailed_description": "Company A6 operates as a major software platform provider specializing in data analytics and artificial intelligence solutions. The company develops and deploys software platforms serving government and commercial customers. With a mega-cap market capitalization and established presence, the firm provides data integration, analysis, and AI-driven platforms. Operations span multiple software products focused on data transformation and intelligence capabilities. The company serves diverse customer segments with cloud-based deployment capabilities and maintains strategic partnerships for platform development."
       }
     ]
   },
@@ -96,30 +90,28 @@
     "task_id": 4,
     "stocks": [
       {
-        "name": "BioPharm Industries",
-        "ticker": "BIOP",
-        "image": "https://via.placeholder.com/150?text=BIOP",
-        "past_week_percent": 12.5,
-        "return_percent": 20.0,
-        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=BIOP+Weekly+Chart+%E2%86%91%E2%86%91",
-        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=BIOP+Monthly+Chart+%E2%86%91%E2%86%91",
-        "week_analysis": "Explosive 12.5% weekly gain following breakthrough Phase III trial results announcement. Trading volume spiked to 10x normal levels. The positive data significantly increases probability of FDA approval. Multiple analysts raised price targets. Gap-up opening suggests strong continuation potential.",
-        "month_analysis": "Outstanding monthly performance with 28.4% gains as clinical trial milestones were achieved. Institutional accumulation has been aggressive throughout the month. The stock broke out from a multi-month consolidation pattern. Additional pipeline drugs showing promise in early trials. Risk/reward remains favorable despite the strong rally.",
-        "short_description": "Biotechnology company developing innovative cancer treatments.",
-        "detailed_description": "BioPharm Industries specializes in oncology treatments with several promising drugs in late-stage clinical trials. This week's surge followed positive Phase III trial results for their flagship cancer treatment. The company has a robust pipeline with potential blockbuster drugs. Partnership agreements with larger pharmaceutical companies provide financial stability. However, the biotech sector is inherently risky due to regulatory uncertainties and clinical trial outcomes. If approved, their lead drug could generate billions in annual revenue."
+        "name": "Company A7",
+        "ticker": "A7",
+        "image": "/assets/images/a7_intraday.png",
+        "return_percent": 6.29,
+        "week_image": "/assets/images/a7_week.png",
+        "month_image": "/assets/images/a7_month.png",
+        "week_analysis": "Mixed week with alternating red and green sessions between 78.7 and 81.1. Initial weakness to 79.5 followed by recovery attempt. Mid-week consolidation around 79.8-80.0 before rally to 80.4 range. Overall choppy trading with modest positive bias.",
+        "month_analysis": "Strong early-month rally from 84.7 to 86.5 quickly reversed with persistent selling pressure. Extended decline through mid-month pushed prices down to 82.7-83.1 range. Late-month trading showed continued weakness with choppy consolidation around 80-81 levels. Overall bearish month with failed breakout followed by sustained downtrend.",
+        "short_description": "Large-cap electric utility company operating in the utilities sector with significant renewable energy operations.",
+        "detailed_description": "Company A7 operates as a major electric utility provider generating, transmitting, distributing, and selling electric power to retail and wholesale customers. The company generates electricity through diverse sources including wind, solar, nuclear, natural gas, and other clean energy technologies. Operations include developing, constructing, and operating long-term contracted renewable generation facilities, battery storage facilities, and electric transmission infrastructure. The firm also participates in wholesale energy markets and sells energy commodities. With large-cap market capitalization and extensive generating capacity, transmission and distribution infrastructure, and substantial customer base, the company maintains significant utility operations in coastal regions. The business model combines regulated utility operations with competitive clean energy development."
       },
       {
-        "name": "Global Logistics",
-        "ticker": "GLOG",
-        "image": "https://via.placeholder.com/150?text=GLOG",
-        "past_week_percent": 1.2,
-        "return_percent": 1.5,
-        "week_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=GLOG+Weekly+Chart+%E2%86%92",
-        "month_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=GLOG+Monthly+Chart+%E2%86%92",
-        "week_analysis": "Modest 1.2% weekly gain reflecting the stock's stable, defensive nature. Low volatility persisted throughout the week with tight trading ranges. Fuel cost data came in better than expected. The stock continues its slow, steady appreciation pattern that has characterized it for years.",
-        "month_analysis": "Steady monthly performance with 2.8% gains. The stock moved in a narrow channel with low drama. Dividend announcement maintained at previous levels. Global shipping rates showed slight improvement. For conservative investors, the consistent performance and reliable dividend make this an attractive holding despite limited upside.",
-        "short_description": "International shipping and logistics company with global operations.",
-        "detailed_description": "Global Logistics operates one of the world's largest shipping fleets and logistics networks. The company has shown steady but unspectacular growth. They benefit from global trade expansion but face challenges from fuel costs and port congestion. Recent investments in automation and route optimization are improving margins. The company pays consistent dividends, making it attractive for income-focused investors. Geopolitical tensions and trade disputes present ongoing risks to international shipping operations."
+        "name": "Company A8",
+        "ticker": "A8",
+        "image": "/assets/images/a8_intraday.png",
+        "return_percent": 19.45,
+        "week_image": "/assets/images/a8_week.png",
+        "month_image": "/assets/images/a8_month.png",
+        "week_analysis": "Strong opening rally to 33.5 followed by sharp rejection at 34.1. Mid-week selloff pushed prices down to 31.55 before recovery attempts stabilized trading around 29.9-30.1 range. Mixed signals with significant volatility.",
+        "month_analysis": "Impressive rally from 26.5 to 34.2 range with steady upward progression throughout most of the month. Consistent bullish momentum with multiple green sessions driving higher. Late-month spike to 34+ quickly reversed with sharp pullback to 33 area. Overall strong positive trend despite recent volatility.",
+        "short_description": "Small-cap home energy solutions company operating in the information technology sector with focus on solar technology.",
+        "detailed_description": "Company A8 operates as a home energy solutions provider designing, developing, manufacturing, and selling products for the solar photovoltaic industry. The company offers semiconductor-based microinverters that convert energy at the individual solar module level combined with proprietary networking and software technologies for energy monitoring and control. Product offerings include microinverter units and accessories, battery storage systems and accessories, energy management gateways and routers, cloud-based monitoring services, and electric vehicle charging solutions. The firm also provides design, proposal, permitting, and lead generation services. With small-cap market capitalization, the company sells solutions to solar distributors, large installers, equipment manufacturers, strategic partners, and homeowners through various channels including upgrade programs and online platforms. Operations serve both domestic and international markets."
       }
     ]
   },
@@ -127,30 +119,28 @@
     "task_id": 5,
     "stocks": [
       {
-        "name": "CyberShield Security",
-        "ticker": "CYBER",
-        "image": "https://via.placeholder.com/150?text=CYBER",
-        "past_week_percent": 6.7,
-        "return_percent": -8.0,
-        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=CYBER+Weekly+Chart+%E2%86%91",
-        "month_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=CYBER+Monthly+Chart",
-        "week_analysis": "Strong 6.7% weekly performance driven by news of major enterprise contract wins. High-profile data breaches at competitors highlighted the company's superior security platform. Volume increased notably on the upside days. Technical momentum has shifted positive with MACD crossing bullish.",
-        "month_analysis": "Mixed monthly results with 3.2% gains overall but significant intra-month volatility. Early-month weakness on competitive concerns was reversed by contract announcements. Subscription renewal rates exceeded expectations. The stock is consolidating after a strong prior quarter, forming a base for potential continuation.",
-        "short_description": "Cybersecurity software and services provider for enterprises.",
-        "detailed_description": "CyberShield Security provides comprehensive cybersecurity solutions to Fortune 500 companies. Growing cyber threats have driven increased demand for their services. The company has a subscription-based model ensuring predictable recurring revenue. Recent high-profile data breaches at competing firms have highlighted the importance of robust security. They're expanding into cloud security and threat intelligence. The cybersecurity market is expected to grow significantly, positioning CyberShield favorably. Competition is intense, but their reputation and client relationships provide advantages."
+        "name": "Company A9",
+        "ticker": "A9",
+        "image": "/assets/images/a9_intraday.png",
+        "return_percent": 13.00,
+        "week_image": "/assets/images/a9_week.png",
+        "month_image": "/assets/images/a9_month.png",
+        "week_analysis": "Initial rally from 28.5 to 29.1 followed by strong surge to 31.95 high. Subsequent sessions showed choppy consolidation between 30.0 and 30.9 with mixed red and green candles. Recent trading lacks clear direction after the early-week spike.",
+        "month_analysis": "Strong opening rally from 33.0 to 36.5 quickly reversed with persistent selling pressure. Extended decline through mid-month pushed prices down to 28.5-30.0 range with multiple red sessions. Late-month trading showed stabilization attempts around 30-31 levels but overall bearish trend dominates with significant downside from early highs.",
+        "short_description": "Micro-cap solar technology company operating in the information technology sector with focus on photovoltaic systems.",
+        "detailed_description": "Company A9 operates as a solar technology provider designing, developing, manufacturing, and selling optimized inverter systems for solar photovoltaic installations. The company offers power optimizers, inverters, battery cells and storage solutions, electric vehicle charging systems, and energy management software products. Product portfolio includes cloud-based monitoring platforms for data collection and analysis, mobile applications for system owners and installers, web-based design and planning tools, and grid services. The firm also provides pre-sales support, ongoing training services, and technical support throughout the installation lifecycle. With micro-cap market capitalization, the company serves solar installers, system providers, distributors, construction firms, and electrical wholesalers. Customer base includes residential and commercial end users across domestic and international markets. Operations span multiple product categories focused on solar energy optimization and management technologies."
       },
       {
-        "name": "FoodChain Markets",
-        "ticker": "FOOD",
-        "image": "https://via.placeholder.com/150?text=FOOD",
-        "past_week_percent": -3.2,
-        "return_percent": 5.5,
-        "week_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=FOOD+Weekly+Chart+%E2%86%93",
-        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=FOOD+Monthly+Chart+%E2%86%91",
-        "week_analysis": "3.2% weekly decline on concerns about consumer discretionary spending. Economic data suggesting potential slowdown weighed on premium retailers. However, same-store sales data released mid-week was better than feared. Support held at $52, preventing deeper losses. Selling appears to be stabilizing.",
-        "month_analysis": "Positive monthly performance with 4.7% gains despite recent weakness. Meal kit subscription service exceeded growth targets. Private label expansion improving margins. The stock has shown resilience compared to broader retail sector. Premium positioning and loyal customer base provide downside protection during market volatility.",
-        "short_description": "Organic and specialty food retailer with premium market positioning.",
-        "detailed_description": "FoodChain Markets operates premium grocery stores focusing on organic and locally-sourced products. The recent decline reflects broader concerns about consumer spending in a potential economic slowdown. However, the company has a dedicated customer base willing to pay premium prices. They've successfully launched meal kit services and expanded private label offerings. Real estate costs and competition from conventional grocers entering the organic space pose challenges. The company maintains strong same-store sales growth despite overall market headwinds."
+        "name": "Company A10",
+        "ticker": "A10",
+        "image": "/assets/images/a10_intraday.png",
+        "return_percent": 11.11,
+        "week_image": "/assets/images/a10_week.png",
+        "month_image": "/assets/images/a10_month.png",
+        "week_analysis": "Persistent selling pressure from 2.28 opening down to 2.01 lows through multiple red sessions. Brief recovery attempt rallied to 2.13 before fading. Recent consolidation around 2.07-2.09 range shows overall bearish week with failed bounce.",
+        "month_analysis": "Initial weakness around 1.95 followed by strong rally to 2.39 highs with multiple green sessions. Mid-month consolidation around 2.20-2.35 range preceded spike to 2.49 peak. Late-month selloff erased gains with decline to 2.07-2.10 area. Overall volatile month with failed breakout.",
+        "short_description": "Small-cap hydrogen fuel cell and clean energy technology company operating in the industrials sector.",
+        "detailed_description": "Company A10 operates as a hydrogen fuel cell technology provider developing product solutions for domestic and international markets. The company offers hydrogen-fueled fuel cell systems for material handling vehicles, stationary backup power solutions, and fuel cell stack technology for mobility applications. Product portfolio includes hydrogen fueling infrastructure, electrolyzers for clean hydrogen production, liquefaction systems, and cryogenic distribution equipment. With small-cap market capitalization, the firm sells through direct sales, equipment manufacturers, and dealer networks. Operations serve customers across telecommunications, transportation, utility, and industrial sectors with focus on transitioning from fossil-based energy to hydrogen fuel cell power."
       }
     ]
   },
@@ -158,30 +148,28 @@
     "task_id": 6,
     "stocks": [
       {
-        "name": "AeroSpace Dynamics",
-        "ticker": "AERO",
-        "image": "https://via.placeholder.com/150?text=AERO",
-        "past_week_percent": 4.1,
-        "return_percent": 15.0,
-        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=AERO+Weekly+Chart+%E2%86%91",
-        "month_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=AERO+Monthly+Chart+%E2%86%91",
-        "week_analysis": "Solid 4.1% weekly advance following announcement of new defense contract awards. Government spending on military modernization remains robust. The stock pushed to new 52-week highs on strong volume. Aerospace sector showing broad strength. Momentum indicators suggest the rally has room to run.",
-        "month_analysis": "Excellent monthly performance with 11.3% gains as defense budget priorities aligned with company capabilities. Commercial space ventures showing progress with successful test flights. The stock has been in a strong uptrend for three consecutive months. Institutional ownership increased. Combination of growth and dividends attracts diverse investor base.",
-        "short_description": "Aerospace and defense contractor with government and commercial contracts.",
-        "detailed_description": "AeroSpace Dynamics designs and manufactures aircraft components and defense systems. The company has a diverse portfolio of government contracts providing stable revenue. Recent wins in military modernization programs boosted investor confidence. They're also expanding into commercial space ventures and urban air mobility. Long development cycles and government budget uncertainties create timing risks. The company has strong engineering capabilities and benefits from high barriers to entry in aerospace. Dividend payments have been consistent for decades."
+        "name": "Company A11",
+        "ticker": "A11",
+        "image": "/assets/images/a11_intraday.png",
+        "return_percent": 13.21,
+        "week_image": "/assets/images/a11_week.png",
+        "month_image": "/assets/images/a11_month.png",
+        "week_analysis": "Initial red session with weakness to 116 quickly reversed by strong three-day rally pushing to 120 highs. Recent consolidation around 118.8-119.5 range maintains bullish bias. Overall positive week with momentum intact.",
+        "month_analysis": "Choppy early-month trading around 114-116 followed by steady rally with multiple green sessions pushing to 119-120 range. Mid-month consolidation around 117-118 preceded continued strength. Recent trading near 119-120 highs shows positive momentum with alternating sessions. Overall upward trend from 114 to 120 despite volatility.",
+        "short_description": "Mega-cap integrated energy company operating in the energy sector with diversified upstream and downstream operations.",
+        "detailed_description": "Company A11 operates as a major integrated energy corporation engaged in exploration and production of crude oil and natural gas across domestic and international markets. Operations span four main segments: upstream exploration and production, energy products including fuels and aromatics, chemical products including petrochemicals and intermediates, and specialty products including lubricants and performance materials. The company manufactures, trades, transports, and sells crude oil, natural gas, petroleum products, and petrochemicals. With mega-cap market capitalization, the firm also pursues lower-emission business opportunities including carbon capture and storage, hydrogen, lower-emission fuels, and sustainable aviation fuel. Operations serve global markets through diverse product offerings across the energy value chain."
       },
       {
-        "name": "MediaStream Networks",
-        "ticker": "MDIA",
-        "image": "https://via.placeholder.com/150?text=MDIA",
-        "past_week_percent": -5.8,
-        "return_percent": -10.0,
-        "week_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=MDIA+Weekly+Chart+%E2%86%93",
-        "month_image": "https://via.placeholder.com/600x300/F44336/FFFFFF?text=MDIA+Monthly+Chart+%E2%86%93",
-        "week_analysis": "Difficult 5.8% weekly decline following disappointing subscriber metrics. Analysts downgraded the stock citing increased competition and pricing pressure. Support at $38 was broken, opening potential for further downside to $35. Selling volume was elevated. Negative sentiment dominates the near-term outlook.",
-        "month_analysis": "Challenging monthly performance with 9.2% decline as streaming competition intensified. Multiple competitors announced aggressive pricing strategies. Content spending concerns weighed on profitability outlook. The stock formed a bearish head-and-shoulders pattern. However, international subscriber growth remained solid, providing some optimism for longer-term investors.",
-        "short_description": "Streaming entertainment platform with original content production.",
-        "detailed_description": "MediaStream Networks operates a popular streaming service with millions of subscribers globally. This week's decline came after disappointing subscriber growth numbers. The company is investing heavily in original content to differentiate from competitors. They face intense competition in the crowded streaming market with pricing pressure. International expansion offers growth opportunities, though content costs remain high. The company is exploring ad-supported tiers to boost revenue. Success depends on maintaining subscriber growth while managing content spending."
+        "name": "Company A12",
+        "ticker": "A12",
+        "image": "/assets/images/a12_intraday.png",
+        "return_percent": -1.09,
+        "week_image": "/assets/images/a12_week.png",
+        "month_image": "/assets/images/a12_month.png",
+        "week_analysis": "Persistent weakness with consecutive red sessions from 234.4 to 232.5 range. Brief green recovery to 235 quickly faded. Recent consolidation around 234-234.7 area fails to sustain momentum. Overall bearish week with limited bounce.",
+        "month_analysis": "Strong rally from 225 to 240 range with steady upward progression through multiple green sessions. Mid-month consolidation around 235-237 preceded sharp spike to 244 peak. Late-month selloff with mixed sessions pulled back to 234-235 area. Overall positive trend from lows despite recent weakness and volatility.",
+        "short_description": "Large-cap railroad transportation company operating in the industrials sector.",
+        "detailed_description": "Company A12 operates as a major railroad transportation provider offering freight services across extensive rail networks. The company provides transportation services for diverse commodity categories including agricultural products, energy products, industrial materials, construction products, and finished goods in intermodal containers. With large-cap market capitalization and established infrastructure, the firm serves agricultural processors, manufacturers, energy producers, and industrial customers. Operations span extensive rail network infrastructure supporting freight movement across major corridors. The business model focuses on bulk freight transportation with revenue diversification across multiple commodity segments."
       }
     ]
   },
@@ -189,30 +177,28 @@
     "task_id": 7,
     "stocks": [
       {
-        "name": "SmartHome Tech",
-        "ticker": "SMRT",
-        "image": "https://via.placeholder.com/150?text=SMRT",
-        "past_week_percent": 8.9,
-        "return_percent": -10.0,
-        "week_image": "https://via.placeholder.com/600x300/4CAF50/FFFFFF?text=SMRT+Weekly+Chart+%E2%86%91%E2%86%91",
-        "month_image": "https://via.placeholder.com/600x300/FF9800/FFFFFF?text=SMRT+Monthly+Chart",
-        "week_analysis": "Outstanding 8.9% weekly surge after announcing integration partnerships with all major voice assistant platforms. Holiday sales data exceeded expectations significantly. The stock gapped higher and held gains throughout the week. Ecosystem strategy showing powerful network effects. Technical breakout suggests momentum continuation.",
-        "month_analysis": "Strong monthly gains of 14.8% as smart home adoption accelerated. New product launches received enthusiastic consumer response. However, some concerns about data privacy regulations emerged late in the month, causing minor pullback. Overall trend remains bullish with the stock making higher highs and higher lows consistently.",
-        "short_description": "IoT and smart home device manufacturer with ecosystem approach.",
-        "detailed_description": "SmartHome Tech manufactures connected home devices including smart thermostats, security cameras, and lighting systems. The company has built a comprehensive ecosystem encouraging customers to buy multiple products. Strong brand loyalty and positive reviews drive sales growth. They recently announced integration with major voice assistants. Privacy concerns around connected devices present reputational risks. The smart home market is expanding rapidly, and SmartHome Tech is well-positioned. Gross margins have improved as manufacturing scales up."
+        "name": "Company A13",
+        "ticker": "A13",
+        "image": "/assets/images/a13_intraday.png",
+        "return_percent": -3.57,
+        "week_image": "/assets/images/a13_week.png",
+        "month_image": "/assets/images/a13_month.png",
+        "week_analysis": "Initial red sessions showed weakness from 487.5 to 485 range with volatility. Strong recovery followed with three consecutive green candles pushing back to 487-488 area. Recent consolidation around 487-488 levels maintains positive bias. Overall mixed week with recovery from early weakness.",
+        "month_analysis": "Strong early rally from 477 to 492 range with multiple green sessions. Sharp mid-month selloff with persistent selling pressure pushed prices down to 471 lows. Choppy recovery followed with alternating sessions climbing back to 483-487 area. Overall volatile month with wide swings and mixed trend despite positive close.",
+        "short_description": "Mega-cap software and technology company operating in the information technology sector.",
+        "detailed_description": "Company A13 operates as a major software and technology corporation with operations across three main business segments: productivity and business software, cloud computing services, and personal computing products. The company provides productivity software suites, cloud infrastructure and platform services, enterprise software solutions, operating systems, professional networking platforms, collaboration tools, gaming hardware and services, search and advertising services, and consumer devices. With mega-cap market capitalization and global presence, the firm serves commercial enterprises, consumers, and government customers through diverse product offerings. Operations include software licensing, cloud-based subscriptions, hardware sales, advertising services, and professional services. The company distributes products through equipment manufacturers, distributors, resellers, online channels, and retail stores serving customers across multiple market segments."
       },
       {
-        "name": "BasicMaterials Corp",
-        "ticker": "BMAT",
-        "image": "https://via.placeholder.com/150?text=BMAT",
-        "past_week_percent": -0.5,
-        "return_percent": 2.0,
-        "week_image": "https://via.placeholder.com/600x300/9E9E9E/FFFFFF?text=BMAT+Weekly+Chart+%E2%86%92",
-        "month_image": "https://via.placeholder.com/600x300/2196F3/FFFFFF?text=BMAT+Monthly+Chart+%E2%86%91",
-        "week_analysis": "Minimal 0.5% weekly decline as commodity prices held steady. The stock showed typical low-volatility behavior characteristic of the materials sector. Manufacturing data was mixed, providing no clear directional catalyst. Trading volume was below average. The stock continues to trade within its established range.",
-        "month_analysis": "Moderate monthly gain of 3.4% supported by rising copper prices and strong demand from EV manufacturers. Rare earth element prices increased on supply constraints. The stock provides defensive characteristics with its dividend yield while offering exposure to clean energy trends. Chart shows steady accumulation by long-term investors.",
-        "short_description": "Mining and materials company producing industrial metals and minerals.",
-        "detailed_description": "BasicMaterials Corp mines and processes copper, aluminum, and rare earth elements. The company's performance is closely tied to commodity prices and global economic conditions. Slight decline reflects concerns about manufacturing slowdown in key markets. However, long-term demand for materials needed in renewable energy and electric vehicles supports growth prospects. The company has low-cost mining operations and strong reserves. Environmental regulations pose compliance costs and operational challenges. Dividend yield is attractive compared to the broader market."
+        "name": "Company A14",
+        "ticker": "A14",
+        "image": "/assets/images/a14_intraday.png",
+        "return_percent": -8.42,
+        "week_image": "/assets/images/a14_week.png",
+        "month_image": "/assets/images/a14_month.png",
+        "week_analysis": "Persistent bearish pressure with multiple consecutive red sessions dominating the week. Opening weakness around 488 followed by continued selling pushing prices down through 485-481 range. Mid-week volatility showed brief resistance attempts but failed to sustain. Recent sessions consolidated around 485 area with overall negative bias throughout the period.",
+        "month_analysis": "Impressive rally from 415 to 492 range with steady upward progression through multiple green sessions. Early-month consolidation around 425-430 followed by strong breakout. Mid-month trading around 455-460 preceded continued rally to 490+ highs. Late-month weakness with mixed sessions pulled back to 477-485 area. Overall strongly bullish month with significant gains despite recent profit-taking.",
+        "short_description": "Mega-cap electric vehicle and clean energy company operating in the consumer discretionary sector.",
+        "detailed_description": "Company A14 operates as a major electric vehicle manufacturer and clean energy solutions provider with operations across two main business segments: automotive and energy generation and storage. The automotive segment designs, manufactures, and sells electric vehicles, offers charging infrastructure, provides purchase financing and leasing services, vehicle insurance, and after-sales services including repairs and extended warranties. The energy segment designs, manufactures, installs, and leases solar energy generation and energy storage products for residential, commercial, and industrial customers. With mega-cap market capitalization, the company sells products through direct sales channels including company-owned stores, galleries, online platforms, and a network of channel partners. Operations serve consumer, commercial, industrial, and utility customers with diverse product offerings and financing options."
       }
     ]
   }

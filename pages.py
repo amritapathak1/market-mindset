@@ -42,7 +42,7 @@ def create_stock_card(stock, stock_index, task_id):
         dbc.CardBody([
             html.Div([
                 # Daily image
-                html.Img(src=stock.get('image', ''), style={'width': '100%', 'maxWidth': '150px', 'height': 'auto'}, 
+                html.Img(src=stock.get('image', ''), style={'width': '100%', 'height': 'auto'}, 
                         className="mb-3 d-block mx-auto"),
                 html.H4(stock['name'], className="text-center"),
                 html.H6(f"Ticker: {stock['ticker']}", className="text-center text-muted mb-3"),
