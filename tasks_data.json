@@ -12,7 +12,15 @@
         "week_analysis": "Strong initial momentum pushed prices from mid-560s to mid-580s, but recent sessions showed profit-taking with a pullback to around 577. Mixed volume patterns suggest consolidation after the rally.",
         "month_analysis": "High volatility with wide trading range between 545 and 585. Choppy sideways movement with no clear directional trend. Mixed sentiment reflected in alternating strong up and down sessions.",
         "short_description": "Large-cap aerospace and defense technology company operating in the industrials sector.",
-        "detailed_description": "Company A1 operates as a major aerospace and defense technology firm with diversified operations across multiple segments. The company provides advanced technology systems and solutions, including aircraft systems, defense platforms, electronics, and space systems. With a significant market capitalization and established market presence, the company serves government and commercial customers. The firm maintains operations across different geographic regions and benefits from long-term contracts, though it faces typical industry challenges related to program timing and budget cycles."
+        "detailed_description": "Company A1 operates as a major aerospace and defense technology firm with diversified operations across multiple segments. The company provides advanced technology systems and solutions, including aircraft systems, defense platforms, electronics, and space systems. With a significant market capitalization and established market presence, the company serves government and commercial customers. The firm maintains operations across different geographic regions and benefits from long-term contracts, though it faces typical industry challenges related to program timing and budget cycles.",
+        "performance_metrics": {
+          "5-day": "+1.57%",
+          "10-day": "+1.34%",
+          "1-month": "+1.88%",
+          "3-month": "+0.21%",
+          "6-month": "+19.29%",
+          "YTD": "+23.37%"
+        }
       },
       {
         "name": "Company A2",
@@ -24,7 +32,15 @@
         "week_analysis": "Strong upward progression from low-to-mid 470s to near 490, showing consistent bullish momentum. Recent sessions saw minor profit-taking with pullback to mid-480s.",
         "month_analysis": "Impressive rally from 450 to 490 range with steady upward progression. Mid-month consolidation followed by strong breakout to new highs. Overall trend remains strongly bullish despite recent profit-taking.",
         "short_description": "Large-cap aerospace and defense company with diversified operations in the industrials sector.",
-        "detailed_description": "Company A2 operates as a major aerospace and defense firm with operations across multiple business segments including aircraft systems, missile systems, naval and land systems, and space operations. The company serves government and commercial customers with technology systems and services. With a significant market presence and diversified portfolio, the firm benefits from long-term contracts and strategic positioning. Operations span multiple segments focused on defense systems, aviation platforms, and space technologies."
+        "detailed_description": "Company A2 operates as a major aerospace and defense firm with operations across multiple business segments including aircraft systems, missile systems, naval and land systems, and space operations. The company serves government and commercial customers with technology systems and services. With a significant market presence and diversified portfolio, the firm benefits from long-term contracts and strategic positioning. Operations span multiple segments focused on defense systems, aviation platforms, and space technologies.",
+        "performance_metrics": {
+          "5-day": "+1.88%",
+          "10-day": "+0.58%",
+          "1-month": "+4.83%",
+          "3-month": "+0.55%",
+          "6-month": "+4.96%",
+          "YTD": "+0.16%"
+        }
       }
     ]
   },
@@ -41,7 +57,15 @@
         "week_analysis": "Strong upward progression from 179 to 186 range with mid-week spike reaching near 188. Recent sessions show consolidation around 185-186 level with mixed trading. Overall positive momentum sustained throughout the period.",
         "month_analysis": "Volatile month with wide swings between 167 and 186. Early weakness followed by choppy mid-month trading. Strong late-month rally pushed prices to 186 range, showing overall positive trajectory despite significant fluctuations.",
         "short_description": "Large-cap aerospace and defense company with diversified operations in the industrials sector.",
-        "detailed_description": "Company A3 operates as a major aerospace and defense corporation with operations across multiple business segments. The company provides commercial and military aerospace systems, aircraft engines, and defense technologies. Serving both commercial and government customers globally, the firm has significant scale and market presence. Operations include aircraft components, propulsion systems, and defense platforms with established positions in key markets."
+        "detailed_description": "Company A3 operates as a major aerospace and defense corporation with operations across multiple business segments. The company provides commercial and military aerospace systems, aircraft engines, and defense technologies. Serving both commercial and government customers globally, the firm has significant scale and market presence. Operations include aircraft components, propulsion systems, and defense platforms with established positions in key markets.",
+        "performance_metrics": {
+          "5-day": "+1.74%",
+          "10-day": "+3.64%",
+          "1-month": "+9.13%",
+          "3-month": "+16.15%",
+          "6-month": "+30.54%",
+          "YTD": "+59.62%"
+        }
       },
       {
         "name": "Company A4",
@@ -53,7 +77,15 @@
         "week_analysis": "Choppy trading between 338 and 346 with mid-week spike to 347. Mixed sessions with alternating green and red candles show lack of clear direction. Recent consolidation around 343-345 range.",
         "month_analysis": "Gradual upward trend from 332 to 345 range despite significant volatility. Mid-month selloff to lows around 332-336 followed by steady recovery. Recent strength pushing toward 345-347 levels shows positive momentum overall.",
         "short_description": "Large-cap aerospace and defense company with diversified operations in the industrials sector.",
-        "detailed_description": "Company A4 operates as a major aerospace and defense corporation with operations across multiple business segments including aerospace, marine systems, combat systems, and technology solutions. The company provides defense platforms, naval vessels, land combat systems, and information technology services. Serving government and commercial customers, the firm has an established market presence with diverse revenue streams. Operations span defense manufacturing, shipbuilding, and technology services with long-term government contracts."
+        "detailed_description": "Company A4 operates as a major aerospace and defense corporation with operations across multiple business segments including aerospace, marine systems, combat systems, and technology solutions. The company provides defense platforms, naval vessels, land combat systems, and information technology services. Serving government and commercial customers, the firm has an established market presence with diverse revenue streams. Operations span defense manufacturing, shipbuilding, and technology services with long-term government contracts.",
+        "performance_metrics": {
+          "5-day": "+0.84%",
+          "10-day": "+1.40%",
+          "1-month": "+0.55%",
+          "3-month": "+6.06%",
+          "6-month": "+21.76%",
+          "YTD": "+31.11%"
+        }
       }
     ]
   },
@@ -70,7 +102,15 @@
         "week_analysis": "Volatile week with initial selloff followed by strong rally to 16.75 range. Mid-week pullback to 16.2 level followed by recovery to 16.5 area. Mixed trading reflects uncertainty despite net positive movement.",
         "month_analysis": "Strong rally from 15.3 to 17.2 range followed by choppy consolidation. Multiple pullbacks and recoveries show high volatility. Recent trading around 16.4-16.5 suggests settling into a range after the initial surge.",
         "short_description": "Micro-cap government service provider specializing in secure facilities and support services in the industrials sector.",
-        "detailed_description": "Company A5 operates as a diversified government service provider with operations focused on secure facilities and support services. The company provides facility management, transportation services, electronic monitoring, community-based programs, and healthcare services. With a micro-cap market capitalization and operations across multiple regions, the firm serves government clients through contracted services. The company maintains a significant operational footprint with facilities and workforce supporting various government programs and services."
+        "detailed_description": "Company A5 operates as a diversified government service provider with operations focused on secure facilities and support services. The company provides facility management, transportation services, electronic monitoring, community-based programs, and healthcare services. With a micro-cap market capitalization and operations across multiple regions, the firm serves government clients through contracted services. The company maintains a significant operational footprint with facilities and workforce supporting various government programs and services.",
+        "performance_metrics": {
+          "5-day": "+2.07%",
+          "10-day": "-3.09%",
+          "1-month": "+8.37%",
+          "3-month": "-23.93%",
+          "6-month": "-29.91%",
+          "YTD": "-42.35%"
+        }
       },
       {
         "name": "Company A6",
@@ -82,7 +122,15 @@
         "week_analysis": "Initial rally from 187 to 195 quickly reversed with sharp rejection. Mid-week consolidation around 193-194 failed to hold. Final session saw heavy selling pressure pushing prices down to 189 range. Overall bearish week with failed breakout attempt.",
         "month_analysis": "Strong rally from 160 to 199 range with steady upward progression throughout most of the month. Multiple consolidation phases followed by continued advances. Sharp late-month selloff erased recent gains, pulling prices back to 195 area. Overall positive month despite the weakness in final sessions.",
         "short_description": "Mega-cap software and data analytics company operating in the information technology sector.",
-        "detailed_description": "Company A6 operates as a major software platform provider specializing in data analytics and artificial intelligence solutions. The company develops and deploys software platforms serving government and commercial customers. With a mega-cap market capitalization and established presence, the firm provides data integration, analysis, and AI-driven platforms. Operations span multiple software products focused on data transformation and intelligence capabilities. The company serves diverse customer segments with cloud-based deployment capabilities and maintains strategic partnerships for platform development."
+        "detailed_description": "Company A6 operates as a major software platform provider specializing in data analytics and artificial intelligence solutions. The company develops and deploys software platforms serving government and commercial customers. With a mega-cap market capitalization and established presence, the firm provides data integration, analysis, and AI-driven platforms. Operations span multiple software products focused on data transformation and intelligence capabilities. The company serves diverse customer segments with cloud-based deployment capabilities and maintains strategic partnerships for platform development.",
+        "performance_metrics": {
+          "5-day": "-2.41%",
+          "10-day": "+2.80%",
+          "1-month": "+21.87%",
+          "3-month": "+5.23%",
+          "6-month": "+31.75%",
+          "YTD": "+150.98%"
+        }
       }
     ]
   },
@@ -99,7 +147,15 @@
         "week_analysis": "Mixed week with alternating red and green sessions between 78.7 and 81.1. Initial weakness to 79.5 followed by recovery attempt. Mid-week consolidation around 79.8-80.0 before rally to 80.4 range. Overall choppy trading with modest positive bias.",
         "month_analysis": "Strong early-month rally from 84.7 to 86.5 quickly reversed with persistent selling pressure. Extended decline through mid-month pushed prices down to 82.7-83.1 range. Late-month trading showed continued weakness with choppy consolidation around 80-81 levels. Overall bearish month with failed breakout followed by sustained downtrend.",
         "short_description": "Large-cap electric utility company operating in the utilities sector with significant renewable energy operations.",
-        "detailed_description": "Company A7 operates as a major electric utility provider generating, transmitting, distributing, and selling electric power to retail and wholesale customers. The company generates electricity through diverse sources including wind, solar, nuclear, natural gas, and other clean energy technologies. Operations include developing, constructing, and operating long-term contracted renewable generation facilities, battery storage facilities, and electric transmission infrastructure. The firm also participates in wholesale energy markets and sells energy commodities. With large-cap market capitalization and extensive generating capacity, transmission and distribution infrastructure, and substantial customer base, the company maintains significant utility operations in coastal regions. The business model combines regulated utility operations with competitive clean energy development."
+        "detailed_description": "Company A7 operates as a major electric utility provider generating, transmitting, distributing, and selling electric power to retail and wholesale customers. The company generates electricity through diverse sources including wind, solar, nuclear, natural gas, and other clean energy technologies. Operations include developing, constructing, and operating long-term contracted renewable generation facilities, battery storage facilities, and electric transmission infrastructure. The firm also participates in wholesale energy markets and sells energy commodities. With large-cap market capitalization and extensive generating capacity, transmission and distribution infrastructure, and substantial customer base, the company maintains significant utility operations in coastal regions. The business model combines regulated utility operations with competitive clean energy development.",
+        "performance_metrics": {
+          "5-day": "+1.09%",
+          "10-day": "-1.52%",
+          "1-month": "-3.68%",
+          "3-month": "+11.14%",
+          "6-month": "+12.62%",
+          "YTD": "+12.29%"
+        }
       },
       {
         "name": "Company A8",
@@ -111,7 +167,15 @@
         "week_analysis": "Strong opening rally to 33.5 followed by sharp rejection at 34.1. Mid-week selloff pushed prices down to 31.55 before recovery attempts stabilized trading around 29.9-30.1 range. Mixed signals with significant volatility.",
         "month_analysis": "Impressive rally from 26.5 to 34.2 range with steady upward progression throughout most of the month. Consistent bullish momentum with multiple green sessions driving higher. Late-month spike to 34+ quickly reversed with sharp pullback to 33 area. Overall strong positive trend despite recent volatility.",
         "short_description": "Small-cap home energy solutions company operating in the information technology sector with focus on solar technology.",
-        "detailed_description": "Company A8 operates as a home energy solutions provider designing, developing, manufacturing, and selling products for the solar photovoltaic industry. The company offers semiconductor-based microinverters that convert energy at the individual solar module level combined with proprietary networking and software technologies for energy monitoring and control. Product offerings include microinverter units and accessories, battery storage systems and accessories, energy management gateways and routers, cloud-based monitoring services, and electric vehicle charging solutions. The firm also provides design, proposal, permitting, and lead generation services. With small-cap market capitalization, the company sells solutions to solar distributors, large installers, equipment manufacturers, strategic partners, and homeowners through various channels including upgrade programs and online platforms. Operations serve both domestic and international markets."
+        "detailed_description": "Company A8 operates as a home energy solutions provider designing, developing, manufacturing, and selling products for the solar photovoltaic industry. The company offers semiconductor-based microinverters that convert energy at the individual solar module level combined with proprietary networking and software technologies for energy monitoring and control. Product offerings include microinverter units and accessories, battery storage systems and accessories, energy management gateways and routers, cloud-based monitoring services, and electric vehicle charging solutions. The firm also provides design, proposal, permitting, and lead generation services. With small-cap market capitalization, the company sells solutions to solar distributors, large installers, equipment manufacturers, strategic partners, and homeowners through various channels including upgrade programs and online platforms. Operations serve both domestic and international markets.",
+        "performance_metrics": {
+          "5-day": "-0.75%",
+          "10-day": "+2.55%",
+          "1-month": "+22.54%",
+          "3-month": "-18.52%",
+          "6-month": "-14.02%",
+          "YTD": "-53.76%"
+        }
       }
     ]
   },
@@ -128,7 +192,15 @@
         "week_analysis": "Initial rally from 28.5 to 29.1 followed by strong surge to 31.95 high. Subsequent sessions showed choppy consolidation between 30.0 and 30.9 with mixed red and green candles. Recent trading lacks clear direction after the early-week spike.",
         "month_analysis": "Strong opening rally from 33.0 to 36.5 quickly reversed with persistent selling pressure. Extended decline through mid-month pushed prices down to 28.5-30.0 range with multiple red sessions. Late-month trading showed stabilization attempts around 30-31 levels but overall bearish trend dominates with significant downside from early highs.",
         "short_description": "Micro-cap solar technology company operating in the information technology sector with focus on photovoltaic systems.",
-        "detailed_description": "Company A9 operates as a solar technology provider designing, developing, manufacturing, and selling optimized inverter systems for solar photovoltaic installations. The company offers power optimizers, inverters, battery cells and storage solutions, electric vehicle charging systems, and energy management software products. Product portfolio includes cloud-based monitoring platforms for data collection and analysis, mobile applications for system owners and installers, web-based design and planning tools, and grid services. The firm also provides pre-sales support, ongoing training services, and technical support throughout the installation lifecycle. With micro-cap market capitalization, the company serves solar installers, system providers, distributors, construction firms, and electrical wholesalers. Customer base includes residential and commercial end users across domestic and international markets. Operations span multiple product categories focused on solar energy optimization and management technologies."
+        "detailed_description": "Company A9 operates as a solar technology provider designing, developing, manufacturing, and selling optimized inverter systems for solar photovoltaic installations. The company offers power optimizers, inverters, battery cells and storage solutions, electric vehicle charging systems, and energy management software products. Product portfolio includes cloud-based monitoring platforms for data collection and analysis, mobile applications for system owners and installers, web-based design and planning tools, and grid services. The firm also provides pre-sales support, ongoing training services, and technical support throughout the installation lifecycle. With micro-cap market capitalization, the company serves solar installers, system providers, distributors, construction firms, and electrical wholesalers. Customer base includes residential and commercial end users across domestic and international markets. Operations span multiple product categories focused on solar energy optimization and management technologies.",
+        "performance_metrics": {
+          "5-day": "+4.78%",
+          "10-day": "+3.12%",
+          "1-month": "-11.61%",
+          "3-month": "-21.06%",
+          "6-month": "+60.86%",
+          "YTD": "+105.74%"
+        }
       },
       {
         "name": "Company A10",
@@ -140,7 +212,15 @@
         "week_analysis": "Persistent selling pressure from 2.28 opening down to 2.01 lows through multiple red sessions. Brief recovery attempt rallied to 2.13 before fading. Recent consolidation around 2.07-2.09 range shows overall bearish week with failed bounce.",
         "month_analysis": "Initial weakness around 1.95 followed by strong rally to 2.39 highs with multiple green sessions. Mid-month consolidation around 2.20-2.35 range preceded spike to 2.49 peak. Late-month selloff erased gains with decline to 2.07-2.10 area. Overall volatile month with failed breakout.",
         "short_description": "Small-cap hydrogen fuel cell and clean energy technology company operating in the industrials sector.",
-        "detailed_description": "Company A10 operates as a hydrogen fuel cell technology provider developing product solutions for domestic and international markets. The company offers hydrogen-fueled fuel cell systems for material handling vehicles, stationary backup power solutions, and fuel cell stack technology for mobility applications. Product portfolio includes hydrogen fueling infrastructure, electrolyzers for clean hydrogen production, liquefaction systems, and cryogenic distribution equipment. With small-cap market capitalization, the firm sells through direct sales, equipment manufacturers, and dealer networks. Operations serve customers across telecommunications, transportation, utility, and industrial sectors with focus on transitioning from fossil-based energy to hydrogen fuel cell power."
+        "detailed_description": "Company A10 operates as a hydrogen fuel cell technology provider developing product solutions for domestic and international markets. The company offers hydrogen-fueled fuel cell systems for material handling vehicles, stationary backup power solutions, and fuel cell stack technology for mobility applications. Product portfolio includes hydrogen fueling infrastructure, electrolyzers for clean hydrogen production, liquefaction systems, and cryogenic distribution equipment. With small-cap market capitalization, the firm sells through direct sales, equipment manufacturers, and dealer networks. Operations serve customers across telecommunications, transportation, utility, and industrial sectors with focus on transitioning from fossil-based energy to hydrogen fuel cell power.",
+        "performance_metrics": {
+          "5-day": "-5.91%",
+          "10-day": "-10.78%",
+          "1-month": "+4.55%",
+          "3-month": "-21.89%",
+          "6-month": "+78.45%",
+          "YTD": "-11.16%"
+        }
       }
     ]
   },
@@ -157,7 +237,15 @@
         "week_analysis": "Initial red session with weakness to 116 quickly reversed by strong three-day rally pushing to 120 highs. Recent consolidation around 118.8-119.5 range maintains bullish bias. Overall positive week with momentum intact.",
         "month_analysis": "Choppy early-month trading around 114-116 followed by steady rally with multiple green sessions pushing to 119-120 range. Mid-month consolidation around 117-118 preceded continued strength. Recent trading near 119-120 highs shows positive momentum with alternating sessions. Overall upward trend from 114 to 120 despite volatility.",
         "short_description": "Mega-cap integrated energy company operating in the energy sector with diversified upstream and downstream operations.",
-        "detailed_description": "Company A11 operates as a major integrated energy corporation engaged in exploration and production of crude oil and natural gas across domestic and international markets. Operations span four main segments: upstream exploration and production, energy products including fuels and aromatics, chemical products including petrochemicals and intermediates, and specialty products including lubricants and performance materials. The company manufactures, trades, transports, and sells crude oil, natural gas, petroleum products, and petrochemicals. With mega-cap market capitalization, the firm also pursues lower-emission business opportunities including carbon capture and storage, hydrogen, lower-emission fuels, and sustainable aviation fuel. Operations serve global markets through diverse product offerings across the energy value chain."
+        "detailed_description": "Company A11 operates as a major integrated energy corporation engaged in exploration and production of crude oil and natural gas across domestic and international markets. Operations span four main segments: upstream exploration and production, energy products including fuels and aromatics, chemical products including petrochemicals and intermediates, and specialty products including lubricants and performance materials. The company manufactures, trades, transports, and sells crude oil, natural gas, petroleum products, and petrochemicals. With mega-cap market capitalization, the firm also pursues lower-emission business opportunities including carbon capture and storage, hydrogen, lower-emission fuels, and sustainable aviation fuel. Operations serve global markets through diverse product offerings across the energy value chain.",
+        "performance_metrics": {
+          "5-day": "+2.07%",
+          "10-day": "+0.24%",
+          "1-month": "+1.73%",
+          "3-month": "+6.33%",
+          "6-month": "+9.94%",
+          "YTD": "+11.00%"
+        }
       },
       {
         "name": "Company A12",
@@ -169,7 +257,15 @@
         "week_analysis": "Persistent weakness with consecutive red sessions from 234.4 to 232.5 range. Brief green recovery to 235 quickly faded. Recent consolidation around 234-234.7 area fails to sustain momentum. Overall bearish week with limited bounce.",
         "month_analysis": "Strong rally from 225 to 240 range with steady upward progression through multiple green sessions. Mid-month consolidation around 235-237 preceded sharp spike to 244 peak. Late-month selloff with mixed sessions pulled back to 234-235 area. Overall positive trend from lows despite recent weakness and volatility.",
         "short_description": "Large-cap railroad transportation company operating in the industrials sector.",
-        "detailed_description": "Company A12 operates as a major railroad transportation provider offering freight services across extensive rail networks. The company provides transportation services for diverse commodity categories including agricultural products, energy products, industrial materials, construction products, and finished goods in intermodal containers. With large-cap market capitalization and established infrastructure, the firm serves agricultural processors, manufacturers, energy producers, and industrial customers. Operations span extensive rail network infrastructure supporting freight movement across major corridors. The business model focuses on bulk freight transportation with revenue diversification across multiple commodity segments."
+        "detailed_description": "Company A12 operates as a major railroad transportation provider offering freight services across extensive rail networks. The company provides transportation services for diverse commodity categories including agricultural products, energy products, industrial materials, construction products, and finished goods in intermodal containers. With large-cap market capitalization and established infrastructure, the firm serves agricultural processors, manufacturers, energy producers, and industrial customers. Operations span extensive rail network infrastructure supporting freight movement across major corridors. The business model focuses on bulk freight transportation with revenue diversification across multiple commodity segments.",
+        "performance_metrics": {
+          "5-day": "-0.34%",
+          "10-day": "-2.71%",
+          "1-month": "+3.19%",
+          "3-month": "+3.36%",
+          "6-month": "+2.43%",
+          "YTD": "+1.89%"
+        }
       }
     ]
   },
@@ -186,7 +282,15 @@
         "week_analysis": "Initial red sessions showed weakness from 487.5 to 485 range with volatility. Strong recovery followed with three consecutive green candles pushing back to 487-488 area. Recent consolidation around 487-488 levels maintains positive bias. Overall mixed week with recovery from early weakness.",
         "month_analysis": "Strong early rally from 477 to 492 range with multiple green sessions. Sharp mid-month selloff with persistent selling pressure pushed prices down to 471 lows. Choppy recovery followed with alternating sessions climbing back to 483-487 area. Overall volatile month with wide swings and mixed trend despite positive close.",
         "short_description": "Mega-cap software and technology company operating in the information technology sector.",
-        "detailed_description": "Company A13 operates as a major software and technology corporation with operations across three main business segments: productivity and business software, cloud computing services, and personal computing products. The company provides productivity software suites, cloud infrastructure and platform services, enterprise software solutions, operating systems, professional networking platforms, collaboration tools, gaming hardware and services, search and advertising services, and consumer devices. With mega-cap market capitalization and global presence, the firm serves commercial enterprises, consumers, and government customers through diverse product offerings. Operations include software licensing, cloud-based subscriptions, hardware sales, advertising services, and professional services. The company distributes products through equipment manufacturers, distributors, resellers, online channels, and retail stores serving customers across multiple market segments."
+        "detailed_description": "Company A13 operates as a major software and technology corporation with operations across three main business segments: productivity and business software, cloud computing services, and personal computing products. The company provides productivity software suites, cloud infrastructure and platform services, enterprise software solutions, operating systems, professional networking platforms, collaboration tools, gaming hardware and services, search and advertising services, and consumer devices. With mega-cap market capitalization and global presence, the firm serves commercial enterprises, consumers, and government customers through diverse product offerings. Operations include software licensing, cloud-based subscriptions, hardware sales, advertising services, and professional services. The company distributes products through equipment manufacturers, distributors, resellers, online channels, and retail stores serving customers across multiple market segments.",
+        "performance_metrics": {
+          "5-day": "+0.37%",
+          "10-day": "+1.92%",
+          "1-month": "+3.30%",
+          "3-month": "-5.20%",
+          "6-month": "-0.49%",
+          "YTD": "+16.52%"
+        }
       },
       {
         "name": "Company A14",
@@ -198,7 +302,15 @@
         "week_analysis": "Persistent bearish pressure with multiple consecutive red sessions dominating the week. Opening weakness around 488 followed by continued selling pushing prices down through 485-481 range. Mid-week volatility showed brief resistance attempts but failed to sustain. Recent sessions consolidated around 485 area with overall negative bias throughout the period.",
         "month_analysis": "Impressive rally from 415 to 492 range with steady upward progression through multiple green sessions. Early-month consolidation around 425-430 followed by strong breakout. Mid-month trading around 455-460 preceded continued rally to 490+ highs. Late-month weakness with mixed sessions pulled back to 477-485 area. Overall strongly bullish month with significant gains despite recent profit-taking.",
         "short_description": "Mega-cap electric vehicle and clean energy company operating in the consumer discretionary sector.",
-        "detailed_description": "Company A14 operates as a major electric vehicle manufacturer and clean energy solutions provider with operations across two main business segments: automotive and energy generation and storage. The automotive segment designs, manufactures, and sells electric vehicles, offers charging infrastructure, provides purchase financing and leasing services, vehicle insurance, and after-sales services including repairs and extended warranties. The energy segment designs, manufactures, installs, and leases solar energy generation and energy storage products for residential, commercial, and industrial customers. With mega-cap market capitalization, the company sells products through direct sales channels including company-owned stores, galleries, online platforms, and a network of channel partners. Operations serve consumer, commercial, industrial, and utility customers with diverse product offerings and financing options."
+        "detailed_description": "Company A14 operates as a major electric vehicle manufacturer and clean energy solutions provider with operations across two main business segments: automotive and energy generation and storage. The automotive segment designs, manufactures, and sells electric vehicles, offers charging infrastructure, provides purchase financing and leasing services, vehicle insurance, and after-sales services including repairs and extended warranties. The energy segment designs, manufactures, installs, and leases solar energy generation and energy storage products for residential, commercial, and industrial customers. With mega-cap market capitalization, the company sells products through direct sales channels including company-owned stores, galleries, online platforms, and a network of channel partners. Operations serve consumer, commercial, industrial, and utility customers with diverse product offerings and financing options.",
+        "performance_metrics": {
+          "5-day": "-1.25%",
+          "10-day": "+3.54%",
+          "1-month": "+21.50%",
+          "3-month": "+9.44%",
+          "6-month": "+39.57%",
+          "YTD": "+25.29%"
+        }
       }
     ]
   }

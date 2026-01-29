@@ -11,6 +11,7 @@ This module contains all Dash callback functions that handle:
 
 import dash
 from dash import html, ctx, Input, Output, State, ALL
+import dash_bootstrap_components as dbc
 from flask import request
 
 from config import PAGES, NUM_TASKS, CONFIDENCE_RISK_CHECKPOINT
@@ -350,10 +351,49 @@ def register_callbacks(app, db_enabled, db_functions):
                     except Exception as e:
                         print(f"Error logging event: {e}")
                 
-                return True, stock['name'], html.Div([
+                # Build modal body content
+                modal_content = [
                     html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
                     html.P(stock['detailed_description'])
-                ])
+                ]
+                
+                # Add performance metrics table if available
+                if 'performance_metrics' in stock:
+                    metrics = stock['performance_metrics']
+                    modal_content.append(html.Hr(className="my-4"))
+                    modal_content.append(html.H5("Performance Metrics", className="mb-3"))
+                    modal_content.append(
+                        dbc.Table([
+                            html.Tbody([
+                                html.Tr([
+                                    html.Td("5-day", style={'fontWeight': 'bold', 'width': '40%'}),
+                                    html.Td(metrics.get('5-day', 'N/A'), style={'textAlign': 'right'})
+                                ]),
+                                html.Tr([
+                                    html.Td("10-day", style={'fontWeight': 'bold'}),
+                                    html.Td(metrics.get('10-day', 'N/A'), style={'textAlign': 'right'})
+                                ]),
+                                html.Tr([
+                                    html.Td("1-month", style={'fontWeight': 'bold'}),
+                                    html.Td(metrics.get('1-month', 'N/A'), style={'textAlign': 'right'})
+                                ]),
+                                html.Tr([
+                                    html.Td("3-month", style={'fontWeight': 'bold'}),
+                                    html.Td(metrics.get('3-month', 'N/A'), style={'textAlign': 'right'})
+                                ]),
+                                html.Tr([
+                                    html.Td("6-month", style={'fontWeight': 'bold'}),
+                                    html.Td(metrics.get('6-month', 'N/A'), style={'textAlign': 'right'})
+                                ]),
+                                html.Tr([
+                                    html.Td("YTD", style={'fontWeight': 'bold'}),
+                                    html.Td(metrics.get('YTD', 'N/A'), style={'textAlign': 'right'})
+                                ])
+                            ])
+                        ], bordered=True, hover=True, striped=True, className="mb-0")
+                    )
+                
+                return True, stock['name'], html.Div(modal_content)
         
         return dash.no_update, dash.no_update, dash.no_update
     
