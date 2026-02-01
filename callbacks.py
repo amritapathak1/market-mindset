@@ -54,6 +54,7 @@ def register_callbacks(app, db_enabled, db_functions):
     
     @app.callback(
         Output('participant-id', 'data'),
+        Output('task-order', 'data'),
         Input('participant-id', 'data')
     )
     def initialize_participant(participant_id):
@@ -85,11 +86,16 @@ def register_callbacks(app, db_enabled, db_functions):
                     action='load'
                 )
                 
-                return str(new_participant_id)
+                # Create randomized task order
+                import random
+                task_order = list(range(1, NUM_TASKS + 1))
+                random.shuffle(task_order)
+                
+                return str(new_participant_id), task_order
             except Exception as e:
                 print(f"Error creating participant: {e}")
-                return None
-        return participant_id or None
+                return None, None
+        return participant_id or None, dash.no_update
     
     
     # ============================================
@@ -102,6 +108,7 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('current-page', 'data', allow_duplicate=True),
         Input('current-page', 'data'),
         State('current-task', 'data'),
+        State('task-order', 'data'),
         State('amount', 'data'),
         State('consent-given', 'data'),
         State('demographics', 'data'),
@@ -109,7 +116,7 @@ def register_callbacks(app, db_enabled, db_functions):
         State('portfolio', 'data'),
         prevent_initial_call='initial_duplicate'
     )
-    def display_page(page, current_task, amount, consent_given, demographics, confidence_risk, portfolio):
+    def display_page(page, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio):
         """Display the appropriate page based on current page state with flow validation."""
         # Validate page access
         demographics_completed = bool(demographics and demographics.get('age'))
@@ -133,7 +140,9 @@ def register_callbacks(app, db_enabled, db_functions):
         elif page == PAGES['demographics']:
             return demographics_page(), False, dash.no_update
         elif page == PAGES['task']:
-            return task_page(current_task, amount), False, dash.no_update
+            # Use the randomized task order
+            actual_task_id = task_order[current_task - 1] if task_order else current_task
+            return task_page(actual_task_id, amount, sequential_task_num=current_task), False, dash.no_update
         elif page == PAGES['confidence_risk']:
             return confidence_risk_page(), False, dash.no_update
         elif page == PAGES['feedback']:
@@ -565,18 +574,20 @@ def register_callbacks(app, db_enabled, db_functions):
         Input('task-submit', 'n_clicks'),
         State({'type': 'investment-input', 'task': ALL, 'stock': ALL}, 'value'),
         State('current-task', 'data'),
+        State('task-order', 'data'),
         State('amount', 'data'),
         State('task-responses', 'data'),
         State('portfolio', 'data'),
         State('participant-id', 'data'),
         prevent_initial_call=True
     )
-    def submit_task(n_clicks, investment_values, current_task, current_amount, responses, portfolio, participant_id):
+    def submit_task(n_clicks, investment_values, current_task, task_order, current_amount, responses, portfolio, participant_id):
         """Handle task submission with investment validation and portfolio tracking."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-        
-        # Validate each investment
+                # Get the actual task ID from the randomized order
+        actual_task_id = task_order[current_task - 1] if task_order else current_task
+                # Validate each investment
         validated_investments = []
         for i, value in enumerate(investment_values):
             amount, error = validate_investment(value, f"Stock {i+1}")
@@ -616,8 +627,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     print(f"Error logging event: {e}")
             return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error
         
-        # Get task data
-        task_data, task_error = get_task_data_safe(current_task)
+        # Get task data using the actual randomized task ID
+        task_data, task_error = get_task_data_safe(actual_task_id)
         if task_error:
             return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, task_error
         
@@ -690,10 +701,12 @@ def register_callbacks(app, db_enabled, db_functions):
                     event_category='interaction',
                     page_name='task',
                     task_id=current_task,
+                    stock_ticker=stocks[0]['ticker'],
                     element_id='task-submit',
                     element_type='button',
                     action='submit',
                     metadata={
+                        'stock_name': stocks[0]['name'],
                         'investments': validated_investments,
                         'total_investment': total_investment,
                         'remaining_amount': new_amount,

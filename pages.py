@@ -206,8 +206,11 @@ def demographics_page():
     ])
 
 
-def task_page(task_id, amount):
+def task_page(task_id, amount, sequential_task_num=None):
     """Render the main investment task page for a given task number."""
+    # Use sequential number for display if provided, otherwise use task_id
+    display_task_num = sequential_task_num if sequential_task_num is not None else task_id
+    
     # Safely get task data
     task_data, error = get_task_data_safe(task_id)
     
@@ -224,7 +227,7 @@ def task_page(task_id, amount):
     stocks = task_data['stocks']
     
     return dbc.Container([
-        html.H2(f"Investment Decision {task_id} of {NUM_TASKS}", className="text-center mb-4"),
+        html.H2(f"Investment Decision {display_task_num} of {NUM_TASKS}", className="text-center mb-4"),
         
         html.P("Review the stock below and decide how much to invest. You can invest any amount up to your available balance, or choose not to invest.", 
                className="text-center text-muted mb-4"),
@@ -248,12 +251,12 @@ def task_page(task_id, amount):
         
         # Profit/Loss Modal
         dbc.Modal([
-            dbc.ModalHeader(dbc.ModalTitle("Investment Result")),
+            dbc.ModalHeader(dbc.ModalTitle("Investment Result"), close_button=False),
             dbc.ModalBody(id="result-modal-body"),
             dbc.ModalFooter(
                 dbc.Button("OK", id="result-modal-ok", color="primary")
             )
-        ], id="result-modal", is_open=False, centered=True)
+        ], id="result-modal", is_open=False, centered=True, backdrop="static", keyboard=False)
     ])
 
 

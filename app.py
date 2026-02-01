@@ -103,6 +103,7 @@ app.layout = dbc.Container([
     dcc.Store(id='current-page', data=PAGES['consent'], storage_type='memory'),
     dcc.Store(id='amount', data=INITIAL_AMOUNT, storage_type='memory'),
     dcc.Store(id='current-task', data=1, storage_type='memory'),
+    dcc.Store(id='task-order', data=None, storage_type='memory'),
     dcc.Store(id='consent-given', data=False, storage_type='memory'),
     dcc.Store(id='demographics', data={}, storage_type='memory'),
     dcc.Store(id='task-responses', data={}, storage_type='memory'),
