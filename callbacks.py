@@ -554,6 +554,8 @@ def register_callbacks(app, db_enabled, db_functions):
     # ============================================
     
     @app.callback(
+        Output('result-modal', 'is_open'),
+        Output('result-modal-body', 'children'),
         Output('current-page', 'data', allow_duplicate=True),
         Output('current-task', 'data'),
         Output('amount', 'data'),
@@ -572,7 +574,7 @@ def register_callbacks(app, db_enabled, db_functions):
     def submit_task(n_clicks, investment_values, current_task, current_amount, responses, portfolio, participant_id):
         """Handle task submission with investment validation and portfolio tracking."""
         if not n_clicks:
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         # Validate each investment
         validated_investments = []
@@ -593,7 +595,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         )
                     except Exception as e:
                         print(f"Error logging event: {e}")
-                return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error
+                return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error
             validated_investments.append(amount)
         
         # Validate total
@@ -612,12 +614,12 @@ def register_callbacks(app, db_enabled, db_functions):
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error
+            return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error
         
         # Get task data
         task_data, task_error = get_task_data_safe(current_task)
         if task_error:
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, task_error
+            return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, task_error
         
         total_investment = sum(validated_investments)
         responses[f'task_{current_task}'] = {
@@ -625,15 +627,18 @@ def register_callbacks(app, db_enabled, db_functions):
             'total': total_investment
         }
         
-        # Update portfolio
+        # Update portfolio and calculate profit/loss
         if portfolio is None:
             portfolio = []
         
+        total_profit_loss = 0
         for i, investment_amount in enumerate(validated_investments):
             if investment_amount > 0:
                 stock = task_data['stocks'][i]
                 return_percent = stock.get('return_percent', 0)
                 final_value = investment_amount * (1 + return_percent / 100)
+                profit_loss = final_value - investment_amount
+                total_profit_loss += profit_loss
                 
                 portfolio_item = {
                     'task_id': current_task,
@@ -642,7 +647,7 @@ def register_callbacks(app, db_enabled, db_functions):
                     'invested': investment_amount,
                     'return_percent': return_percent,
                     'final_value': final_value,
-                    'profit_loss': final_value - investment_amount
+                    'profit_loss': profit_loss
                 }
                 portfolio.append(portfolio_item)
                 
@@ -673,9 +678,9 @@ def register_callbacks(app, db_enabled, db_functions):
                     stock_1_ticker=stocks[0]['ticker'],
                     stock_1_name=stocks[0]['name'],
                     stock_1_investment=validated_investments[0] if len(validated_investments) > 0 else 0,
-                    stock_2_ticker=stocks[1]['ticker'],
-                    stock_2_name=stocks[1]['name'],
-                    stock_2_investment=validated_investments[1] if len(validated_investments) > 1 else 0,
+                    stock_2_ticker=stocks[0]['ticker'] if len(stocks) > 1 else "",
+                    stock_2_name=stocks[0]['name'] if len(stocks) > 1 else "",
+                    stock_2_investment=0,
                     total_investment=total_investment,
                     remaining_amount=new_amount
                 )
@@ -691,16 +696,66 @@ def register_callbacks(app, db_enabled, db_functions):
                     metadata={
                         'investments': validated_investments,
                         'total_investment': total_investment,
-                        'remaining_amount': new_amount
+                        'remaining_amount': new_amount,
+                        'profit_loss': total_profit_loss
                     }
                 )
             except Exception as e:
                 print(f"Error saving task response: {e}")
         
+        # Determine profit/loss message
+        if total_investment == 0:
+            modal_message = "You did not invest in this task."
+        elif total_profit_loss > 0:
+            modal_message = "Your investment made a profit! 📈"
+        elif total_profit_loss < 0:
+            modal_message = "Your investment made a loss. 📉"
+        else:
+            modal_message = "Your investment broke even."
+        
         next_task = current_task + 1
         
-        # Route to next page
-        if current_task == CONFIDENCE_RISK_CHECKPOINT:
+        # Route to next page - but first show the modal
+        # We're not changing the page yet, the modal OK button will do that
+        return True, modal_message, dash.no_update, next_task, new_amount, responses, portfolio, ""
+    
+    
+    # Handle modal OK button - navigate to next page
+    @app.callback(
+        Output('result-modal', 'is_open', allow_duplicate=True),
+        Output('current-page', 'data', allow_duplicate=True),
+        Input('result-modal-ok', 'n_clicks'),
+        State('current-task', 'data'),
+        State('participant-id', 'data'),
+        prevent_initial_call=True
+    )
+    def handle_modal_ok(n_clicks, current_task, participant_id):
+        """Handle modal OK button click and navigate to appropriate next page."""
+        if not n_clicks:
+            return dash.no_update, dash.no_update
+        
+        # current_task has already been incremented in submit_task
+        # So current_task - 1 is the task that was just completed
+        completed_task = current_task - 1
+        
+        # Log the modal OK button click
+        if participant_id:
+            try:
+                log_event(
+                    participant_id=participant_id,
+                    event_type='modal_ok',
+                    event_category='interaction',
+                    page_name='task',
+                    task_id=completed_task,
+                    element_id='result-modal-ok',
+                    element_type='button',
+                    action='click'
+                )
+            except Exception as e:
+                print(f"Error logging event: {e}")
+        
+        # Route to next page based on completed task
+        if completed_task == CONFIDENCE_RISK_CHECKPOINT:
             if participant_id:
                 try:
                     log_event(
@@ -712,9 +767,9 @@ def register_callbacks(app, db_enabled, db_functions):
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
-            return PAGES['confidence_risk'], next_task, new_amount, responses, portfolio, ""
+            return False, PAGES['confidence_risk']
         
-        if current_task == NUM_TASKS:
+        if completed_task == NUM_TASKS:
             if participant_id:
                 try:
                     log_event(
@@ -726,8 +781,9 @@ def register_callbacks(app, db_enabled, db_functions):
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
-            return PAGES['feedback'], next_task, new_amount, responses, portfolio, ""
+            return False, PAGES['feedback']
         
+        # Continue to next task
         if participant_id:
             try:
                 log_event(
@@ -735,12 +791,12 @@ def register_callbacks(app, db_enabled, db_functions):
                     event_type='page_navigation',
                     event_category='navigation',
                     page_name='task',
-                    task_id=next_task,
+                    task_id=current_task,
                     action='navigate'
                 )
             except Exception as e:
                 print(f"Error logging event: {e}")
-        return PAGES['task'], next_task, new_amount, responses, portfolio, ""
+        return False, PAGES['task']
     
     
     # ============================================

@@ -244,7 +244,16 @@ def task_page(task_id, amount):
                     className="w-100"
                 )
             ], md=6, className="mx-auto")
-        ])
+        ]),
+        
+        # Profit/Loss Modal
+        dbc.Modal([
+            dbc.ModalHeader(dbc.ModalTitle("Investment Result")),
+            dbc.ModalBody(id="result-modal-body"),
+            dbc.ModalFooter(
+                dbc.Button("OK", id="result-modal-ok", color="primary")
+            )
+        ], id="result-modal", is_open=False, centered=True)
     ])
 
 
