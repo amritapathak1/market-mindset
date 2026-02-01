@@ -89,8 +89,8 @@ def get_task_data_safe(task_id):
         if 'task_id' not in task_data or 'stocks' not in task_data:
             return None, "Missing required fields in task data"
         
-        if len(task_data['stocks']) != 2:
-            return None, "Task must have exactly 2 stocks"
+        if len(task_data['stocks']) != 1:
+            return None, "Task must have exactly 1 stock"
         
         # Validate stock data structure
         for i, stock in enumerate(task_data['stocks']):

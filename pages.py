@@ -35,62 +35,77 @@ def create_amount_display(amount):
     ], color="success", className="text-center mb-4")
 
 
-def create_stock_card(stock, stock_index, task_id):
+def create_stock_card(stock, stock_index, task_id, amount=None):
     """Create a card displaying information about a single stock."""
     
     return dbc.Card([
         dbc.CardBody([
+            # Header - Company name and ticker
             html.Div([
-                # Daily image
-                html.Img(src=stock.get('image', ''), style={'width': '100%', 'height': 'auto'}, 
-                        className="mb-3 d-block mx-auto"),
                 html.H4(stock['name'], className="text-center"),
                 html.H6(f"Ticker: {stock['ticker']}", className="text-center text-muted mb-3"),
+                html.P(stock['short_description'], className="text-muted mb-4 text-center"),
+            ]),
+            
+            # Two column layout
+            dbc.Row([
+                # Left column - Image
+                dbc.Col([
+                    html.Img(src=stock.get('image', ''), style={'width': '100%', 'height': 'auto'}, 
+                            className="d-block")
+                ], md=6),
                 
-                html.P(stock['short_description'], className="text-muted mb-3"),
-                
-                # Three buttons for different time periods
-                dbc.Button(
-                    "Show More Details",
-                    id={'type': 'show-more', 'task': task_id, 'stock': stock_index},
-                    color="info",
-                    outline=True,
-                    size="sm",
-                    className="w-100 mb-2"
-                ),
-                
-                dbc.Button(
-                    "Week's Chart & Analysis",
-                    id={'type': 'show-week', 'task': task_id, 'stock': stock_index},
-                    color="secondary",
-                    outline=True,
-                    size="sm",
-                    className="w-100 mb-2"
-                ),
-                
-                dbc.Button(
-                    "Month's Chart & Analysis",
-                    id={'type': 'show-month', 'task': task_id, 'stock': stock_index},
-                    color="secondary",
-                    outline=True,
-                    size="sm",
-                    className="w-100 mb-3"
-                ),
-                
-                html.Hr(),
-                
-                dbc.Label(f"Amount to invest in {stock['name']}:"),
-                dbc.InputGroup([
-                    dbc.InputGroupText("$"),
-                    dbc.Input(
-                        id={'type': 'investment-input', 'task': task_id, 'stock': stock_index},
-                        type="number",
-                        min=0,
-                        step=0.01,
-                        placeholder="0.00",
-                        value=0
-                    )
-                ])
+                # Right column - Buttons and inputs
+                dbc.Col([
+                    # Three buttons for different time periods
+                    dbc.Button(
+                        "Show More Details",
+                        id={'type': 'show-more', 'task': task_id, 'stock': stock_index},
+                        color="info",
+                        outline=True,
+                        size="sm",
+                        className="w-100 mb-2"
+                    ),
+                    
+                    dbc.Button(
+                        "Week's Chart & Analysis",
+                        id={'type': 'show-week', 'task': task_id, 'stock': stock_index},
+                        color="secondary",
+                        outline=True,
+                        size="sm",
+                        className="w-100 mb-2"
+                    ),
+                    
+                    dbc.Button(
+                        "Month's Chart & Analysis",
+                        id={'type': 'show-month', 'task': task_id, 'stock': stock_index},
+                        color="secondary",
+                        outline=True,
+                        size="sm",
+                        className="w-100 mb-3"
+                    ),
+                    
+                    html.Hr(),
+                    
+                    # Available amount display
+                    html.H5([
+                        html.I(className="bi bi-wallet2 me-2"),
+                        f"Available: ${amount:,.2f}" if amount is not None else "Available: $0.00"
+                    ], className="text-success mb-3") if amount is not None else html.Div(),
+                    
+                    dbc.Label(f"Amount to invest in {stock['name']}:"),
+                    dbc.InputGroup([
+                        dbc.InputGroupText("$"),
+                        dbc.Input(
+                            id={'type': 'investment-input', 'task': task_id, 'stock': stock_index},
+                            type="number",
+                            min=0,
+                            step=0.01,
+                            placeholder="0.00",
+                            value=0
+                        )
+                    ])
+                ], md=6)
             ])
         ])
     ])
@@ -209,23 +224,15 @@ def task_page(task_id, amount):
     stocks = task_data['stocks']
     
     return dbc.Container([
-        create_amount_display(amount),
-        
         html.H2(f"Investment Decision {task_id} of {NUM_TASKS}", className="text-center mb-4"),
         
-        html.P("Review the two stocks below and decide how much to invest in each. You can invest in one, both, or neither.", 
+        html.P("Review the stock below and decide how much to invest. You can invest any amount up to your available balance, or choose not to invest.", 
                className="text-center text-muted mb-4"),
         
-        dbc.Row([
-            dbc.Col([
-                create_stock_card(stocks[0], 0, task_id)
-            ], md=6, className="mb-4"),
-            dbc.Col([
-                create_stock_card(stocks[1], 1, task_id)
-            ], md=6, className="mb-4")
-        ]),
+        # Stock card - now full width
+        create_stock_card(stocks[0], 0, task_id, amount),
         
-        html.Div(id="task-error", className="text-danger text-center mb-3"),
+        html.Div(id="task-error", className="text-danger text-center mb-3 mt-3"),
         
         dbc.Row([
             dbc.Col([
