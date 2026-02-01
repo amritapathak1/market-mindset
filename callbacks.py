@@ -14,7 +14,7 @@ from dash import html, ctx, Input, Output, State, ALL
 import dash_bootstrap_components as dbc
 from flask import request
 
-from config import PAGES, NUM_TASKS, CONFIDENCE_RISK_CHECKPOINT
+from config import PAGES, NUM_TASKS, CONFIDENCE_RISK_CHECKPOINTS
 from utils import (
     validate_investment, validate_total_investment, get_task_data_safe,
     validate_demographics, validate_page_access
@@ -144,7 +144,7 @@ def register_callbacks(app, db_enabled, db_functions):
             actual_task_id = task_order[current_task - 1] if task_order else current_task
             return task_page(actual_task_id, amount, sequential_task_num=current_task), False, dash.no_update
         elif page == PAGES['confidence_risk']:
-            return confidence_risk_page(), False, dash.no_update
+            return confidence_risk_page(completed_tasks=current_task-1), False, dash.no_update
         elif page == PAGES['feedback']:
             return feedback_page(amount, portfolio or []), False, dash.no_update
         elif page == PAGES['thank_you']:
@@ -768,7 +768,7 @@ def register_callbacks(app, db_enabled, db_functions):
                 print(f"Error logging event: {e}")
         
         # Route to next page based on completed task
-        if completed_task == CONFIDENCE_RISK_CHECKPOINT:
+        if completed_task in CONFIDENCE_RISK_CHECKPOINTS:
             if participant_id:
                 try:
                     log_event(
@@ -822,10 +822,11 @@ def register_callbacks(app, db_enabled, db_functions):
         Input('confidence-risk-submit', 'n_clicks'),
         State('confidence-slider', 'value'),
         State('risk-slider', 'value'),
+        State('current-task', 'data'),
         State('participant-id', 'data'),
         prevent_initial_call=True
     )
-    def submit_confidence_risk(n_clicks, confidence, risk, participant_id):
+    def submit_confidence_risk(n_clicks, confidence, risk, current_task, participant_id):
         """Handle confidence and risk assessment submission."""
         if not n_clicks:
             return dash.no_update, dash.no_update
@@ -837,7 +838,8 @@ def register_callbacks(app, db_enabled, db_functions):
         
         if participant_id:
             try:
-                save_confidence_risk(participant_id, confidence, risk)
+                completed_after_task = current_task - 1
+                save_confidence_risk(participant_id, confidence, risk, completed_after_task=completed_after_task)
                 log_event(
                     participant_id=participant_id,
                     event_type='confidence_risk_submit',
@@ -846,20 +848,35 @@ def register_callbacks(app, db_enabled, db_functions):
                     element_id='confidence-risk-submit',
                     element_type='button',
                     action='submit',
-                    metadata={'confidence': confidence, 'risk': risk}
+                    metadata={'confidence': confidence, 'risk': risk, 'completed_after_task': completed_after_task}
                 )
-                log_event(
-                    participant_id=participant_id,
-                    event_type='page_navigation',
-                    event_category='navigation',
-                    page_name='task',
-                    task_id=CONFIDENCE_RISK_CHECKPOINT + 1,
-                    action='navigate'
-                )
+                # Navigate to next task or feedback
+                next_task = current_task
+                if current_task <= NUM_TASKS:
+                    log_event(
+                        participant_id=participant_id,
+                        event_type='page_navigation',
+                        event_category='navigation',
+                        page_name='task',
+                        task_id=next_task,
+                        action='navigate'
+                    )
+                else:
+                    log_event(
+                        participant_id=participant_id,
+                        event_type='page_navigation',
+                        event_category='navigation',
+                        page_name='feedback',
+                        action='navigate'
+                    )
             except Exception as e:
                 print(f"Error saving confidence/risk: {e}")
         
-        return PAGES['task'], confidence_risk_data
+        # Navigate to task or feedback based on whether we've completed all tasks
+        if current_task <= NUM_TASKS:
+            return PAGES['task'], confidence_risk_data
+        else:
+            return PAGES['feedback'], confidence_risk_data
     
     
     @app.callback(

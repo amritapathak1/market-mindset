@@ -253,17 +253,14 @@ def get_portfolio(participant_id):
 # CONFIDENCE & RISK
 # ============================================
 
-def save_confidence_risk(participant_id, confidence_rating, risk_rating):
+def save_confidence_risk(participant_id, confidence_rating, risk_rating, completed_after_task=None):
     """Save confidence and risk ratings."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO confidence_risk (participant_id, confidence_rating, risk_rating)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (participant_id) DO UPDATE
-                SET confidence_rating = EXCLUDED.confidence_rating,
-                    risk_rating = EXCLUDED.risk_rating
-            """, (participant_id, confidence_rating, risk_rating))
+                INSERT INTO confidence_risk (participant_id, confidence_rating, risk_rating, completed_after_task)
+                VALUES (%s, %s, %s, %s)
+            """, (participant_id, confidence_rating, risk_rating, completed_after_task))
 
 
 def get_confidence_risk(participant_id):

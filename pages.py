@@ -10,7 +10,7 @@ import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from config import (
-    INITIAL_AMOUNT, NUM_TASKS, CONFIDENCE_RISK_CHECKPOINT,
+    INITIAL_AMOUNT, NUM_TASKS, CONFIDENCE_RISK_CHECKPOINTS,
     SLIDER_CONFIG, GENDER_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_OPTIONS,
     MIN_AGE, MAX_AGE, COLORS
 )
@@ -260,13 +260,19 @@ def task_page(task_id, amount, sequential_task_num=None):
     ])
 
 
-def confidence_risk_page():
+def confidence_risk_page(completed_tasks=None):
     """Render the confidence and risk assessment page."""
     conf_config = SLIDER_CONFIG['confidence']
     risk_config = SLIDER_CONFIG['risk']
     
+    # Determine which checkpoint this is
+    if completed_tasks:
+        message = f"You've completed {completed_tasks} investment decisions. Please rate your confidence and risk perception."
+    else:
+        message = "Please rate your confidence and risk perception."
+    
     content = [
-        html.P(f"You've completed {CONFIDENCE_RISK_CHECKPOINT} investment decisions. Please rate your confidence and risk perception."),
+        html.P(message),
         
         html.H5("How confident are you in the investment decisions you've made so far?", className="mt-4 mb-3"),
         create_slider_with_labels(

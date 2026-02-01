@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS confidence_risk (
     participant_id UUID REFERENCES participants(participant_id) ON DELETE CASCADE,
     confidence_rating INTEGER,
     risk_rating INTEGER,
-    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(participant_id)
+    completed_after_task INTEGER,
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Feedback

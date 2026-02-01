@@ -199,7 +199,7 @@ def validate_page_access(requested_page, consent_given, demographics_completed, 
             - If allowed: (True, None, None)
             - If not allowed: (False, redirect_page, error_message)
     """
-    from config import PAGES, CONFIDENCE_RISK_CHECKPOINT
+    from config import PAGES, CONFIDENCE_RISK_CHECKPOINTS
     
     # Consent page is always accessible
     if requested_page == PAGES['consent']:
@@ -221,8 +221,8 @@ def validate_page_access(requested_page, consent_given, demographics_completed, 
     
     # Confidence/risk requires completing checkpoint tasks
     if requested_page == PAGES['confidence_risk']:
-        if current_task <= CONFIDENCE_RISK_CHECKPOINT:
-            return False, PAGES['task'], f"Please complete task {CONFIDENCE_RISK_CHECKPOINT} first"
+        if current_task <= CONFIDENCE_RISK_CHECKPOINTS[0]:
+            return False, PAGES['task'], f"Please complete task {CONFIDENCE_RISK_CHECKPOINTS[0]} first"
         return True, None, None
     
     # Feedback requires all tasks completed

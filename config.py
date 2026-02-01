@@ -20,8 +20,8 @@ INITIAL_AMOUNT = 1000
 # Total number of investment tasks
 NUM_TASKS = 14
 
-# Task number after which to show confidence/risk assessment
-CONFIDENCE_RISK_CHECKPOINT = 7
+# Task numbers after which to show confidence/risk assessment
+CONFIDENCE_RISK_CHECKPOINTS = [3, 9, 14]
 
 # ============================================
 # VALIDATION SETTINGS
