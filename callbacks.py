@@ -25,6 +25,9 @@ from pages import (
     feedback_page, thank_you_page
 )
 
+# Import INFO_COSTS and INITIAL_AMOUNT for cost confirmation and amount display
+from config import INFO_COSTS, INITIAL_AMOUNT
+
 
 def register_callbacks(app, db_enabled, db_functions):
     """
@@ -79,12 +82,12 @@ def register_callbacks(app, db_enabled, db_functions):
                 # Log initial event
                 if new_participant_id:
                     log_event(
-                    participant_id=new_participant_id,
-                    event_type='session_start',
-                    event_category='navigation',
-                    page_name='consent',
-                    action='load'
-                )
+                        participant_id=new_participant_id,
+                        event_type='session_start',
+                        event_category='navigation',
+                        page_name='consent',
+                        action='load'
+                    )
                 
                 # Create randomized task order
                 import random
@@ -106,6 +109,7 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('page-content', 'children'),
         Output('stock-modal', 'is_open', allow_duplicate=True),
         Output('current-page', 'data', allow_duplicate=True),
+        Output('pending-info-request', 'data', allow_duplicate=True),
         Input('current-page', 'data'),
         State('current-task', 'data'),
         State('task-order', 'data'),
@@ -114,9 +118,10 @@ def register_callbacks(app, db_enabled, db_functions):
         State('demographics', 'data'),
         State('confidence-risk', 'data'),
         State('portfolio', 'data'),
+        State('info-cost-spent', 'data'),
         prevent_initial_call='initial_duplicate'
     )
-    def display_page(page, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio):
+    def display_page(page, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio, info_spent):
         """Display the appropriate page based on current page state with flow validation."""
         # Validate page access
         demographics_completed = bool(demographics and demographics.get('age'))
@@ -132,24 +137,24 @@ def register_callbacks(app, db_enabled, db_functions):
                 create_error_alert("Access Denied", error_msg, "You will be redirected to the appropriate page."),
                 html.Script("setTimeout(function(){ window.location.reload(); }, 2000);")
             ])
-            return error_content, False, redirect_page
+            return error_content, False, redirect_page, {}
         
-        # Always close modal when changing pages
+        # Always close modal and clear pending requests when changing pages
         if page == PAGES['consent']:
-            return consent_page(), False, dash.no_update
+            return consent_page(), False, dash.no_update, {}
         elif page == PAGES['demographics']:
-            return demographics_page(), False, dash.no_update
+            return demographics_page(), False, dash.no_update, {}
         elif page == PAGES['task']:
             # Use the randomized task order
             actual_task_id = task_order[current_task - 1] if task_order else current_task
-            return task_page(actual_task_id, amount, sequential_task_num=current_task), False, dash.no_update
+            return task_page(actual_task_id, amount, sequential_task_num=current_task), False, dash.no_update, {}
         elif page == PAGES['confidence_risk']:
-            return confidence_risk_page(completed_tasks=current_task-1), False, dash.no_update
+            return confidence_risk_page(completed_tasks=current_task-1), False, dash.no_update, {}
         elif page == PAGES['feedback']:
-            return feedback_page(amount, portfolio or []), False, dash.no_update
+            return feedback_page(amount, portfolio or [], info_spent or 0), False, dash.no_update, {}
         elif page == PAGES['thank_you']:
-            return thank_you_page(), False, dash.no_update
-        return html.Div("Page not found"), False, dash.no_update
+            return thank_you_page(), False, dash.no_update, {}
+        return html.Div("Page not found"), False, dash.no_update, {}
     
     
     # ============================================
@@ -287,6 +292,154 @@ def register_callbacks(app, db_enabled, db_functions):
     
     
     # ============================================
+    # COST CONFIRMATION CALLBACKS
+    # ============================================
+    
+    @app.callback(
+        Output('cost-modal', 'is_open'),
+        Output('cost-modal-body', 'children'),
+        Output('pending-info-request', 'data'),
+        Input({'type': 'show-more', 'task': ALL, 'stock': ALL}, 'n_clicks'),
+        Input({'type': 'show-week', 'task': ALL, 'stock': ALL}, 'n_clicks'),
+        Input({'type': 'show-month', 'task': ALL, 'stock': ALL}, 'n_clicks'),
+        Input('cost-modal-cancel', 'n_clicks'),
+        State('pending-info-request', 'data'),
+        State('current-task', 'data'),
+        State('participant-id', 'data'),
+        State('purchased-info', 'data'),
+        prevent_initial_call=True
+    )
+    def handle_cost_confirmation(show_more_clicks, show_week_clicks, show_month_clicks, 
+                                  cancel_clicks, pending_request, current_task, participant_id, purchased_info):
+        """Handle cost confirmation modal for information requests."""
+        if not ctx.triggered:
+            return dash.no_update, dash.no_update, dash.no_update
+        
+        triggered_id = ctx.triggered[0]['prop_id']
+        button_id = ctx.triggered_id
+        
+        # CRITICAL: Check that something was actually clicked (not just component rendered)
+        if not button_id or (isinstance(button_id, dict) and not any([
+            show_more_clicks and any(c for c in show_more_clicks if c),
+            show_week_clicks and any(c for c in show_week_clicks if c),
+            show_month_clicks and any(c for c in show_month_clicks if c)
+        ])) and 'cost-modal' not in triggered_id:
+            return dash.no_update, dash.no_update, dash.no_update
+        
+        # Handle cancel button
+        if 'cost-modal-cancel' in triggered_id:
+            if participant_id and pending_request:
+                try:
+                    log_event(
+                        participant_id=participant_id,
+                        event_type='cost_confirmation_cancel',
+                        event_category='interaction',
+                        page_name='task',
+                        task_id=current_task,
+                        element_id=pending_request.get('element_id'),
+                        element_type='button',
+                        action='cancel',
+                        stock_ticker=pending_request.get('stock_ticker'),
+                        metadata={
+                            'cost': pending_request.get('cost'),
+                            'info_type': pending_request.get('info_type'),
+                            'stock_name': pending_request.get('stock_name')
+                        }
+                    )
+                except Exception as e:
+                    print(f"Error logging event: {e}")
+            return False, "", {}
+        
+        # Handle information request buttons
+        if isinstance(button_id, dict):
+            info_type = button_id.get('type')
+            task_id = button_id.get('task')
+            stock_index = button_id.get('stock')
+            
+            if info_type in ['show-more', 'show-week', 'show-month']:
+                # Get task data to retrieve stock info
+                task_data, error = get_task_data_safe(task_id)
+                if error:
+                    return False, "", {}
+                
+                stock = task_data['stocks'][stock_index]
+                
+                # Get cost from stock data
+                cost_key = info_type.replace('-', '_')
+                cost = stock.get('info_costs', {}).get(cost_key, 0)
+                
+                # Check if this info has already been purchased for current task
+                info_identifier = f'{info_type}-{stock_index}'
+                already_purchased = info_identifier in (purchased_info or [])
+                
+                # If already purchased, treat as free
+                if already_purchased:
+                    cost = 0
+                
+                # Determine info type label
+                info_type_labels = {
+                    'show-more': 'Additional Details',
+                    'show-week': "Week's Chart & Analysis",
+                    'show-month': "Month's Chart & Analysis"
+                }
+                info_label = info_type_labels.get(info_type, 'Information')
+                
+                # Log the initial request
+                if participant_id:
+                    try:
+                        log_event(
+                            participant_id=participant_id,
+                            event_type='info_request',
+                            event_category='interaction',
+                            page_name='task',
+                            task_id=task_id,
+                            element_id=f'{info_type}-{stock_index}',
+                            element_type='button',
+                            action='click',
+                            stock_ticker=stock['ticker'],
+                            metadata={
+                                'cost': cost,
+                                'info_type': info_type,
+                                'stock_name': stock['name'],
+                                'stock_index': stock_index
+                            }
+                        )
+                    except Exception as e:
+                        print(f"Error logging event: {e}")
+                
+                # Create pending request
+                pending = {
+                    'info_type': info_type,
+                    'task_id': task_id,
+                    'stock_index': stock_index,
+                    'stock_ticker': stock['ticker'],
+                    'stock_name': stock['name'],
+                    'cost': cost,
+                    'element_id': f'{info_type}-{stock_index}'
+                }
+                
+                # If cost is $0, skip the confirmation modal - directly store pending request
+                if cost == 0:
+                    return False, "", pending
+                
+                # Create modal body for non-zero cost
+                modal_body = html.Div([
+                    html.P([
+                        f"Viewing {info_label} for ",
+                        html.Strong(stock['name']),
+                        f" ({stock['ticker']}) will cost ",
+                        html.Strong(f"${cost:.2f}"),
+                        "."
+                    ], className="mb-3"),
+                    html.P("Do you want to proceed?", className="mb-0")
+                ])
+                
+                return True, modal_body, pending
+        
+        return dash.no_update, dash.no_update, dash.no_update
+    
+    
+    # ============================================
     # MODAL CALLBACKS
     # ============================================
     
@@ -295,20 +448,33 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('modal-title', 'children'),
         Output('modal-body', 'children'),
         Output('modal-context', 'data'),
-        Input({'type': 'show-more', 'task': ALL, 'stock': ALL}, 'n_clicks'),
+        Output('pending-info-request', 'data', allow_duplicate=True),
+        Output('cost-modal', 'is_open', allow_duplicate=True),
+        Output('amount', 'data', allow_duplicate=True),
+        Output('info-cost-spent', 'data', allow_duplicate=True),
+        Output('purchased-info', 'data', allow_duplicate=True),
+        Input('cost-modal-ok', 'n_clicks'),
         Input('close-modal', 'n_clicks'),
+        Input('pending-info-request', 'data'),
         State('stock-modal', 'is_open'),
         State('current-task', 'data'),
+        State('task-order', 'data'),
         State('participant-id', 'data'),
         State('modal-context', 'data'),
+        State('amount', 'data'),
+        State('info-cost-spent', 'data'),
+        State('purchased-info', 'data'),
         prevent_initial_call=True
     )
-    def toggle_modal(show_clicks, close_clicks, is_open, current_task, participant_id, modal_context):
-        """Handle opening/closing of stock details modal."""
+    def toggle_modal(ok_clicks, close_clicks, pending_request, is_open, current_task, task_order, participant_id, modal_context, current_amount, info_spent, purchased_info):
+        """Handle opening/closing of stock details modal after cost confirmation."""
         if not ctx.triggered:
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         triggered_id = ctx.triggered[0]['prop_id']
+        
+        # Debug: print what triggered and what we have
+        print(f"DEBUG toggle_modal: triggered={triggered_id}, pending_request={pending_request}, ok_clicks={ok_clicks}, current_task={current_task}")
         
         if 'close-modal' in triggered_id:
             if participant_id and modal_context:
@@ -327,26 +493,241 @@ def register_callbacks(app, db_enabled, db_functions):
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
-            return False, "", "", {}
+            # Clear pending request when closing info modal
+            return False, "", "", {}, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
-        if 'show-more' in triggered_id and ctx.triggered_id:
-            button_id = ctx.triggered_id
-            if not isinstance(button_id, dict):
-                return dash.no_update, dash.no_update, dash.no_update
-            
-            if show_clicks and any(clicks and clicks > 0 for clicks in show_clicks if clicks is not None):
-                task_id = button_id.get('task')
-                stock_index = button_id.get('stock')
+        # Handle pending request with $0 cost - directly open stock modal without confirmation
+        if 'pending-info-request' in triggered_id and pending_request:
+            cost = pending_request.get('cost', 0)
+            # Only process if cost is 0 (free information)
+            if cost == 0:
+                info_type = pending_request.get('info_type')
+                task_id = pending_request.get('task_id')
+                stock_index = pending_request.get('stock_index')
+                
+                # Get the actual task ID for current task from randomized order
+                actual_task_id = task_order[current_task - 1] if task_order else current_task
+                
+                # Validate that pending request matches current task
+                if task_id != actual_task_id:
+                    print(f"DEBUG: Task ID mismatch for free info - pending task_id={task_id}, actual_task_id={actual_task_id}")
+                    return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 
                 if task_id is None or stock_index is None:
-                    return dash.no_update, dash.no_update, dash.no_update
+                    return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 
                 task_data, error = get_task_data_safe(task_id)
                 if error:
-                    return True, "Error", html.P(error, className="text-danger")
+                    return True, "Error", html.P(error, className="text-danger"), {}, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 
                 stock = task_data['stocks'][stock_index]
                 
+                # Add to purchased list
+                info_identifier = f'{info_type}-{stock_index}'
+                updated_purchased = list(purchased_info or [])
+                if info_identifier not in updated_purchased:
+                    updated_purchased.append(info_identifier)
+                
+                # Log acceptance (auto-accepted because it's free)
+                if participant_id:
+                    try:
+                        log_event(
+                            participant_id=participant_id,
+                            event_type='cost_confirmation_accept',
+                            event_category='interaction',
+                            page_name='task',
+                            task_id=current_task,
+                            element_id=pending_request.get('element_id'),
+                            element_type='button',
+                            action='accept',
+                            stock_ticker=pending_request.get('stock_ticker'),
+                            metadata={
+                                'cost': 0,
+                                'info_type': pending_request.get('info_type'),
+                                'stock_name': pending_request.get('stock_name'),
+                                'is_free': True
+                            }
+                        )
+                    except Exception as e:
+                        print(f"Error logging event: {e}")
+                
+                # Handle different info types (same logic as OK button handler)
+                if info_type == 'show-more':
+                    modal_ctx = {
+                        'element_id': f'show-more-{stock_index}',
+                        'stock_ticker': stock['ticker'],
+                        'metadata': {'stock_name': stock['name'], 'stock_index': stock_index}
+                    }
+                    
+                    if participant_id:
+                        try:
+                            log_event(
+                                participant_id=participant_id,
+                                event_type='modal_open',
+                                event_category='interaction',
+                                page_name='task',
+                                task_id=task_id,
+                                element_id=modal_ctx['element_id'],
+                                element_type='button',
+                                action='click',
+                                stock_ticker=modal_ctx['stock_ticker'],
+                                metadata=modal_ctx['metadata']
+                            )
+                        except Exception as e:
+                            print(f"Error logging event: {e}")
+                    
+                    modal_content = [
+                        html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
+                        html.P(stock['detailed_description'])
+                    ]
+                    
+                    if 'performance_metrics' in stock:
+                        metrics = stock['performance_metrics']
+                        modal_content.append(html.Hr(className="my-4"))
+                        modal_content.append(html.H5("Performance Metrics", className="mb-3"))
+                        modal_content.append(
+                            dbc.Table([
+                                html.Tbody([
+                                    html.Tr([html.Td("5-day", style={'fontWeight': 'bold', 'width': '40%'}), html.Td(metrics.get('5-day', 'N/A'), style={'textAlign': 'right'})]),
+                                    html.Tr([html.Td("10-day", style={'fontWeight': 'bold'}), html.Td(metrics.get('10-day', 'N/A'), style={'textAlign': 'right'})]),
+                                    html.Tr([html.Td("1-month", style={'fontWeight': 'bold'}), html.Td(metrics.get('1-month', 'N/A'), style={'textAlign': 'right'})]),
+                                    html.Tr([html.Td("3-month", style={'fontWeight': 'bold'}), html.Td(metrics.get('3-month', 'N/A'), style={'textAlign': 'right'})]),
+                                    html.Tr([html.Td("6-month", style={'fontWeight': 'bold'}), html.Td(metrics.get('6-month', 'N/A'), style={'textAlign': 'right'})]),
+                                    html.Tr([html.Td("YTD", style={'fontWeight': 'bold'}), html.Td(metrics.get('YTD', 'N/A'), style={'textAlign': 'right'})])
+                                ])
+                            ], bordered=True, hover=True, striped=True, className="mb-0")
+                        )
+                    
+                    return True, stock['name'], html.Div(modal_content), modal_ctx, dash.no_update, False, current_amount, info_spent, updated_purchased
+                
+                elif info_type == 'show-week':
+                    modal_ctx = {
+                        'element_id': f'show-week-{stock_index}',
+                        'stock_ticker': stock['ticker'],
+                        'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'week'}
+                    }
+                    
+                    if participant_id:
+                        try:
+                            log_event(
+                                participant_id=participant_id,
+                                event_type='modal_open',
+                                event_category='interaction',
+                                page_name='task',
+                                task_id=task_id,
+                                element_id=modal_ctx['element_id'],
+                                element_type='button',
+                                action='click',
+                                stock_ticker=modal_ctx['stock_ticker'],
+                                metadata=modal_ctx['metadata']
+                            )
+                        except Exception as e:
+                            print(f"Error logging event: {e}")
+                    
+                    return True, f"{stock['name']} - Weekly Analysis", html.Div([
+                        html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
+                        html.Img(
+                            src=stock.get('week_image', 'https://via.placeholder.com/600x300?text=Weekly+Chart'),
+                            style={'width': '100%', 'maxWidth': '600px'},
+                            className="mb-3 d-block mx-auto"
+                        ),
+                        html.H6("Weekly Performance Analysis", className="mb-2"),
+                        html.P(stock.get('week_analysis', 'Weekly performance data for this stock.'))
+                    ]), modal_ctx, dash.no_update, False, current_amount, info_spent, updated_purchased
+                
+                elif info_type == 'show-month':
+                    modal_ctx = {
+                        'element_id': f'show-month-{stock_index}',
+                        'stock_ticker': stock['ticker'],
+                        'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'month'}
+                    }
+                    
+                    if participant_id:
+                        try:
+                            log_event(
+                                participant_id=participant_id,
+                                event_type='modal_open',
+                                event_category='interaction',
+                                page_name='task',
+                                task_id=task_id,
+                                element_id=modal_ctx['element_id'],
+                                element_type='button',
+                                action='click',
+                                stock_ticker=modal_ctx['stock_ticker'],
+                                metadata=modal_ctx['metadata']
+                            )
+                        except Exception as e:
+                            print(f"Error logging event: {e}")
+                    
+                    return True, f"{stock['name']} - Monthly Analysis", html.Div([
+                        html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
+                        html.Img(
+                            src=stock.get('month_image', 'https://via.placeholder.com/600x300?text=Monthly+Chart'),
+                            style={'width': '100%', 'maxWidth': '600px'},
+                            className="mb-3 d-block mx-auto"
+                        ),
+                        html.H6("Monthly Performance Analysis", className="mb-2"),
+                        html.P(stock.get('month_analysis', 'Monthly performance data for this stock.'))
+                    ]), modal_ctx, dash.no_update, False, current_amount, info_spent, updated_purchased
+        
+        # Handle OK button on cost modal - close cost modal and open info modal
+        if 'cost-modal-ok' in triggered_id and pending_request and ok_clicks:
+            # Deduct cost from available amount and add to spent tracker
+            cost = pending_request.get('cost', 0)
+            new_amount = current_amount - cost
+            new_info_spent = (info_spent or 0) + cost
+            
+            # Log acceptance of cost
+            if participant_id and pending_request:
+                try:
+                    log_event(
+                        participant_id=participant_id,
+                        event_type='cost_confirmation_accept',
+                        event_category='interaction',
+                        page_name='task',
+                        task_id=current_task,
+                        element_id=pending_request.get('element_id'),
+                        element_type='button',
+                        action='accept',
+                        stock_ticker=pending_request.get('stock_ticker'),
+                        metadata={
+                            'cost': pending_request.get('cost'),
+                            'info_type': pending_request.get('info_type'),
+                            'stock_name': pending_request.get('stock_name')
+                        }
+                    )
+                except Exception as e:
+                    print(f"Error logging event: {e}")
+            
+            info_type = pending_request.get('info_type')
+            task_id = pending_request.get('task_id')
+            stock_index = pending_request.get('stock_index')
+            
+            # Get the actual task ID for current task from randomized order
+            actual_task_id = task_order[current_task - 1] if task_order else current_task
+            
+            # Validate that pending request matches current task - prevents stale data issues
+            if task_id != actual_task_id:
+                print(f"DEBUG: Task ID mismatch - pending task_id={task_id}, actual_task_id={actual_task_id}")
+                return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, False, dash.no_update, dash.no_update, dash.no_update
+            
+            if task_id is None or stock_index is None:
+                return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, False, dash.no_update, dash.no_update, dash.no_update
+            
+            task_data, error = get_task_data_safe(task_id)
+            if error:
+                return True, "Error", html.P(error, className="text-danger"), {}, dash.no_update, False, dash.no_update, dash.no_update, dash.no_update
+            
+            stock = task_data['stocks'][stock_index]
+            
+            # Add to purchased list
+            info_identifier = f'{info_type}-{stock_index}'
+            updated_purchased = list(purchased_info or [])
+            if info_identifier not in updated_purchased:
+                updated_purchased.append(info_identifier)
+            
+            # Handle show-more
+            if info_type == 'show-more':
                 # Store modal context for close event
                 modal_ctx = {
                     'element_id': f'show-more-{stock_index}',
@@ -413,149 +794,109 @@ def register_callbacks(app, db_enabled, db_functions):
                         ], bordered=True, hover=True, striped=True, className="mb-0")
                     )
                 
-                return True, stock['name'], html.Div(modal_content), modal_ctx
+                # Don't clear pending_request here - let it be cleared when modal closes or page changes
+                # Close cost modal and open info modal, deduct cost from amount
+                return True, stock['name'], html.Div(modal_content), modal_ctx, dash.no_update, False, new_amount, new_info_spent, updated_purchased
+            
+            # Handle show-week
+            elif info_type == 'show-week':
+                # Store modal context for close event
+                modal_ctx = {
+                    'element_id': f'show-week-{stock_index}',
+                    'stock_ticker': stock['ticker'],
+                    'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'week'}
+                }
+                
+                if participant_id:
+                    try:
+                        log_event(
+                            participant_id=participant_id,
+                            event_type='modal_open',
+                            event_category='interaction',
+                            page_name='task',
+                            task_id=task_id,
+                            element_id=modal_ctx['element_id'],
+                            element_type='button',
+                            action='click',
+                            stock_ticker=modal_ctx['stock_ticker'],
+                            metadata=modal_ctx['metadata']
+                        )
+                    except Exception as e:
+                        print(f"Error logging event: {e}")
+                
+                return True, f"{stock['name']} - Weekly Analysis", html.Div([
+                    html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
+                    html.Img(
+                        src=stock.get('week_image', 'https://via.placeholder.com/600x300?text=Weekly+Chart'),
+                        style={'width': '100%', 'maxWidth': '600px'},
+                        className="mb-3 d-block mx-auto"
+                    ),
+                    html.H6("Weekly Performance Analysis", className="mb-2"),
+                    html.P(stock.get('week_analysis', 'Weekly performance data for this stock.'))
+                ]), modal_ctx, dash.no_update, False, new_amount, new_info_spent, updated_purchased
+            
+            # Handle show-month
+            elif info_type == 'show-month':
+                # Store modal context for close event
+                modal_ctx = {
+                    'element_id': f'show-month-{stock_index}',
+                    'stock_ticker': stock['ticker'],
+                    'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'month'}
+                }
+                
+                if participant_id:
+                    try:
+                        log_event(
+                            participant_id=participant_id,
+                            event_type='modal_open',
+                            event_category='interaction',
+                            page_name='task',
+                            task_id=task_id,
+                            element_id=modal_ctx['element_id'],
+                            element_type='button',
+                            action='click',
+                            stock_ticker=modal_ctx['stock_ticker'],
+                            metadata=modal_ctx['metadata']
+                        )
+                    except Exception as e:
+                        print(f"Error logging event: {e}")
+                
+                return True, f"{stock['name']} - Monthly Analysis", html.Div([
+                    html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
+                    html.Img(
+                        src=stock.get('month_image', 'https://via.placeholder.com/600x300?text=Monthly+Chart'),
+                        style={'width': '100%', 'maxWidth': '600px'},
+                        className="mb-3 d-block mx-auto"
+                    ),
+                    html.H6("Monthly Performance Analysis", className="mb-2"),
+                    html.P(stock.get('month_analysis', 'Monthly performance data for this stock.'))
+                ]), modal_ctx, dash.no_update, False, new_amount, new_info_spent, updated_purchased
         
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
     
+    
+    # ============================================
+    # AMOUNT DISPLAY UPDATE
+    # ============================================
     
     @app.callback(
-        Output('stock-modal', 'is_open', allow_duplicate=True),
-        Output('modal-title', 'children', allow_duplicate=True),
-        Output('modal-body', 'children', allow_duplicate=True),
-        Output('modal-context', 'data', allow_duplicate=True),
-        Input({'type': 'show-week', 'task': ALL, 'stock': ALL}, 'n_clicks'),
-        State('current-task', 'data'),
-        State('participant-id', 'data'),
-        prevent_initial_call=True
+        Output({'type': 'amount-display', 'task': ALL, 'stock': ALL}, 'children'),
+        Input('amount', 'data'),
+        prevent_initial_call=False
     )
-    def show_week_analysis(week_clicks, current_task, participant_id):
-        """Show weekly chart and analysis for a stock."""
-        if not ctx.triggered or not ctx.triggered_id:
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+    def update_amount_display(amount):
+        """Update the available amount display when amount changes."""
+        if amount is None:
+            amount = INITIAL_AMOUNT
         
-        button_id = ctx.triggered_id
-        if not isinstance(button_id, dict):
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        # Return the same content for all amount displays on the page
+        display_content = [
+            html.I(className="bi bi-wallet2 me-2"),
+            f"Available: ${amount:,.2f}"
+        ]
         
-        if week_clicks and any(clicks and clicks > 0 for clicks in week_clicks if clicks is not None):
-            task_id = button_id.get('task')
-            stock_index = button_id.get('stock')
-            
-            if task_id is None or stock_index is None:
-                return dash.no_update, dash.no_update, dash.no_update, dash.no_update
-            
-            task_data, error = get_task_data_safe(task_id)
-            if error:
-                return True, "Error", html.P(error, className="text-danger"), {}
-            
-            stock = task_data['stocks'][stock_index]
-            
-            # Store modal context for close event
-            modal_ctx = {
-                'element_id': f'show-week-{stock_index}',
-                'stock_ticker': stock['ticker'],
-                'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'week'}
-            }
-            
-            if participant_id:
-                try:
-                    log_event(
-                        participant_id=participant_id,
-                        event_type='modal_open',
-                        event_category='interaction',
-                        page_name='task',
-                        task_id=task_id,
-                        element_id=modal_ctx['element_id'],
-                        element_type='button',
-                        action='click',
-                        stock_ticker=modal_ctx['stock_ticker'],
-                        metadata=modal_ctx['metadata']
-                    )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
-            
-            return True, f"{stock['name']} - Weekly Analysis", html.Div([
-                html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
-                html.Img(
-                    src=stock.get('week_image', 'https://via.placeholder.com/600x300?text=Weekly+Chart'),
-                    style={'width': '100%', 'maxWidth': '600px'},
-                    className="mb-3 d-block mx-auto"
-                ),
-                html.H6("Weekly Performance Analysis", className="mb-2"),
-                html.P(stock.get('week_analysis', 'Weekly performance data for this stock.'))
-            ]), modal_ctx
-        
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
-    
-    
-    @app.callback(
-        Output('stock-modal', 'is_open', allow_duplicate=True),
-        Output('modal-title', 'children', allow_duplicate=True),
-        Output('modal-body', 'children', allow_duplicate=True),
-        Output('modal-context', 'data', allow_duplicate=True),
-        Input({'type': 'show-month', 'task': ALL, 'stock': ALL}, 'n_clicks'),
-        State('current-task', 'data'),
-        State('participant-id', 'data'),
-        prevent_initial_call=True
-    )
-    def show_month_analysis(month_clicks, current_task, participant_id):
-        """Show monthly chart and analysis for a stock."""
-        if not ctx.triggered or not ctx.triggered_id:
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
-        
-        button_id = ctx.triggered_id
-        if not isinstance(button_id, dict):
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
-        
-        if month_clicks and any(clicks and clicks > 0 for clicks in month_clicks if clicks is not None):
-            task_id = button_id.get('task')
-            stock_index = button_id.get('stock')
-            
-            if task_id is None or stock_index is None:
-                return dash.no_update, dash.no_update, dash.no_update, dash.no_update
-            
-            task_data, error = get_task_data_safe(task_id)
-            if error:
-                return True, "Error", html.P(error, className="text-danger"), {}
-            
-            stock = task_data['stocks'][stock_index]
-            
-            # Store modal context for close event
-            modal_ctx = {
-                'element_id': f'show-month-{stock_index}',
-                'stock_ticker': stock['ticker'],
-                'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'month'}
-            }
-            
-            if participant_id:
-                try:
-                    log_event(
-                        participant_id=participant_id,
-                        event_type='modal_open',
-                        event_category='interaction',
-                        page_name='task',
-                        task_id=task_id,
-                        element_id=modal_ctx['element_id'],
-                        element_type='button',
-                        action='click',
-                        stock_ticker=modal_ctx['stock_ticker'],
-                        metadata=modal_ctx['metadata']
-                    )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
-            
-            return True, f"{stock['name']} - Monthly Analysis", html.Div([
-                html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
-                html.Img(
-                    src=stock.get('month_image', 'https://via.placeholder.com/600x300?text=Monthly+Chart'),
-                    style={'width': '100%', 'maxWidth': '600px'},
-                    className="mb-3 d-block mx-auto"
-                ),
-                html.H6("Monthly Performance Analysis", className="mb-2"),
-                html.P(stock.get('month_analysis', 'Monthly performance data for this stock.'))
-            ]), modal_ctx
-        
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        # Return list of same content for each display (pattern matching ALL)
+        return [display_content] * len(dash.callback_context.outputs_list)
     
     
     # ============================================
@@ -571,6 +912,7 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('task-responses', 'data'),
         Output('portfolio', 'data'),
         Output('task-error', 'children'),
+        Output('purchased-info', 'data', allow_duplicate=True),
         Input('task-submit', 'n_clicks'),
         State({'type': 'investment-input', 'task': ALL, 'stock': ALL}, 'value'),
         State('current-task', 'data'),
@@ -584,7 +926,7 @@ def register_callbacks(app, db_enabled, db_functions):
     def submit_task(n_clicks, investment_values, current_task, task_order, current_amount, responses, portfolio, participant_id):
         """Handle task submission with investment validation and portfolio tracking."""
         if not n_clicks:
-            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 # Get the actual task ID from the randomized order
         actual_task_id = task_order[current_task - 1] if task_order else current_task
                 # Validate each investment
@@ -606,7 +948,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         )
                     except Exception as e:
                         print(f"Error logging event: {e}")
-                return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error
+                return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
             validated_investments.append(amount)
         
         # Validate total
@@ -625,7 +967,7 @@ def register_callbacks(app, db_enabled, db_functions):
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
-            return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error
+            return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
         
         # Get task data using the actual randomized task ID
         task_data, task_error = get_task_data_safe(actual_task_id)
@@ -730,7 +1072,8 @@ def register_callbacks(app, db_enabled, db_functions):
         
         # Route to next page - but first show the modal
         # We're not changing the page yet, the modal OK button will do that
-        return True, modal_message, dash.no_update, next_task, new_amount, responses, portfolio, ""
+        # Clear purchased-info for next task
+        return True, modal_message, dash.no_update, next_task, new_amount, responses, portfolio, "", []
     
     
     # Handle modal OK button - navigate to next page

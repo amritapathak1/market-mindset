@@ -20,6 +20,11 @@
           "3-month": "+0.21%",
           "6-month": "+19.29%",
           "YTD": "+23.37%"
+        },
+        "info_costs": {
+          "show_more": 5.00,
+          "show_week": 10.00,
+          "show_month": 15.00
         }
       }
     ]
@@ -45,6 +50,11 @@
           "3-month": "+0.55%",
           "6-month": "+4.96%",
           "YTD": "+0.16%"
+        },
+        "info_costs": {
+          "show_more": 0,
+          "show_week": 8.00,
+          "show_month": 12.00
         }
       }
     ]
@@ -70,6 +80,11 @@
           "3-month": "+16.15%",
           "6-month": "+30.54%",
           "YTD": "+59.62%"
+        },
+        "info_costs": {
+          "show_more": 3.00,
+          "show_week": 0,
+          "show_month": 10.00
         }
       }
     ]
@@ -95,6 +110,11 @@
           "3-month": "+6.06%",
           "6-month": "+21.76%",
           "YTD": "+31.11%"
+        },
+        "info_costs": {
+          "show_more": 4.00,
+          "show_week": 9.00,
+          "show_month": 0
         }
       }
     ]
@@ -120,6 +140,11 @@
           "3-month": "-23.93%",
           "6-month": "-29.91%",
           "YTD": "-42.35%"
+        },
+        "info_costs": {
+          "show_more": 0,
+          "show_week": 0,
+          "show_month": 0
         }
       }
     ]
@@ -145,6 +170,11 @@
           "3-month": "+5.23%",
           "6-month": "+31.75%",
           "YTD": "+150.98%"
+        },
+        "info_costs": {
+          "show_more": 7.00,
+          "show_week": 12.00,
+          "show_month": 18.00
         }
       }
     ]
@@ -170,6 +200,11 @@
           "3-month": "+11.14%",
           "6-month": "+12.62%",
           "YTD": "+12.29%"
+        },
+        "info_costs": {
+          "show_more": 2.00,
+          "show_week": 6.00,
+          "show_month": 11.00
         }
       }
     ]
@@ -195,6 +230,11 @@
           "3-month": "-18.52%",
           "6-month": "-14.02%",
           "YTD": "-53.76%"
+        },
+        "info_costs": {
+          "show_more": 6.00,
+          "show_week": 0,
+          "show_month": 14.00
         }
       }
     ]
@@ -220,6 +260,11 @@
           "3-month": "-21.06%",
           "6-month": "+60.86%",
           "YTD": "+105.74%"
+        },
+        "info_costs": {
+          "show_more": 0,
+          "show_week": 7.00,
+          "show_month": 13.00
         }
       }
     ]
@@ -245,6 +290,11 @@
           "3-month": "-21.89%",
           "6-month": "+78.45%",
           "YTD": "-11.16%"
+        },
+        "info_costs": {
+          "show_more": 5.00,
+          "show_week": 10.00,
+          "show_month": 0
         }
       }
     ]
@@ -270,6 +320,11 @@
           "3-month": "+6.33%",
           "6-month": "+9.94%",
           "YTD": "+11.00%"
+        },
+        "info_costs": {
+          "show_more": 4.00,
+          "show_week": 8.00,
+          "show_month": 15.00
         }
       }
     ]
@@ -295,6 +350,11 @@
           "3-month": "+3.36%",
           "6-month": "+2.43%",
           "YTD": "+1.89%"
+        },
+        "info_costs": {
+          "show_more": 3.00,
+          "show_week": 9.00,
+          "show_month": 16.00
         }
       }
     ]
@@ -320,6 +380,11 @@
           "3-month": "-5.20%",
           "6-month": "-0.49%",
           "YTD": "+16.52%"
+        },
+        "info_costs": {
+          "show_more": 0,
+          "show_week": 11.00,
+          "show_month": 17.00
         }
       }
     ]
@@ -345,6 +410,11 @@
           "3-month": "+9.44%",
           "6-month": "+39.57%",
           "YTD": "+25.29%"
+        },
+        "info_costs": {
+          "show_more": 5.00,
+          "show_week": 10.00,
+          "show_month": 15.00
         }
       }
     ]

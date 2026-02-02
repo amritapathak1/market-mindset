@@ -87,11 +87,14 @@ def create_stock_card(stock, stock_index, task_id, amount=None):
                     
                     html.Hr(),
                     
-                    # Available amount display
+                    # Available amount display - made reactive with ID
                     html.H5([
                         html.I(className="bi bi-wallet2 me-2"),
                         f"Available: ${amount:,.2f}" if amount is not None else "Available: $0.00"
-                    ], className="text-success mb-3") if amount is not None else html.Div(),
+                    ],
+                        id={'type': 'amount-display', 'task': task_id, 'stock': stock_index},
+                        className="text-success mb-3"
+                    ),
                     
                     dbc.Label(f"Amount to invest in {stock['name']}:"),
                     dbc.InputGroup([
@@ -305,7 +308,7 @@ def confidence_risk_page(completed_tasks=None):
     ])
 
 
-def feedback_page(uninvested_amount, portfolio):
+def feedback_page(uninvested_amount, portfolio, info_cost_spent=0):
     """Render the final feedback and results page with investment portfolio breakdown."""
     # Calculate total invested value (current worth of all investments)
     total_invested_original = sum(inv['invested'] for inv in portfolio)
@@ -321,10 +324,13 @@ def feedback_page(uninvested_amount, portfolio):
     stats_row = dbc.Row([
         dbc.Col([
             create_info_card("Starting Amount", format_currency(INITIAL_AMOUNT))
-        ], md=3),
+        ], md=2),
+        dbc.Col([
+            create_info_card("Information Cost", format_currency(info_cost_spent))
+        ], md=2),
         dbc.Col([
             create_info_card("Uninvested Cash", format_currency(uninvested_amount))
-        ], md=3),
+        ], md=2),
         dbc.Col([
             create_info_card(
                 "Portfolio Value", 

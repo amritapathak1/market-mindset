@@ -90,7 +90,7 @@ if not DB_ENABLED:
 # APP INITIALIZATION
 # ============================================
 
-from config import INITIAL_AMOUNT, PAGES, MODAL_SIZE
+from config import INITIAL_AMOUNT, PAGES, MODAL_SIZE, INFO_COSTS
 
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
@@ -111,6 +111,19 @@ app.layout = dbc.Container([
     dcc.Store(id='confidence-risk', data={}, storage_type='memory'),
     dcc.Store(id='feedback', data='', storage_type='memory'),
     dcc.Store(id='modal-context', data={}, storage_type='memory'),
+    dcc.Store(id='pending-info-request', data={}, storage_type='memory'),  # Store for pending info requests
+    dcc.Store(id='info-cost-spent', data=0, storage_type='memory'),  # Track total spent on information
+    dcc.Store(id='purchased-info', data=[], storage_type='memory'),  # Track purchased info for current task
+    
+    # Modal for cost confirmation
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("Information Cost"), close_button=False),
+        dbc.ModalBody(id='cost-modal-body'),
+        dbc.ModalFooter([
+            dbc.Button("Cancel", id="cost-modal-cancel", color="secondary", className="me-2"),
+            dbc.Button("OK", id="cost-modal-ok", color="primary")
+        ]),
+    ], id="cost-modal", size="md", is_open=False, backdrop="static", keyboard=False),
     
     # Modal for stock details
     dbc.Modal([

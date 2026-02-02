@@ -57,6 +57,17 @@ COLORS = {
 MODAL_SIZE = 'lg'
 
 # ============================================
+# INFORMATION COSTS
+# ============================================
+
+# Cost to view different types of information (in dollars)
+INFO_COSTS = {
+    'show_more': 5.00,      # Cost to view additional details
+    'show_week': 10.00,     # Cost to view week's chart and analysis
+    'show_month': 15.00     # Cost to view month's chart and analysis
+}
+
+# ============================================
 # ERROR MESSAGES
 # ============================================
 

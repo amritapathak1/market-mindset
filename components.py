@@ -156,7 +156,7 @@ def create_info_card(title, value, color=None, outline=False):
     return dbc.Card([
         dbc.CardBody([
             html.H6(title, className="text-muted"),
-            html.H3(value, className="text-center")
+            html.H6(value, className="text-center")
         ])
     ], className="mb-3", color=color, outline=outline)
 
