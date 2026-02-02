@@ -392,7 +392,7 @@ def register_callbacks(app, db_enabled, db_functions):
                             event_type='info_request',
                             event_category='interaction',
                             page_name='task',
-                            task_id=task_id,
+                            task_id=current_task,
                             element_id=f'{info_type}-{stock_index}',
                             element_type='button',
                             action='click',
@@ -528,28 +528,7 @@ def register_callbacks(app, db_enabled, db_functions):
                 if info_identifier not in updated_purchased:
                     updated_purchased.append(info_identifier)
                 
-                # Log acceptance (auto-accepted because it's free)
-                if participant_id:
-                    try:
-                        log_event(
-                            participant_id=participant_id,
-                            event_type='cost_confirmation_accept',
-                            event_category='interaction',
-                            page_name='task',
-                            task_id=current_task,
-                            element_id=pending_request.get('element_id'),
-                            element_type='button',
-                            action='accept',
-                            stock_ticker=pending_request.get('stock_ticker'),
-                            metadata={
-                                'cost': 0,
-                                'info_type': pending_request.get('info_type'),
-                                'stock_name': pending_request.get('stock_name'),
-                                'is_free': True
-                            }
-                        )
-                    except Exception as e:
-                        print(f"Error logging event: {e}")
+                # Don't log acceptance for free information (cost = 0)
                 
                 # Handle different info types (same logic as OK button handler)
                 if info_type == 'show-more':
@@ -566,7 +545,7 @@ def register_callbacks(app, db_enabled, db_functions):
                                 event_type='modal_open',
                                 event_category='interaction',
                                 page_name='task',
-                                task_id=task_id,
+                                task_id=current_task,
                                 element_id=modal_ctx['element_id'],
                                 element_type='button',
                                 action='click',
@@ -614,7 +593,7 @@ def register_callbacks(app, db_enabled, db_functions):
                                 event_type='modal_open',
                                 event_category='interaction',
                                 page_name='task',
-                                task_id=task_id,
+                                task_id=current_task,
                                 element_id=modal_ctx['element_id'],
                                 element_type='button',
                                 action='click',
@@ -649,7 +628,7 @@ def register_callbacks(app, db_enabled, db_functions):
                                 event_type='modal_open',
                                 event_category='interaction',
                                 page_name='task',
-                                task_id=task_id,
+                                task_id=current_task,
                                 element_id=modal_ctx['element_id'],
                                 element_type='button',
                                 action='click',
@@ -677,8 +656,8 @@ def register_callbacks(app, db_enabled, db_functions):
             new_amount = current_amount - cost
             new_info_spent = (info_spent or 0) + cost
             
-            # Log acceptance of cost
-            if participant_id and pending_request:
+            # Log acceptance of cost (only if cost > 0)
+            if participant_id and pending_request and cost > 0:
                 try:
                     log_event(
                         participant_id=participant_id,
@@ -742,7 +721,7 @@ def register_callbacks(app, db_enabled, db_functions):
                             event_type='modal_open',
                             event_category='interaction',
                             page_name='task',
-                            task_id=task_id,
+                            task_id=current_task,
                             element_id=modal_ctx['element_id'],
                             element_type='button',
                             action='click',
@@ -814,7 +793,7 @@ def register_callbacks(app, db_enabled, db_functions):
                             event_type='modal_open',
                             event_category='interaction',
                             page_name='task',
-                            task_id=task_id,
+                            task_id=current_task,
                             element_id=modal_ctx['element_id'],
                             element_type='button',
                             action='click',
@@ -851,7 +830,7 @@ def register_callbacks(app, db_enabled, db_functions):
                             event_type='modal_open',
                             event_category='interaction',
                             page_name='task',
-                            task_id=task_id,
+                            task_id=current_task,
                             element_id=modal_ctx['element_id'],
                             element_type='button',
                             action='click',
