@@ -1,6 +1,16 @@
 -- PostgreSQL Schema for Stock Market Mindset
 -- Optimized for AWS RDS Free Tier (db.t2.micro)
 
+-- Drop all tables (use CASCADE to handle foreign key dependencies)
+DROP TABLE IF EXISTS events CASCADE;
+DROP TABLE IF EXISTS page_visits CASCADE;
+DROP TABLE IF EXISTS feedback CASCADE;
+DROP TABLE IF EXISTS confidence_risk CASCADE;
+DROP TABLE IF EXISTS portfolio CASCADE;
+DROP TABLE IF EXISTS task_responses CASCADE;
+DROP TABLE IF EXISTS demographics CASCADE;
+DROP TABLE IF EXISTS participants CASCADE;
+
 -- Participants table
 CREATE TABLE IF NOT EXISTS participants (
     participant_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
