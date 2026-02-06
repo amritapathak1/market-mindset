@@ -90,7 +90,7 @@ if not DB_ENABLED:
 # APP INITIALIZATION
 # ============================================
 
-from config import INITIAL_AMOUNT, PAGES, MODAL_SIZE, INFO_COSTS
+from config import INITIAL_AMOUNT, TUTORIAL_INITIAL_AMOUNT, PAGES, MODAL_SIZE, INFO_COSTS
 
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
@@ -101,9 +101,10 @@ app.layout = dbc.Container([
     # Store components for state management (memory only - no persistence)
     dcc.Store(id='participant-id', data=None, storage_type='memory'),
     dcc.Store(id='current-page', data=PAGES['consent'], storage_type='memory'),
-    dcc.Store(id='amount', data=INITIAL_AMOUNT, storage_type='memory'),
-    dcc.Store(id='current-task', data=1, storage_type='memory'),
-    dcc.Store(id='task-order', data=None, storage_type='memory'),
+    dcc.Store(id='amount', data=TUTORIAL_INITIAL_AMOUNT, storage_type='memory'),
+    dcc.Store(id='current-task', data=1, storage_type='memory'),  # Index into task-order (1-based)
+    dcc.Store(id='task-order', data=None, storage_type='memory'),  # List of task IDs (main tasks only)
+    dcc.Store(id='tutorial-completed', data=False, storage_type='memory'),  # Flag for tutorial completion
     dcc.Store(id='consent-given', data=False, storage_type='memory'),
     dcc.Store(id='demographics', data={}, storage_type='memory'),
     dcc.Store(id='task-responses', data={}, storage_type='memory'),

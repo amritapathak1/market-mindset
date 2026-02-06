@@ -2,7 +2,7 @@
 Utility functions for the Stock Market Mindset application.
 """
 
-from config import ERROR_MESSAGES, MAX_DECIMAL_PLACES, MIN_INVESTMENT, TASKS_DATA
+from config import ERROR_MESSAGES, MAX_DECIMAL_PLACES, MIN_INVESTMENT, TASKS_DATA, TUTORIAL_TASKS_DATA
 
 
 def validate_investment(value, stock_name=None):
@@ -68,9 +68,10 @@ def validate_total_investment(investments, available_amount):
 def get_task_data_safe(task_id):
     """
     Safely retrieve task data with error handling.
+    Supports both tutorial tasks (string IDs like 'tutorial_1') and main tasks (integer IDs).
     
     Args:
-        task_id: The ID of the task to retrieve (1-indexed)
+        task_id: The ID of the task to retrieve (string for tutorial, 1-indexed int for main)
         
     Returns:
         tuple: (task_data, error_message)
@@ -78,6 +79,31 @@ def get_task_data_safe(task_id):
             - If error: (None, error_string)
     """
     try:
+        # Check if this is a tutorial task
+        if isinstance(task_id, str) and task_id.startswith('tutorial_'):
+            # Find tutorial task by task_id field
+            for task_data in TUTORIAL_TASKS_DATA:
+                if task_data.get('task_id') == task_id:
+                    # Validate required fields
+                    if 'task_id' not in task_data or 'stocks' not in task_data:
+                        return None, "Missing required fields in tutorial task data"
+                    
+                    if len(task_data['stocks']) != 1:
+                        return None, "Task must have exactly 1 stock"
+                    
+                    # Validate stock data structure
+                    for i, stock in enumerate(task_data['stocks']):
+                        required_fields = ['name', 'ticker',
+                                         'short_description', 'detailed_description']
+                        for field in required_fields:
+                            if field not in stock:
+                                return None, f"Stock {i} missing required field: {field}"
+                    
+                    return task_data, None
+            
+            return None, f"Tutorial task not found: {task_id}"
+        
+        # Handle main tasks (integer IDs)
         # Validate task_id range
         if not isinstance(task_id, int) or not 1 <= task_id <= len(TASKS_DATA):
             return None, f"Invalid task ID: {task_id}"
@@ -211,7 +237,15 @@ def validate_page_access(requested_page, consent_given, demographics_completed, 
             return False, PAGES['consent'], "Please provide consent before continuing"
         return True, None, None
     
-    # Tasks require demographics
+    # Tutorials require demographics
+    if requested_page == PAGES['tutorial_1'] or requested_page == PAGES['tutorial_2']:
+        if not consent_given:
+            return False, PAGES['consent'], "Please provide consent before continuing"
+        if not demographics_completed:
+            return False, PAGES['demographics'], "Please complete demographics before starting tutorials"
+        return True, None, None
+    
+    # Tasks require demographics (tutorials are optional to enforce)
     if requested_page == PAGES['task']:
         if not consent_given:
             return False, PAGES['consent'], "Please provide consent before continuing"

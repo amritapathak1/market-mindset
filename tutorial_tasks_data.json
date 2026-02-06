@@ -1,0 +1,62 @@
+[
+  {
+    "task_id": "tutorial_1",
+    "stocks": [
+      {
+        "name": "Tutorial Company Alpha",
+        "ticker": "TUT1",
+        "image": "/assets/images/a1_intraday.png",
+        "return_percent": 12.50,
+        "week_image": "/assets/images/a1_week.png",
+        "month_image": "/assets/images/a1_month.png",
+        "week_analysis": "This is a tutorial example. The stock showed steady upward movement throughout the week, with minor fluctuations. This demonstrates a typical positive trend pattern.",
+        "month_analysis": "This is a tutorial example. Over the month, the stock displayed moderate volatility with an overall upward trajectory. Notice how the price moved in both directions before settling at a higher level.",
+        "short_description": "Tutorial company for practice purposes - Technology sector.",
+        "detailed_description": "This is a practice round to help you become familiar with the interface. In actual tasks, you'll see real company information here. For this tutorial, focus on understanding how to: 1) View additional information by clicking the buttons, 2) See how information costs are deducted from your available amount, 3) Enter investment amounts in the input field. Your decisions in this tutorial will not affect your actual study data.",
+        "performance_metrics": {
+          "5-day": "+2.15%",
+          "10-day": "+1.85%",
+          "1-month": "+3.20%",
+          "3-month": "+5.10%",
+          "6-month": "+12.50%",
+          "YTD": "+15.30%"
+        },
+        "info_costs": {
+          "show_more": 5.00,
+          "show_week": 10.00,
+          "show_month": 15.00
+        }
+      }
+    ]
+  },
+  {
+    "task_id": "tutorial_2",
+    "stocks": [
+      {
+        "name": "Tutorial Company Beta",
+        "ticker": "TUT2",
+        "image": "/assets/images/a2_intraday.png",
+        "return_percent": 8.75,
+        "week_image": "/assets/images/a2_week.png",
+        "month_image": "/assets/images/a2_month.png",
+        "week_analysis": "This is a tutorial example. The stock experienced mixed trading with both gains and losses during the week. This pattern shows how stocks can be volatile in the short term.",
+        "month_analysis": "This is a tutorial example. Monthly performance shows the stock had significant ups and downs but maintained a modest positive return overall. This illustrates typical market volatility.",
+        "short_description": "Tutorial company for practice purposes - Healthcare sector.",
+        "detailed_description": "This is the second practice round. By now, you should be familiar with: 1) Viewing different types of information and their costs, 2) How your available amount changes when you purchase information, 3) Entering investment amounts. Remember, you can invest any amount from $0 up to your available balance. After this tutorial, the main study tasks will begin, and your responses will be recorded for research purposes.",
+        "performance_metrics": {
+          "5-day": "+0.95%",
+          "10-day": "+1.20%",
+          "1-month": "+2.40%",
+          "3-month": "+4.80%",
+          "6-month": "+8.75%",
+          "YTD": "+10.20%"
+        },
+        "info_costs": {
+          "show_more": 5.00,
+          "show_week": 10.00,
+          "show_month": 15.00
+        }
+      }
+    ]
+  }
+]

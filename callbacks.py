@@ -14,14 +14,14 @@ from dash import html, ctx, Input, Output, State, ALL
 import dash_bootstrap_components as dbc
 from flask import request
 
-from config import PAGES, NUM_TASKS, CONFIDENCE_RISK_CHECKPOINTS
+from config import PAGES, NUM_TASKS, NUM_TUTORIAL_TASKS, CONFIDENCE_RISK_CHECKPOINTS
 from utils import (
     validate_investment, validate_total_investment, get_task_data_safe,
     validate_demographics, validate_page_access
 )
 from components import create_centered_card, create_error_alert
 from pages import (
-    consent_page, demographics_page, task_page, confidence_risk_page,
+    consent_page, demographics_page, tutorial_page, task_page, confidence_risk_page,
     feedback_page, thank_you_page
 )
 
@@ -89,7 +89,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         action='load'
                     )
                 
-                # Create randomized task order
+                # Create randomized task order for main tasks only
                 import random
                 task_order = list(range(1, NUM_TASKS + 1))
                 random.shuffle(task_order)
@@ -144,12 +144,18 @@ def register_callbacks(app, db_enabled, db_functions):
             return consent_page(), False, dash.no_update, {}
         elif page == PAGES['demographics']:
             return demographics_page(), False, dash.no_update, {}
+        elif page == PAGES['tutorial_1']:
+            return tutorial_page(1, amount), False, dash.no_update, {}
+        elif page == PAGES['tutorial_2']:
+            return tutorial_page(2, amount), False, dash.no_update, {}
         elif page == PAGES['task']:
             # Use the randomized task order
             actual_task_id = task_order[current_task - 1] if task_order else current_task
             return task_page(actual_task_id, amount, sequential_task_num=current_task), False, dash.no_update, {}
         elif page == PAGES['confidence_risk']:
-            return confidence_risk_page(completed_tasks=current_task-1), False, dash.no_update, {}
+            # Calculate number of completed main tasks (excluding tutorials)
+            completed_main_tasks = max(0, current_task - 1)
+            return confidence_risk_page(completed_tasks=completed_main_tasks), False, dash.no_update, {}
         elif page == PAGES['feedback']:
             return feedback_page(amount, portfolio or [], info_spent or 0), False, dash.no_update, {}
         elif page == PAGES['thank_you']:
@@ -281,14 +287,13 @@ def register_callbacks(app, db_enabled, db_functions):
                     participant_id=participant_id,
                     event_type='page_navigation',
                     event_category='navigation',
-                    page_name='task',
-                    task_id=1,
+                    page_name='tutorial_1',
                     action='navigate'
                 )
             except Exception as e:
                 print(f"Error saving demographics: {e}")
         
-        return PAGES['task'], demographics_data, ""
+        return PAGES['tutorial_1'], demographics_data, ""
     
     
     # ============================================
@@ -464,17 +469,15 @@ def register_callbacks(app, db_enabled, db_functions):
         State('amount', 'data'),
         State('info-cost-spent', 'data'),
         State('purchased-info', 'data'),
+        State('current-page', 'data'),
         prevent_initial_call=True
     )
-    def toggle_modal(ok_clicks, close_clicks, pending_request, is_open, current_task, task_order, participant_id, modal_context, current_amount, info_spent, purchased_info):
+    def toggle_modal(ok_clicks, close_clicks, pending_request, is_open, current_task, task_order, participant_id, modal_context, current_amount, info_spent, purchased_info, current_page):
         """Handle opening/closing of stock details modal after cost confirmation."""
         if not ctx.triggered:
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         triggered_id = ctx.triggered[0]['prop_id']
-        
-        # Debug: print what triggered and what we have
-        print(f"DEBUG toggle_modal: triggered={triggered_id}, pending_request={pending_request}, ok_clicks={ok_clicks}, current_task={current_task}")
         
         if 'close-modal' in triggered_id:
             if participant_id and modal_context:
@@ -505,13 +508,15 @@ def register_callbacks(app, db_enabled, db_functions):
                 task_id = pending_request.get('task_id')
                 stock_index = pending_request.get('stock_index')
                 
-                # Get the actual task ID for current task from randomized order
-                actual_task_id = task_order[current_task - 1] if task_order else current_task
-                
-                # Validate that pending request matches current task
-                if task_id != actual_task_id:
-                    print(f"DEBUG: Task ID mismatch for free info - pending task_id={task_id}, actual_task_id={actual_task_id}")
-                    return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+                # Validate task ID - skip validation for tutorial tasks
+                if not str(task_id).startswith('tutorial_'):
+                    # Get the actual task ID for current task from randomized order
+                    actual_task_id = task_order[current_task - 1] if task_order else current_task
+                    
+                    # Validate that pending request matches current task
+                    if task_id != actual_task_id:
+                        print(f"DEBUG: Task ID mismatch for free info - pending task_id={task_id}, actual_task_id={actual_task_id}")
+                        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 
                 if task_id is None or stock_index is None:
                     return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
@@ -682,13 +687,15 @@ def register_callbacks(app, db_enabled, db_functions):
             task_id = pending_request.get('task_id')
             stock_index = pending_request.get('stock_index')
             
-            # Get the actual task ID for current task from randomized order
-            actual_task_id = task_order[current_task - 1] if task_order else current_task
-            
-            # Validate that pending request matches current task - prevents stale data issues
-            if task_id != actual_task_id:
-                print(f"DEBUG: Task ID mismatch - pending task_id={task_id}, actual_task_id={actual_task_id}")
-                return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, False, dash.no_update, dash.no_update, dash.no_update
+            # Validate task ID - skip validation for tutorial tasks
+            if not str(task_id).startswith('tutorial_'):
+                # Get the actual task ID for current task from randomized order
+                actual_task_id = task_order[current_task - 1] if task_order else current_task
+                
+                # Validate that pending request matches current task - prevents stale data issues
+                if task_id != actual_task_id:
+                    print(f"DEBUG: Task ID mismatch - pending task_id={task_id}, actual_task_id={actual_task_id}")
+                    return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, False, dash.no_update, dash.no_update, dash.no_update
             
             if task_id is None or stock_index is None:
                 return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, False, dash.no_update, dash.no_update, dash.no_update
@@ -879,6 +886,288 @@ def register_callbacks(app, db_enabled, db_functions):
     
     
     # ============================================
+    # TUTORIAL SUBMISSION
+    # ============================================
+    
+    # ============================================
+    # TUTORIAL CALLBACKS
+    # ============================================
+    
+    # Reset tutorial buttons to disabled when entering tutorial pages
+    @app.callback(
+        Output('tutorial-1-submit', 'disabled', allow_duplicate=True),
+        Output('purchased-info', 'data', allow_duplicate=True),
+        Input('current-page', 'data'),
+        prevent_initial_call=True
+    )
+    def reset_tutorial_1_button(current_page):
+        """Ensure tutorial 1 button starts disabled and reset purchased info."""
+        if current_page == PAGES['tutorial_1']:
+            return True, []  # Reset purchased-info to empty list
+        elif current_page == PAGES['tutorial_2']:
+            return dash.no_update, []  # Reset purchased-info but don't touch tutorial 2 button
+        return dash.no_update, dash.no_update
+    
+    
+    # Simple tutorial 1 button enablement - enable button when info modal closes
+    @app.callback(
+        Output('tutorial-1-submit', 'disabled'),
+        Output('tutorial-1-status', 'children'),
+        Input('stock-modal', 'is_open'),
+        State('current-page', 'data'),
+        State('purchased-info', 'data'),
+        prevent_initial_call=True
+    )
+    def enable_tutorial_1_button(modal_is_open, current_page, purchased_info):
+        """Enable tutorial 1 button after viewing info."""
+        # Only act on tutorial 1 page
+        if current_page != PAGES['tutorial_1']:
+            return dash.no_update, dash.no_update
+        
+        # Check if modal just closed AND user has viewed at least one piece of info
+        if not modal_is_open and purchased_info and len(purchased_info) > 0:
+            return False, dbc.Alert([
+                html.I(className="bi bi-check-circle me-2"),
+                "Great! You've learned how to view information. Now enter an investment amount and click Continue."
+            ], color="success", className="text-center mt-3")
+        
+        return dash.no_update, dash.no_update
+    
+    
+    @app.callback(
+        Output('tutorial-1-result-modal', 'is_open'),
+        Output('tutorial-1-result-body', 'children'),
+        Output('tutorial-error', 'children', allow_duplicate=True),
+        Output('amount', 'data', allow_duplicate=True),
+        Input('tutorial-1-submit', 'n_clicks'),
+        State({'type': 'investment-input', 'task': ALL, 'stock': ALL}, 'value'),
+        State('amount', 'data'),
+        State('participant-id', 'data'),
+        prevent_initial_call=True
+    )
+    def submit_tutorial_1(n_clicks, investment_values, current_amount, participant_id):
+        """Handle tutorial 1 submission."""
+        if not n_clicks:
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        
+        # Validate investment
+        validated_investments = []
+        for i, value in enumerate(investment_values):
+            amount, error = validate_investment(value, f"Stock {i+1}")
+            if error:
+                return False, "", error, dash.no_update
+            validated_investments.append(amount)
+        
+        # Validate total
+        is_valid, error = validate_total_investment(validated_investments, current_amount)
+        if not is_valid:
+            return False, "", error, dash.no_update
+        
+        # Get task data
+        task_data, task_error = get_task_data_safe('tutorial_1')
+        if task_error:
+            return False, "", task_error, dash.no_update
+        
+        total_investment = sum(validated_investments)
+        
+        # Calculate result
+        total_profit_loss = 0
+        for i, investment_amount in enumerate(validated_investments):
+            if investment_amount > 0:
+                stock = task_data['stocks'][i]
+                return_percent = stock.get('return_percent', 0)
+                final_value = investment_amount * (1 + return_percent / 100)
+                profit_loss = final_value - investment_amount
+                total_profit_loss += profit_loss
+        
+        # Create result modal content
+        profit_loss_color = 'success' if total_profit_loss >= 0 else 'warning'
+        result_content = dbc.Alert([
+            html.H5([html.I(className="bi bi-check-circle me-2"), "Tutorial 1 Complete!"], className="mb-3"),
+            html.Hr(),
+            html.H6("Your Practice Result:", className="mb-2"),
+            html.P(f"Investment: ${total_investment:,.2f}", className="mb-1"),
+            html.P([
+                "Result: ",
+                html.Span(f"${total_profit_loss:+,.2f}", 
+                         style={'color': 'green' if total_profit_loss >= 0 else 'red', 
+                                'fontWeight': 'bold'}),
+                " (" + ("Profit" if total_profit_loss >= 0 else "Loss") + ")"
+            ], className="mb-3"),
+            html.Hr(),
+            html.P([
+                html.I(className="bi bi-lightbulb me-2"),
+                "In the actual study, you'll see results like this after each investment. "
+                "Your goal is to maximize your final amount through strategic investments."
+            ], className="text-muted small mb-0")
+        ], color=profit_loss_color)
+        
+        if participant_id:
+            try:
+                log_event(
+                    participant_id=participant_id,
+                    event_type='tutorial_submit',
+                    event_category='interaction',
+                    page_name='tutorial_1',
+                    element_id='tutorial-1-submit',
+                    action='submit',
+                    metadata={'investment': total_investment, 'profit_loss': total_profit_loss}
+                )
+            except Exception as e:
+                print(f"Error logging tutorial: {e}")
+        
+        # Deduct investment from amount
+        new_amount = current_amount - total_investment
+        return True, result_content, "", new_amount
+    
+    
+    @app.callback(
+        Output('current-page', 'data', allow_duplicate=True),
+        Input('tutorial-1-result-ok', 'n_clicks'),
+        State('participant-id', 'data'),
+        prevent_initial_call=True
+    )
+    def tutorial_1_next(n_clicks, participant_id):
+        """Navigate from tutorial 1 to tutorial 2."""
+        if not n_clicks:
+            return dash.no_update
+        
+        if participant_id:
+            try:
+                log_event(
+                    participant_id=participant_id,
+                    event_type='page_navigation',
+                    event_category='navigation',
+                    page_name='tutorial_2',
+                    action='navigate'
+                )
+            except Exception as e:
+                print(f"Error logging event: {e}")
+        
+        return PAGES['tutorial_2']
+    
+    
+    @app.callback(
+        Output('tutorial-2-result-modal', 'is_open'),
+        Output('tutorial-2-result-body', 'children'),
+        Output('tutorial-error', 'children'),
+        Output('amount', 'data', allow_duplicate=True),
+        Input('tutorial-2-submit', 'n_clicks'),
+        State({'type': 'investment-input', 'task': ALL, 'stock': ALL}, 'value'),
+        State('amount', 'data'),
+        State('participant-id', 'data'),
+        prevent_initial_call=True
+    )
+    def submit_tutorial_2(n_clicks, investment_values, current_amount, participant_id):
+        """Handle tutorial 2 submission."""
+        if not n_clicks:
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        
+        # Validate investment
+        validated_investments = []
+        for i, value in enumerate(investment_values):
+            amount, error = validate_investment(value, f"Stock {i+1}")
+            if error:
+                return False, "", error, dash.no_update
+            validated_investments.append(amount)
+        
+        # Validate total
+        is_valid, error = validate_total_investment(validated_investments, current_amount)
+        if not is_valid:
+            return False, "", error, dash.no_update
+        
+        # Get task data
+        task_data, task_error = get_task_data_safe('tutorial_2')
+        if task_error:
+            return False, "", task_error, dash.no_update
+        
+        total_investment = sum(validated_investments)
+        
+        # Calculate result
+        total_profit_loss = 0
+        for i, investment_amount in enumerate(validated_investments):
+            if investment_amount > 0:
+                stock = task_data['stocks'][i]
+                return_percent = stock.get('return_percent', 0)
+                final_value = investment_amount * (1 + return_percent / 100)
+                profit_loss = final_value - investment_amount
+                total_profit_loss += profit_loss
+        
+        # Create result modal content
+        profit_loss_color = 'success' if total_profit_loss >= 0 else 'warning'
+        result_content = dbc.Alert([
+            html.H5([html.I(className="bi bi-trophy me-2"), "Tutorial Complete - Ready to Begin!"], className="mb-3"),
+            html.Hr(),
+            html.H6("Your Practice Result:", className="mb-2"),
+            html.P(f"Investment: ${total_investment:,.2f}", className="mb-1"),
+            html.P([
+                "Result: ",
+                html.Span(f"${total_profit_loss:+,.2f}", 
+                         style={'color': 'green' if total_profit_loss >= 0 else 'red', 
+                                'fontWeight': 'bold'}),
+                " (" + ("Profit" if total_profit_loss >= 0 else "Loss") + ")"
+            ], className="mb-3"),
+            html.Hr(),
+            html.Div([
+                html.P([html.Strong("You're now ready for the main study!")], className="mb-2"),
+                html.P([
+                    html.I(className="bi bi-info-circle me-2"),
+                    "From this point forward, your investment decisions will be recorded. "
+                    "Remember: you can view additional information (at a cost) or make decisions based on the basic information provided."
+                ], className="text-muted small mb-0")
+            ])
+        ], color="primary")
+        
+        if participant_id:
+            try:
+                log_event(
+                    participant_id=participant_id,
+                    event_type='tutorial_submit',
+                    event_category='interaction',
+                    page_name='tutorial_2',
+                    element_id='tutorial-2-submit',
+                    action='submit',
+                    metadata={'investment': total_investment, 'profit_loss': total_profit_loss}
+                )
+            except Exception as e:
+                print(f"Error logging tutorial: {e}")
+        
+        # Deduct investment from amount
+        new_amount = current_amount - total_investment
+        return True, result_content, "", new_amount
+    
+    
+    @app.callback(
+        Output('current-page', 'data', allow_duplicate=True),
+        Output('tutorial-completed', 'data'),
+        Output('amount', 'data', allow_duplicate=True),
+        Input('tutorial-2-result-ok', 'n_clicks'),
+        State('participant-id', 'data'),
+        prevent_initial_call=True
+    )
+    def tutorial_2_next(n_clicks, participant_id):
+        """Navigate from tutorial 2 to first main task and reset amount to $1000."""
+        if not n_clicks:
+            return dash.no_update, dash.no_update, dash.no_update
+        
+        if participant_id:
+            try:
+                log_event(
+                    participant_id=participant_id,
+                    event_type='page_navigation',
+                    event_category='navigation',
+                    page_name='task',
+                    task_id=1,
+                    action='navigate',
+                    metadata={'tutorials_completed': True, 'amount_reset': INITIAL_AMOUNT}
+                )
+            except Exception as e:
+                print(f"Error logging event: {e}")
+        
+        return PAGES['task'], True, INITIAL_AMOUNT
+    
+    
+    # ============================================
     # TASK SUBMISSION
     # ============================================
     
@@ -906,9 +1195,11 @@ def register_callbacks(app, db_enabled, db_functions):
         """Handle task submission with investment validation and portfolio tracking."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-                # Get the actual task ID from the randomized order
+        
+        # Get the actual task ID from the randomized order
         actual_task_id = task_order[current_task - 1] if task_order else current_task
-                # Validate each investment
+        
+        # Validate each investment
         validated_investments = []
         for i, value in enumerate(investment_values):
             amount, error = validate_investment(value, f"Stock {i+1}")
@@ -1061,10 +1352,11 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('current-page', 'data', allow_duplicate=True),
         Input('result-modal-ok', 'n_clicks'),
         State('current-task', 'data'),
+        State('task-order', 'data'),
         State('participant-id', 'data'),
         prevent_initial_call=True
     )
-    def handle_modal_ok(n_clicks, current_task, participant_id):
+    def handle_modal_ok(n_clicks, current_task, task_order, participant_id):
         """Handle modal OK button click and navigate to appropriate next page."""
         if not n_clicks:
             return dash.no_update, dash.no_update
@@ -1089,7 +1381,7 @@ def register_callbacks(app, db_enabled, db_functions):
             except Exception as e:
                 print(f"Error logging event: {e}")
         
-        # Route to next page based on completed task
+        # Route to next page based on completed task number
         if completed_task in CONFIDENCE_RISK_CHECKPOINTS:
             if participant_id:
                 try:
@@ -1160,6 +1452,7 @@ def register_callbacks(app, db_enabled, db_functions):
         
         if participant_id:
             try:
+                # Completed task number (already incremented, so -1)
                 completed_after_task = current_task - 1
                 save_confidence_risk(participant_id, confidence, risk, completed_after_task=completed_after_task)
                 log_event(

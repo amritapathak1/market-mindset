@@ -10,7 +10,7 @@ import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from config import (
-    INITIAL_AMOUNT, NUM_TASKS, CONFIDENCE_RISK_CHECKPOINTS,
+    INITIAL_AMOUNT, NUM_TASKS, NUM_TUTORIAL_TASKS, CONFIDENCE_RISK_CHECKPOINTS,
     SLIDER_CONFIG, GENDER_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_OPTIONS,
     MIN_AGE, MAX_AGE, COLORS
 )
@@ -196,7 +196,7 @@ def demographics_page():
                         
                         html.Div(id="demographics-error", className="text-danger mb-2"),
                         dbc.Button(
-                            "Continue to Tasks",
+                            "Continue to Tutorial",
                             id="demographics-submit",
                             color="primary",
                             size="lg",
@@ -206,6 +206,99 @@ def demographics_page():
                 ])
             ], width=12, lg=8, className="mx-auto")
         ])
+    ])
+
+
+def tutorial_page(tutorial_num, amount):
+    """Render a tutorial page (practice round)."""
+    # Get tutorial task ID
+    tutorial_task_id = f'tutorial_{tutorial_num}'
+    
+    # Safely get task data
+    task_data, error = get_task_data_safe(tutorial_task_id)
+    
+    if error:
+        return dbc.Container([
+            dbc.Alert([
+                html.H4("Error Loading Tutorial", className="alert-heading"),
+                html.P(error),
+                html.Hr(),
+                html.P("Please refresh the page or contact the study administrator.", className="mb-0")
+            ], color=COLORS['danger'])
+        ])
+    
+    stocks = task_data['stocks']
+    
+    # Instructions for each tutorial
+    if tutorial_num == 1:
+        instructions = dbc.Alert([
+            html.H4([html.I(className="bi bi-lightbulb me-2"), "Tutorial 1: Exploring Information"], className="mb-3"),
+            html.P([
+                html.Strong("Welcome!"),
+                " This is a practice round to help you learn the interface."
+            ], className="mb-2"),
+            html.Hr(),
+            html.P([
+                html.Strong("Step 1: "),
+                "Click on one of the information buttons below (Show More Details, Week's Chart, or Month's Chart). ",
+                "Notice that some information costs money."
+            ], className="mb-2"),
+            html.P([
+                html.Strong("Step 2: "),
+                "After viewing the information, click Continue to proceed to the next tutorial."
+            ], className="mb-0")
+        ], color="primary", className="mb-4")
+    else:  # tutorial_num == 2
+        instructions = dbc.Alert([
+            html.H4([html.I(className="bi bi-lightbulb me-2"), "Tutorial 2: Making Investments"], className="mb-3"),
+            html.P([
+                html.Strong("Great job!"),
+                " Now practice making an investment decision."
+            ], className="mb-2"),
+            html.Hr(),
+            html.P([
+                "Enter an investment amount in the box below (you can enter $0 if you don't want to invest). ",
+                "Then click 'Start Main Study' to see the result and begin the actual study."
+            ], className="mb-0")
+        ], color="primary", className="mb-4")
+    
+    return dbc.Container([
+        instructions,
+        
+        html.H2(f"Tutorial {tutorial_num} of {NUM_TUTORIAL_TASKS}", className="text-center mb-2"),
+        
+        html.P("Practice round - decisions here are not recorded.", 
+               className="text-center text-muted mb-4"),
+        
+        # Stock card
+        create_stock_card(stocks[0], 0, tutorial_task_id, amount),
+        
+        html.Div(id="tutorial-error", className="text-danger text-center mb-3 mt-3"),
+        
+        # Completion status
+        html.Div(id=f'tutorial-{tutorial_num}-status', className="text-center mb-3"),
+        
+        dbc.Row([
+            dbc.Col([
+                dbc.Button(
+                    "Continue" if tutorial_num < NUM_TUTORIAL_TASKS else "Start Main Study",
+                    id=f"tutorial-{tutorial_num}-submit",
+                    color="success" if tutorial_num < NUM_TUTORIAL_TASKS else "primary",
+                    size="lg",
+                    className="w-100",
+                    disabled=(tutorial_num == 1)  # Only tutorial 1 starts disabled
+                )
+            ], md=6, className="mx-auto")
+        ]),
+        
+        # Result Modal for tutorial
+        dbc.Modal([
+            dbc.ModalHeader(dbc.ModalTitle("Investment Result (Practice)"), close_button=False),
+            dbc.ModalBody(id=f"tutorial-{tutorial_num}-result-body"),
+            dbc.ModalFooter(
+                dbc.Button("Continue", id=f"tutorial-{tutorial_num}-result-ok", color="primary")
+            )
+        ], id=f"tutorial-{tutorial_num}-result-modal", is_open=False, centered=True, backdrop="static", keyboard=False)
     ])
 
 

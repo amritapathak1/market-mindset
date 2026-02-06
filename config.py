@@ -9,6 +9,11 @@ import os
 # STUDY CONFIGURATION
 # ============================================
 
+# Load tutorial tasks data from JSON file
+TUTORIAL_TASKS_DATA_FILE = os.path.join(os.path.dirname(__file__), 'tutorial_tasks_data.json')
+with open(TUTORIAL_TASKS_DATA_FILE, 'r') as f:
+    TUTORIAL_TASKS_DATA = json.load(f)
+
 # Load tasks data from JSON file
 TASKS_DATA_FILE = os.path.join(os.path.dirname(__file__), 'tasks_data.json')
 with open(TASKS_DATA_FILE, 'r') as f:
@@ -17,10 +22,17 @@ with open(TASKS_DATA_FILE, 'r') as f:
 # Initial amount given to participants
 INITIAL_AMOUNT = 1000
 
-# Total number of investment tasks
+# Initial amount for tutorial tasks
+TUTORIAL_INITIAL_AMOUNT = 100
+
+# Number of tutorial rounds (practice tasks before main tasks)
+NUM_TUTORIAL_TASKS = 2
+
+# Total number of investment tasks (main tasks, excluding tutorials)
 NUM_TASKS = 14
 
 # Task numbers after which to show confidence/risk assessment
+# Note: These are relative to main tasks only (not including tutorial tasks)
 CONFIDENCE_RISK_CHECKPOINTS = [3, 9, 14]
 
 # ============================================
@@ -102,6 +114,8 @@ SUCCESS_MESSAGES = {
 PAGES = {
     'consent': 'consent',
     'demographics': 'demographics',
+    'tutorial_1': 'tutorial-1',
+    'tutorial_2': 'tutorial-2',
     'task': 'task',
     'confidence_risk': 'confidence-risk',
     'feedback': 'feedback',
