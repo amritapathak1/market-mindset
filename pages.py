@@ -408,9 +408,60 @@ def confidence_risk_page(completed_tasks=None):
             risk_config['label_min'],
             risk_config['label_max']
         ),
-        
-        create_action_button("Continue", "confidence-risk-submit", className="mt-4")
     ]
+    
+    # Add attention check for checkpoints 3 and 9 (not 14)
+    # Always include the slider (for callback), but hide it when not needed
+    if completed_tasks == 3:
+        content.extend([
+            html.Div([
+                html.H5("Please select option 2 for this item. This question is used to verify attentive responding.", 
+                       className="mt-5 mb-3", style={'color': '#0066cc'}),
+                create_slider_with_labels(
+                    'attention-slider',
+                    1,
+                    7,
+                    4,
+                    1,
+                    '1',
+                    '7'
+                ),
+            ])
+        ])
+    elif completed_tasks == 9:
+        content.extend([
+            html.Div([
+                html.H5("Please select option 4 for this item. This question is used to verify attentive responding.", 
+                       className="mt-5 mb-3", style={'color': '#0066cc'}),
+                create_slider_with_labels(
+                    'attention-slider',
+                    1,
+                    7,
+                    4,
+                    1,
+                    '1',
+                    '7'
+                ),
+            ])
+        ])
+    else:
+        # Hidden slider for callback compatibility
+        content.append(
+            html.Div(
+                create_slider_with_labels(
+                    'attention-slider',
+                    1,
+                    7,
+                    4,
+                    1,
+                    '1',
+                    '7'
+                ),
+                style={'display': 'none'}
+            )
+        )
+    
+    content.append(create_action_button("Continue", "confidence-risk-submit", className="mt-4"))
     
     return dbc.Container([
         create_page_header("Confidence and Risk Assessment"),

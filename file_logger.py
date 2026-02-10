@@ -99,11 +99,12 @@ def save_portfolio_investment(participant_id=None, task_id=None, stock_ticker=No
     })
 
 
-def save_confidence_risk(participant_id=None, confidence=None, risk_perception=None, completed_after_task=None, **kwargs):
+def save_confidence_risk(participant_id=None, confidence=None, risk_perception=None, attention_check_response=None, completed_after_task=None, **kwargs):
     """Save confidence and risk perception to file."""
     _write_log_entry(participant_id, 'confidence_risk', {
         'confidence': confidence,
         'risk_perception': risk_perception,
+        'attention_check_response': attention_check_response,
         'completed_after_task': completed_after_task
     })
 

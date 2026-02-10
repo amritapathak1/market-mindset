@@ -812,7 +812,7 @@ def register_callbacks(app, db_enabled, db_functions):
     def update_button_states(purchased_info, current_task, task_order):
         """Enable/disable buttons based on purchase status."""
         # Get the actual task ID from the randomized order
-        if current_task and task_order and not str(task_order[current_task - 1]).startswith('tutorial_'):
+        if current_task and task_order and (current_task - 1) < len(task_order) and not str(task_order[current_task - 1]).startswith('tutorial_'):
             actual_task_id = task_order[current_task - 1] if task_order else current_task
         else:
             actual_task_id = current_task
@@ -1448,25 +1448,27 @@ def register_callbacks(app, db_enabled, db_functions):
         Input('confidence-risk-submit', 'n_clicks'),
         State('confidence-slider', 'value'),
         State('risk-slider', 'value'),
+        State('attention-slider', 'value'),
         State('current-task', 'data'),
         State('participant-id', 'data'),
         prevent_initial_call=True
     )
-    def submit_confidence_risk(n_clicks, confidence, risk, current_task, participant_id):
+    def submit_confidence_risk(n_clicks, confidence, risk, attention_check, current_task, participant_id):
         """Handle confidence and risk assessment submission."""
         if not n_clicks:
             return dash.no_update, dash.no_update
         
         confidence_risk_data = {
             'confidence': confidence,
-            'risk': risk
+            'risk': risk,
+            'attention_check': attention_check
         }
         
         if participant_id:
             try:
                 # Completed task number (already incremented, so -1)
                 completed_after_task = current_task - 1
-                save_confidence_risk(participant_id, confidence, risk, completed_after_task=completed_after_task)
+                save_confidence_risk(participant_id, confidence, risk, attention_check_response=attention_check, completed_after_task=completed_after_task)
                 log_event(
                     participant_id=participant_id,
                     event_type='confidence_risk_submit',
@@ -1475,7 +1477,7 @@ def register_callbacks(app, db_enabled, db_functions):
                     element_id='confidence-risk-submit',
                     element_type='button',
                     action='submit',
-                    metadata={'confidence': confidence, 'risk': risk, 'completed_after_task': completed_after_task}
+                    metadata={'confidence': confidence, 'risk': risk, 'attention_check': attention_check, 'completed_after_task': completed_after_task}
                 )
                 # Navigate to next task or feedback
                 next_task = current_task

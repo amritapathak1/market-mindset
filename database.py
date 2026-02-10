@@ -253,14 +253,14 @@ def get_portfolio(participant_id):
 # CONFIDENCE & RISK
 # ============================================
 
-def save_confidence_risk(participant_id, confidence_rating, risk_rating, completed_after_task=None):
+def save_confidence_risk(participant_id, confidence_rating, risk_rating, attention_check_response=None, completed_after_task=None):
     """Save confidence and risk ratings."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO confidence_risk (participant_id, confidence_rating, risk_rating, completed_after_task)
-                VALUES (%s, %s, %s, %s)
-            """, (participant_id, confidence_rating, risk_rating, completed_after_task))
+                INSERT INTO confidence_risk (participant_id, confidence_rating, risk_rating, attention_check_response, completed_after_task)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (participant_id, confidence_rating, risk_rating, attention_check_response, completed_after_task))
 
 
 def get_confidence_risk(participant_id):
