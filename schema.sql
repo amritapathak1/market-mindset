@@ -142,10 +142,17 @@ SELECT
     p.created_at,
     p.completed,
     p.completed_at,
-    d.age,
+    p.withdrawn,
+    p.withdrawn_at,
+    d.age_range,
     d.gender,
+    d.gender_self_describe,
     d.education,
+    d.income,
     d.experience,
+    d.hispanic_latino,
+    d.race,
+    d.race_other,
     COUNT(DISTINCT tr.task_id) as tasks_completed,
     SUM(tr.total_investment) as total_invested,
     cr.confidence_rating,
@@ -157,7 +164,10 @@ LEFT JOIN demographics d ON p.participant_id = d.participant_id
 LEFT JOIN task_responses tr ON p.participant_id = tr.participant_id
 LEFT JOIN confidence_risk cr ON p.participant_id = cr.participant_id
 GROUP BY p.participant_id, p.session_id, p.created_at, p.completed, p.completed_at,
-         d.age, d.gender, d.education, d.experience, cr.confidence_rating, cr.risk_rating;
+         p.withdrawn, p.withdrawn_at,
+         d.age_range, d.gender, d.gender_self_describe, d.education, d.income, 
+         d.experience, d.hispanic_latino, d.race, d.race_other,
+         cr.confidence_rating, cr.risk_rating;
 
 -- Function to update last_active timestamp
 CREATE OR REPLACE FUNCTION update_last_active()
