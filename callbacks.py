@@ -939,27 +939,52 @@ def register_callbacks(app, db_enabled, db_functions):
                 profit_loss = final_value - investment_amount
                 total_profit_loss += profit_loss
         
-        # Create result modal content
-        profit_loss_color = 'success' if total_profit_loss >= 0 else 'warning'
-        result_content = dbc.Alert([
-            html.H5([html.I(className="bi bi-check-circle me-2"), "Tutorial 1 Complete!"], className="mb-3"),
+        # Create result modal content - similar to task result but with profit/loss details
+        # Determine profit/loss message like in tasks
+        if total_investment == 0:
+            main_message = "You did not invest in this task."
+        elif total_profit_loss > 0:
+            main_message = "Your investment made a profit! 📈"
+        elif total_profit_loss < 0:
+            main_message = "Your investment made a loss. 📉"
+        else:
+            main_message = "Your investment broke even."
+        
+        result_content = html.Div([
+            html.H5(main_message, className="text-center mb-4"),
+            
+            # Show profit/loss amount (only in tutorial)
+            html.Div([
+                html.P([
+                    html.Strong("Investment: "),
+                    f"${total_investment:,.2f}"
+                ], className="mb-2"),
+                html.P([
+                    html.Strong("Profit/Loss: "),
+                    html.Span(
+                        f"${total_profit_loss:+,.2f}",
+                        style={
+                            'color': 'green' if total_profit_loss >= 0 else 'red',
+                            'fontWeight': 'bold'
+                        }
+                    )
+                ], className="mb-4"),
+            ], className="text-center"),
+            
             html.Hr(),
-            html.H6("Your Practice Result:", className="mb-2"),
-            html.P(f"Investment: ${total_investment:,.2f}", className="mb-1"),
-            html.P([
-                "Result: ",
-                html.Span(f"${total_profit_loss:+,.2f}", 
-                         style={'color': 'green' if total_profit_loss >= 0 else 'red', 
-                                'fontWeight': 'bold'}),
-                " (" + ("Profit" if total_profit_loss >= 0 else "Loss") + ")"
-            ], className="mb-3"),
-            html.Hr(),
-            html.P([
-                html.I(className="bi bi-lightbulb me-2"),
-                "In the actual study, you'll see results like this after each investment. "
-                "Your goal is to maximize your final amount through strategic investments."
-            ], className="text-muted small mb-0")
-        ], color=profit_loss_color)
+            
+            # Message for tutorial 1
+            html.Div([
+                html.P([
+                    html.I(className="bi bi-lightbulb-fill me-2"),
+                    "Great job! You've completed the first tutorial."
+                ], className="mb-2"),
+                html.P([
+                    "Notice how the investment result is shown. ",
+                    "In the main study, you will NOT see profit/loss details after each task—only at the very end."
+                ], className="text-muted mb-0")
+            ], style={'backgroundColor': '#f8f9fa', 'padding': '15px', 'borderRadius': '8px'})
+        ])
         
         if participant_id:
             try:
@@ -1052,30 +1077,58 @@ def register_callbacks(app, db_enabled, db_functions):
                 profit_loss = final_value - investment_amount
                 total_profit_loss += profit_loss
         
-        # Create result modal content
-        profit_loss_color = 'success' if total_profit_loss >= 0 else 'warning'
-        result_content = dbc.Alert([
-            html.H5([html.I(className="bi bi-trophy me-2"), "Tutorial Complete - Ready to Begin!"], className="mb-3"),
-            html.Hr(),
-            html.H6("Your Practice Result:", className="mb-2"),
-            html.P(f"Investment: ${total_investment:,.2f}", className="mb-1"),
-            html.P([
-                "Result: ",
-                html.Span(f"${total_profit_loss:+,.2f}", 
-                         style={'color': 'green' if total_profit_loss >= 0 else 'red', 
-                                'fontWeight': 'bold'}),
-                " (" + ("Profit" if total_profit_loss >= 0 else "Loss") + ")"
-            ], className="mb-3"),
-            html.Hr(),
+        # Create result modal content - similar to task result but with profit/loss details
+        # Determine profit/loss message like in tasks
+        if total_investment == 0:
+            main_message = "You did not invest in this task."
+        elif total_profit_loss > 0:
+            main_message = "Your investment made a profit! 📈"
+        elif total_profit_loss < 0:
+            main_message = "Your investment made a loss. 📉"
+        else:
+            main_message = "Your investment broke even."
+        
+        result_content = html.Div([
+            html.H5(main_message, className="text-center mb-4"),
+            
+            # Show profit/loss amount (only in tutorial)
             html.Div([
-                html.P([html.Strong("You're now ready for the main study!")], className="mb-2"),
                 html.P([
-                    html.I(className="bi bi-info-circle me-2"),
-                    "From this point forward, your investment decisions will be recorded. "
-                    "Remember: you can view additional information (at a cost) or make decisions based on the basic information provided."
-                ], className="text-muted small mb-0")
-            ])
-        ], color="primary")
+                    html.Strong("Investment: "),
+                    f"${total_investment:,.2f}"
+                ], className="mb-2"),
+                html.P([
+                    html.Strong("Profit/Loss: "),
+                    html.Span(
+                        f"${total_profit_loss:+,.2f}",
+                        style={
+                            'color': 'green' if total_profit_loss >= 0 else 'red',
+                            'fontWeight': 'bold'
+                        }
+                    )
+                ], className="mb-4"),
+            ], className="text-center"),
+            
+            html.Hr(),
+            
+            # Important note about main study
+            html.Div([
+                html.P([
+                    html.I(className="bi bi-info-circle-fill me-2"),
+                    html.Strong("Important:")
+                ], className="mb-2"),
+                html.Ul([
+                    html.Li("In the main study, you will NOT see your profit or loss after each task."),
+                    html.Li("Profit/loss will only be shown once at the very end of the study."),
+                    html.Li("The profit/loss is NOT added to or removed from your available amount."),
+                    html.Li("Your available amount only decreases based on what you invest and the information you purchase.")
+                ], className="mb-3 text-start"),
+                html.P([
+                    html.Strong("You're now ready for the main study!"),
+                    " Your decisions will be recorded from this point forward."
+                ], className="text-center mb-0")
+            ], style={'backgroundColor': '#f8f9fa', 'padding': '20px', 'borderRadius': '8px'})
+        ])
         
         if participant_id:
             try:
