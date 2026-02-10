@@ -25,7 +25,8 @@ try:
     from database import (
         create_participant, log_event,
         save_demographics, save_task_response, save_portfolio_investment,
-        save_confidence_risk, save_feedback, update_participant_completion
+        save_confidence_risk, save_feedback, update_participant_completion,
+        update_participant_withdrawal
     )
     # Test if database is actually usable
     import psycopg2
@@ -49,7 +50,8 @@ try:
                 'save_portfolio_investment': save_portfolio_investment,
                 'save_confidence_risk': save_confidence_risk,
                 'save_feedback': save_feedback,
-                'update_participant_completion': update_participant_completion
+                'update_participant_completion': update_participant_completion,
+                'update_participant_withdrawal': update_participant_withdrawal
             }
         except Exception as conn_error:
             print(f"✗ Database connection failed: {conn_error}")
@@ -71,6 +73,7 @@ if not DB_ENABLED:
         create_participant, log_event,
         save_demographics, save_task_response, save_portfolio_investment,
         save_confidence_risk, save_feedback, update_participant_completion,
+        update_participant_withdrawal,
         LOGS_DIR
     )
     print(f"✓ File-based logging enabled. Logs directory: {LOGS_DIR.absolute()}")
@@ -83,7 +86,8 @@ if not DB_ENABLED:
         'save_portfolio_investment': save_portfolio_investment,
         'save_confidence_risk': save_confidence_risk,
         'save_feedback': save_feedback,
-        'update_participant_completion': update_participant_completion
+        'update_participant_completion': update_participant_completion,
+        'update_participant_withdrawal': update_participant_withdrawal
     }
 
 # ============================================

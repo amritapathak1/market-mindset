@@ -119,6 +119,7 @@ PAGES = {
     'task': 'task',
     'confidence_risk': 'confidence-risk',
     'feedback': 'feedback',
+    'debrief': 'debrief',
     'thank_you': 'thank-you',
 }
 
@@ -153,25 +154,65 @@ GENDER_OPTIONS = [
     {"label": "Select...", "value": ""},
     {"label": "Male", "value": "male"},
     {"label": "Female", "value": "female"},
-    {"label": "Non-binary", "value": "non-binary"},
+    {"label": "Non-binary / Third gender", "value": "non-binary"},
+    {"label": "Prefer to self-describe", "value": "prefer-to-self-describe"},
     {"label": "Prefer not to say", "value": "prefer-not-to-say"}
+]
+
+AGE_RANGE_OPTIONS = [
+    {"label": "Select...", "value": ""},
+    {"label": "18–24 years old", "value": "18-24"},
+    {"label": "25–34 years old", "value": "25-34"},
+    {"label": "35–44 years old", "value": "35-44"},
+    {"label": "45–54 years old", "value": "45-54"},
+    {"label": "55–64 years old", "value": "55-64"},
+    {"label": "65 years old or older", "value": "65+"}
 ]
 
 EDUCATION_OPTIONS = [
     {"label": "Select...", "value": ""},
-    {"label": "High School", "value": "high-school"},
-    {"label": "Some College", "value": "some-college"},
-    {"label": "Bachelor's Degree", "value": "bachelors"},
-    {"label": "Master's Degree", "value": "masters"},
-    {"label": "Doctoral Degree", "value": "doctoral"},
-    {"label": "Other", "value": "other"}
+    {"label": "Less than high school", "value": "less-than-high-school"},
+    {"label": "High school diploma or equivalent", "value": "high-school"},
+    {"label": "Some college, no degree", "value": "some-college"},
+    {"label": "Associate degree", "value": "associate"},
+    {"label": "Bachelor's degree (e.g., BA, BS)", "value": "bachelors"},
+    {"label": "Master's degree (e.g., MA, MS, MBA)", "value": "masters"},
+    {"label": "Doctorate or professional degree (e.g., PhD, JD, MD)", "value": "doctoral"},
+    {"label": "Prefer not to say", "value": "prefer-not-to-say"}
+]
+
+INCOME_OPTIONS = [
+    {"label": "Select...", "value": ""},
+    {"label": "Less than $20,000", "value": "less-than-20k"},
+    {"label": "$20,000–$39,999", "value": "20k-39k"},
+    {"label": "$40,000–$59,999", "value": "40k-59k"},
+    {"label": "$60,000–$79,999", "value": "60k-79k"},
+    {"label": "$80,000–$99,999", "value": "80k-99k"},
+    {"label": "$100,000–$149,999", "value": "100k-149k"},
+    {"label": "$150,000 or more", "value": "150k-plus"}
 ]
 
 EXPERIENCE_OPTIONS = [
     {"label": "Select...", "value": ""},
-    {"label": "None - No prior experience", "value": "none"},
-    {"label": "Beginner - Less than 1 year", "value": "beginner"},
-    {"label": "Intermediate - 1-5 years", "value": "intermediate"},
-    {"label": "Advanced - 5-10 years", "value": "advanced"},
-    {"label": "Expert - More than 10 years", "value": "expert"}
+    {"label": "I have never invested in stocks, mutual funds, ETFs, or similar financial assets", "value": "none"},
+    {"label": "I have limited experience (e.g., tried investing once or twice, or for less than one year)", "value": "limited"},
+    {"label": "I have some experience (e.g., invested occasionally for 1–3 years)", "value": "some"},
+    {"label": "I have moderate experience (e.g., invested regularly for 3–5 years)", "value": "moderate"},
+    {"label": "I have extensive experience (e.g., routinely invested for more than 5 years)", "value": "extensive"}
+]
+
+HISPANIC_LATINO_OPTIONS = [
+    {"label": "Select...", "value": ""},
+    {"label": "Yes", "value": "yes"},
+    {"label": "No", "value": "no"}
+]
+
+RACE_OPTIONS = [
+    {"label": "Select...", "value": ""},
+    {"label": "American Indian or Alaskan Native", "value": "american-indian-alaskan-native"},
+    {"label": "Asian", "value": "asian"},
+    {"label": "Black or African American", "value": "black-african-american"},
+    {"label": "Native Hawaiian and Other Pacific Islander", "value": "native-hawaiian-pacific-islander"},
+    {"label": "White", "value": "white"},
+    {"label": "Other", "value": "other"}
 ]

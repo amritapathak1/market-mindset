@@ -56,14 +56,21 @@ def log_event(participant_id=None, event_type=None, event_category=None,
     })
 
 
-def save_demographics(participant_id=None, age=None, gender=None, 
-                     education=None, experience=None, **kwargs):
+def save_demographics(participant_id=None, age_range=None, gender=None, 
+                     gender_self_describe=None, education=None, income=None,
+                     experience=None, hispanic_latino=None, race=None, 
+                     race_other=None, **kwargs):
     """Save demographics to file."""
     _write_log_entry(participant_id, 'demographics', {
-        'age': age,
+        'age_range': age_range,
         'gender': gender,
+        'gender_self_describe': gender_self_describe,
         'education': education,
-        'experience': experience
+        'income': income,
+        'experience': experience,
+        'hispanic_latino': hispanic_latino,
+        'race': race,
+        'race_other': race_other
     })
 
 
@@ -120,4 +127,10 @@ def update_participant_completion(participant_id=None, completed=None, **kwargs)
     """Log completion status to file."""
     _write_log_entry(participant_id, 'completion', {
         'completed': completed
+    })
+
+def update_participant_withdrawal(participant_id=None, withdrawn=True, **kwargs):
+    """Update withdrawal status in file."""
+    _write_log_entry(participant_id, 'withdrawal', {
+        'withdrawn': withdrawn
     })

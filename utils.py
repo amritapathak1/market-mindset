@@ -134,52 +134,71 @@ def get_task_data_safe(task_id):
         return None, f"{ERROR_MESSAGES['unknown_error']} ({str(e)})"
 
 
-def validate_demographics(age, gender, education, experience):
+def validate_demographics(age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other):
     """
     Validate demographics form data.
     
     Args:
-        age: Age value
+        age_range: Age range selection
         gender: Gender selection
+        gender_self_describe: Self-described gender (if applicable)
         education: Education level selection
+        income: Income range selection
         experience: Investment experience selection
+        hispanic_latino: Hispanic/Latino identification
+        race: Race identification
+        race_other: Other race specification (if applicable)
         
     Returns:
         tuple: (is_valid, error_message, validated_data)
     """
-    from config import MIN_AGE, MAX_AGE
-    
-    # Validate age
-    if not age:
-        return False, ERROR_MESSAGES['age_required'], None
-    
-    try:
-        age_int = int(age)
-        if age_int < MIN_AGE:
-            return False, ERROR_MESSAGES['age_too_young'], None
-        if age_int > MAX_AGE:
-            return False, ERROR_MESSAGES['age_invalid'], None
-    except (ValueError, TypeError):
-        return False, ERROR_MESSAGES['age_invalid'], None
+    # Validate age range
+    if not age_range or age_range == "":
+        return False, "Please select your age range", None
     
     # Validate gender
     if not gender or gender == "":
         return False, ERROR_MESSAGES['gender_required'], None
     
+    # If "prefer to self-describe" is selected, validate the text input
+    if gender == "prefer-to-self-describe" and not gender_self_describe:
+        return False, "Please specify your gender", None
+    
     # Validate education
     if not education or education == "":
         return False, ERROR_MESSAGES['education_required'], None
+    
+    # Validate income
+    if not income or income == "":
+        return False, "Please select your income range", None
     
     # Validate experience
     if not experience or experience == "":
         return False, ERROR_MESSAGES['experience_required'], None
     
+    # Validate hispanic/latino
+    if not hispanic_latino or hispanic_latino == "":
+        return False, "Please indicate whether you are Hispanic/Latino", None
+    
+    # Validate race
+    if not race or race == "":
+        return False, "Please select your race/ethnicity", None
+    
+    # If "other" is selected for race, validate the text input
+    if race == "other" and not race_other:
+        return False, "Please specify your race/ethnicity", None
+    
     # Return validated data
     validated_data = {
-        'age': age_int,
+        'age_range': age_range,
         'gender': gender,
+        'gender_self_describe': gender_self_describe if gender == "prefer-to-self-describe" else None,
         'education': education,
-        'experience': experience
+        'income': income,
+        'experience': experience,
+        'hispanic_latino': hispanic_latino,
+        'race': race,
+        'race_other': race_other if race == "other" else None
     }
     
     return True, None, validated_data

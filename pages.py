@@ -12,6 +12,7 @@ import dash_bootstrap_components as dbc
 from config import (
     INITIAL_AMOUNT, NUM_TASKS, NUM_TUTORIAL_TASKS, CONFIDENCE_RISK_CHECKPOINTS,
     SLIDER_CONFIG, GENDER_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_OPTIONS,
+    AGE_RANGE_OPTIONS, INCOME_OPTIONS, HISPANIC_LATINO_OPTIONS, RACE_OPTIONS,
     MIN_AGE, MAX_AGE, COLORS
 )
 from utils import (
@@ -129,31 +130,85 @@ def create_stock_card(stock, stock_index, task_id, amount=None):
 def consent_page():
     """Render the consent form page."""
     content = [
-        html.H4("Investment Decision Study", className="mb-3"),
+        html.H3("University of Chicago Online Consent Form for Research Participation", className="mb-4 text-center"),
+        
+        html.Div([
+            html.P([html.Strong("Study Number: "), "IRB26-XXXX"]),
+            html.P([html.Strong("Study Title: "), "Investment Decisions in a Simulated Stock Market"]),
+            html.P([html.Strong("Researcher(s): "), "Amrita Pathak, Henry K. Dambanemuya (PI)"])
+        ], className="mb-4"),
+        
+        html.H5("Description:", className="mt-3"),
         html.P([
-            "Thank you for your interest in participating in this research study. ",
-            "This study investigates how individuals make investment decisions when presented with stock information."
+            "We are researchers at the University of Chicago doing a research study on how people make investment decisions in a simulated market environment. ",
+            "If you agree to participate, you will complete an interactive online task in which you make a series of investment decisions using virtual money across multiple rounds, ",
+            "along with a short set of demographic questions (age, gender, education, income). ",
+            "The full study takes about 25 to 30 minutes to complete in a single session. Your participation is voluntary."
         ]),
-        html.H5("Study Overview:", className="mt-3"),
+        
+        html.H5("Incentives:", className="mt-3"),
+        html.P([
+            "Your participation in this study is entirely voluntary. While we welcome participants who are motivated by an interest in contributing to research, ",
+            "we also offer a small token of appreciation for your time. All participants who complete the study and pass the attention checks will receive a base payment of $5. ",
+            "An additional $10 bonus will be awarded to the top 10 participants whose investment decisions result in the highest overall returns during the task. ",
+            "Participants will not lose any compensation if their task performance results in a loss, and no real money is at risk. ",
+            "Participants who choose to withdraw before completing the study will not receive payment. ",
+            "To ensure data quality, the study includes attention check questions. Participants who fail these checks or do not complete the full study may not be eligible for compensation."
+        ]),
+        
+        html.H5("Risks and Benefits:", className="mt-3"),
+        html.P([
+            "Your participation in this study does not involve any risk to you beyond that of everyday life. ",
+            "The study involves making decisions using virtual money in a simulated market environment and answering brief, non-sensitive questions. ",
+            "You may not receive any direct personal benefit from participating in this study; however, the information collected may help researchers better understand ",
+            "how people make investment decisions, which could inform future research and educational efforts related to investment behavior."
+        ]),
+        
+        html.H5("Confidentiality:", className="mt-3"),
+        html.P([
+            "The information collected in this study will be used only for research purposes related to this study. ",
+            "The study does not collect names, contact information, IP addresses, or other directly identifying information within the study application. ",
+            "Data collected during participation include demographic information, investment decisions, time spent viewing additional information, and optional feedback responses."
+        ]),
+        html.P([
+            "Study data are recorded under a non-identifying study-specific record. ",
+            "Any identifiers used by the recruitment platform for compensation or participation management are handled by the platform and are not stored with study response data. ",
+            "Access to the study data is limited to the research team."
+        ]),
+        html.P([
+            "If a participant chooses to withdraw before completing the study, any data collected up to the point of withdrawal will not be saved or included in the analysis. ",
+            "At the end of the study, you will have the opportunity to request that your data be excluded from the research analysis. ",
+            "Because the study does not collect identifying information, data cannot be withdrawn after you have left the study session."
+        ]),
+        html.P([
+            "Identifiable information will not be shared outside the research team because it is not collected as part of this study. ",
+            "The information collected as part of this research will not be used or shared for future research studies, even if all identifiers are removed."
+        ]),
+        
+        html.H5("Contacts & Questions:", className="mt-3"),
+        html.P("If you have questions or concerns about the study, you can contact the researchers:"),
         html.Ul([
-            html.Li(f"Duration: Approximately 15-20 minutes"),
-            html.Li("You will be asked to complete a brief demographic survey"),
-            html.Li(f"You will make investment decisions across {NUM_TASKS} different scenarios"),
-            html.Li(f"You will start with a virtual {format_currency(INITIAL_AMOUNT)}"),
-            html.Li("You will be asked to rate your confidence and risk perception midway through"),
-            html.Li("All data collected will be anonymous and used for research purposes only")
+            html.Li("Amrita Pathak at 773-406-4622 or amritap1@uchicago.edu"),
+            html.Li("Principal Investigator: Henry Dambanemuya at 773-834-6207 or hdambane@uchicago.edu")
         ]),
-        html.H5("Your Rights:", className="mt-3"),
-        html.Ul([
-            html.Li("Participation is completely voluntary"),
-            html.Li("You may withdraw at any time without penalty"),
-            html.Li("Your responses will be kept confidential"),
-            html.Li("There are no known risks associated with this study")
+        html.P([
+            "If you have any questions about your rights as a participant in this research, feel you have been harmed, or wish to discuss other study-related concerns with someone who is not part of the research team, ",
+            "you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, or by email at sbs-irb@uchicago.edu."
         ]),
+        
+        html.H5("Consent:", className="mt-3"),
+        html.P([
+            "Participation is voluntary. Refusal to participate or withdrawing from the research will involve no penalty or loss of benefits to which you might otherwise be entitled."
+        ]),
+        html.P([
+            "By clicking \"I agree to participate\" below, you confirm that you have read the consent form, are at least 18 years old, and agree to participate in the research. ",
+            "Please print or save a copy of this page for your records."
+        ]),
+        
         html.Hr(),
         create_checkbox_field(
             "consent-checkbox",
-            "I have read and understood the above information and consent to participate in this study"
+            "I agree to participate in the research"
         ),
         create_action_button("Continue to Study", "consent-submit", disabled=True),
         html.Div(id="consent-error", className="text-danger mt-2")
@@ -171,26 +226,41 @@ def demographics_page():
         dbc.Row([
             dbc.Col([
                 html.H1("Demographic Survey", className="text-center mb-4"),
+                html.P("Study Number: IRB26-XXXX", className="text-center text-muted"),
+                html.P("Study Title: Investment Decisions in a Simulated Stock Market", className="text-center text-muted"),
+                html.P("Researcher(s): Amrita Pathak, Henry K. Dambanemuya (PI)", className="text-center text-muted mb-4"),
                 dbc.Card([
                     dbc.CardBody([
                         html.P("Please provide some basic information about yourself. This information helps us understand our participant pool."),
                         
-                        dbc.Row([
-                            dbc.Col([
-                                dbc.Label("Age:"),
-                                dbc.Input(id="age-input", type="number", min=MIN_AGE, max=MAX_AGE, placeholder="Enter your age")
-                            ], md=6),
-                            dbc.Col([
-                                dbc.Label("Gender:"),
-                                dbc.Select(
-                                    id="gender-select",
-                                    options=GENDER_OPTIONS,
-                                    value=""
-                                )
-                            ], md=6)
-                        ], className="mb-3"),
+                        # Age Range
+                        dbc.Label("1. Please indicate your age:"),
+                        dbc.Select(
+                            id="age-select",
+                            options=AGE_RANGE_OPTIONS,
+                            value="",
+                            className="mb-3"
+                        ),
                         
-                        dbc.Label("Education Level:"),
+                        # Gender
+                        dbc.Label("2. Please indicate your gender:"),
+                        dbc.Select(
+                            id="gender-select",
+                            options=GENDER_OPTIONS,
+                            value="",
+                            className="mb-2"
+                        ),
+                        # Self-describe option (conditional)
+                        dbc.Input(
+                            id="gender-self-describe",
+                            type="text",
+                            placeholder="Please specify",
+                            className="mb-3",
+                            style={'display': 'none'}
+                        ),
+                        
+                        # Education Level
+                        dbc.Label("3. What is the highest level of education you have completed?"),
                         dbc.Select(
                             id="education-select",
                             options=EDUCATION_OPTIONS,
@@ -198,12 +268,48 @@ def demographics_page():
                             className="mb-3"
                         ),
                         
-                        dbc.Label("Investment Experience:"),
+                        # Income
+                        dbc.Label("4. Which of the following best describes your total annual personal income before taxes?"),
+                        dbc.Select(
+                            id="income-select",
+                            options=INCOME_OPTIONS,
+                            value="",
+                            className="mb-3"
+                        ),
+                        
+                        # Investment Experience
+                        dbc.Label("5. Which of the following best describes your personal investment experience?"),
                         dbc.Select(
                             id="experience-select",
                             options=EXPERIENCE_OPTIONS,
                             value="",
                             className="mb-3"
+                        ),
+                        
+                        # Hispanic/Latino
+                        dbc.Label("6. Are you Hispanic/Latino?"),
+                        dbc.Select(
+                            id="hispanic-latino-select",
+                            options=HISPANIC_LATINO_OPTIONS,
+                            value="",
+                            className="mb-3"
+                        ),
+                        
+                        # Race
+                        dbc.Label("7. Regardless of your answer to the prior question, please indicate how you identify yourself:"),
+                        dbc.Select(
+                            id="race-select",
+                            options=RACE_OPTIONS,
+                            value="",
+                            className="mb-2"
+                        ),
+                        # Other race option (conditional)
+                        dbc.Input(
+                            id="race-other",
+                            type="text",
+                            placeholder="Please specify",
+                            className="mb-3",
+                            style={'display': 'none'}
                         ),
                         
                         html.Div(id="demographics-error", className="text-danger mb-2"),
@@ -579,12 +685,190 @@ def feedback_page(uninvested_amount, portfolio, info_cost_spent=0):
         html.H5("Feedback (Optional)", className="mb-3"),
         html.P("Please share any thoughts about your experience in this study:"),
         create_text_area("feedback-text", "Enter your feedback here..."),
-        create_action_button("Submit and Finish", "feedback-submit", color=COLORS['success']),
+        create_action_button("Continue", "feedback-submit", color=COLORS['success']),
         html.Div(id="completion-message", className="text-center mt-3")
     ]
     
     return dbc.Container([
         create_page_header("Study Complete - Thank You!"),
+        create_centered_card(content)
+    ])
+
+
+def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
+    """Render the debriefing page with study explanation and withdrawal option."""
+    # Calculate stats to show
+    total_invested_original = sum(inv['invested'] for inv in portfolio)
+    total_invested_current = sum(inv['final_value'] for inv in portfolio)
+    total_profit_loss = total_invested_current - total_invested_original
+    total_final_amount = uninvested_amount + total_invested_current
+    overall_profit_loss = total_final_amount - INITIAL_AMOUNT
+    overall_profit_loss_percent = (overall_profit_loss / INITIAL_AMOUNT) * 100 if INITIAL_AMOUNT > 0 else 0
+    
+    # Summary stats
+    stats_row = dbc.Row([
+        dbc.Col([
+            create_info_card("Starting Amount", format_currency(INITIAL_AMOUNT))
+        ], md=3),
+        dbc.Col([
+            create_info_card("Information Cost", format_currency(info_cost_spent))
+        ], md=3),
+        dbc.Col([
+            create_info_card("Uninvested Cash", format_currency(uninvested_amount))
+        ], md=3),
+        dbc.Col([
+            create_info_card(
+                "Total Final Amount",
+                html.Div([
+                    format_currency(total_final_amount),
+                    html.Br(),
+                    html.Small(
+                        format_percentage(overall_profit_loss_percent),
+                        className="text-muted",
+                        style={'color': 'green' if overall_profit_loss >= 0 else 'red'}
+                    )
+                ], style={'color': 'green' if overall_profit_loss >= 0 else 'red'}),
+                color=COLORS['primary'],
+                outline=True
+            )
+        ], md=3)
+    ])
+    
+    # Investment portfolio breakdown
+    portfolio_table = None
+    if portfolio:
+        portfolio_rows = []
+        for inv in portfolio:
+            color = 'success' if inv['profit_loss'] >= 0 else 'danger'
+            portfolio_rows.append(
+                html.Tr([
+                    html.Td(f"Task {inv['task_id']}"),
+                    html.Td([html.Strong(inv['stock_name']), html.Br(), html.Small(inv['ticker'], className="text-muted")]),
+                    html.Td(format_currency(inv['invested']), className="text-end"),
+                    html.Td(
+                        f"{inv['return_percent']:+.1f}%",
+                        className="text-end",
+                        style={'color': 'green' if inv['return_percent'] >= 0 else 'red'}
+                    ),
+                    html.Td(format_currency(inv['final_value']), className="text-end"),
+                    html.Td(
+                        format_currency(inv['profit_loss']) if inv['profit_loss'] < 0 else f"+{format_currency(inv['profit_loss'])[1:]}",
+                        className=f"text-end text-{color}",
+                        style={'fontWeight': 'bold'}
+                    )
+                ])
+            )
+        
+        portfolio_table = html.Div([
+            html.H5("Your Investment Portfolio Breakdown", className="mt-4 mb-3"),
+            dbc.Table([
+                html.Thead(html.Tr([
+                    html.Th("Task"),
+                    html.Th("Stock"),
+                    html.Th("Invested", className="text-end"),
+                    html.Th("Return %", className="text-end"),
+                    html.Th("Current Value", className="text-end"),
+                    html.Th("Profit/Loss", className="text-end")
+                ])),
+                html.Tbody(portfolio_rows),
+                html.Tfoot(html.Tr([
+                    html.Th("Total", colSpan=2),
+                    html.Th(format_currency(total_invested_original), className="text-end"),
+                    html.Th(""),
+                    html.Th(format_currency(total_invested_current), className="text-end"),
+                    html.Th(
+                        format_currency(total_profit_loss) if total_profit_loss < 0 else f"+{format_currency(total_profit_loss)[1:]}",
+                        className=f"text-end",
+                        style={'fontWeight': 'bold', 'color': 'green' if total_profit_loss >= 0 else 'red'}
+                    )
+                ], style={'borderTop': '2px solid #dee2e6'}))
+            ], bordered=True, hover=True, responsive=True, striped=True, size='sm')
+        ])
+    
+    content = [
+        html.H3("University of Chicago Debriefing Statement", className="text-center mb-4"),
+        
+        html.Div([
+            html.P([html.Strong("Study Number: "), "IRB26-XXXX"]),
+            html.P([html.Strong("Study Title: "), "How do online trading discussions reflect financial decision-making and risk-taking behavior?"]),
+            html.P([html.Strong("Researcher(s): "), "Amrita Pathak, Dr. Henry K. Dambanemuya (PI)"])
+        ], className="mb-4"),
+        
+        html.P([
+            html.Strong("Thank you for your participation. "), 
+            "We would now like to tell you a little more about the study."
+        ], className="mb-3"),
+        
+        html.H5("Purpose of the Study:", className="mt-3"),
+        html.Ul([
+            html.Li([
+                "The purpose of this study is to understand how people make investment decisions in a simulated market. ",
+                "The study looks at how participants choose between investment options, how they respond to gains and losses, ",
+                "how confident they feel about their decisions, and how they use available information while making choices over multiple rounds."
+            ]),
+            html.Li([
+                "At the beginning of the study, participants were told that they would take part in a simulated investment game using virtual money ",
+                "and that their decisions would be recorded for research purposes. This description accurately reflected the task."
+            ]),
+            html.Li([
+                "The study did not involve deception. However, specific details about the exact research questions and analyses were not described in advance ",
+                "in order to avoid influencing participants' natural decision-making."
+            ]),
+            html.Li([
+                "The study is designed to examine patterns in risk-taking, learning from feedback, confidence, and information use across repeated investment decisions. ",
+                "Providing full details in advance could have changed how participants approached the task, which is why some information was explained only after participation."
+            ])
+        ]),
+        
+        dbc.Alert([
+            html.P([
+                html.Strong("Important: "), 
+                "As this study is ongoing, we ask that you not discuss this study with anyone else who is currently participating or might participate at a future time."
+            ], className="mb-0")
+        ], color="info", className="my-3"),
+        
+        html.Hr(className="my-4"),
+        
+        html.H5("Your Results:", className="mb-3"),
+        stats_row,
+        portfolio_table if portfolio_table else html.Div(),
+        
+        html.Hr(className="my-4"),
+        
+        html.H5("Data Withdrawal Option:", className="mt-4 mb-3"),
+        html.P([
+            "Now that we have explained this study more fully, you may request that your data be excluded from this research study. ",
+            "If you decide that you do not want the researchers to include your data in the analysis, there is no penalty. ",
+            "You will still receive compensation for this experiment."
+        ]),
+        
+        html.P([html.Strong("Do you wish to exclude your data from the study?")], className="mt-3 mb-3"),
+        
+        dbc.RadioItems(
+            id="withdrawal-choice",
+            options=[
+                {"label": " Yes, please exclude my data from the study", "value": "yes"},
+                {"label": " No, you may include my data in the study", "value": "no"}
+            ],
+            value="no",
+            className="mb-3"
+        ),
+        
+        html.Hr(className="my-4"),
+        
+        html.H5("Contacts & Questions:", className="mt-3"),
+        html.P("If you have questions or concerns about the study, you can contact the researchers at amritap1@uchicago.edu."),
+        html.P([
+            "If you have any questions about your rights as a participant in this research, or to discuss other study-related concerns with someone who is not part of the research team, ",
+            "you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, or by email at sbs-irb@uchicago.edu."
+        ]),
+        
+        create_action_button("Finish Study", "debrief-submit", color=COLORS['primary'], className="mt-4"),
+        html.Div(id="debrief-message", className="text-center mt-3")
+    ]
+    
+    return dbc.Container([
+        create_page_header("Study Debriefing"),
         create_centered_card(content)
     ])
 

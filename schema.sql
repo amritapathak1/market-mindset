@@ -20,17 +20,24 @@ CREATE TABLE IF NOT EXISTS participants (
     ip_address VARCHAR(45),
     user_agent TEXT,
     completed BOOLEAN DEFAULT FALSE,
-    completed_at TIMESTAMP
+    completed_at TIMESTAMP,
+    withdrawn BOOLEAN DEFAULT FALSE,
+    withdrawn_at TIMESTAMP
 );
 
 -- Demographics data
 CREATE TABLE IF NOT EXISTS demographics (
     id SERIAL PRIMARY KEY,
     participant_id UUID REFERENCES participants(participant_id) ON DELETE CASCADE,
-    age INTEGER,
+    age_range VARCHAR(20),
     gender VARCHAR(50),
+    gender_self_describe VARCHAR(100),
     education VARCHAR(100),
+    income VARCHAR(50),
     experience VARCHAR(100),
+    hispanic_latino VARCHAR(10),
+    race VARCHAR(100),
+    race_other VARCHAR(100),
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(participant_id)
 );

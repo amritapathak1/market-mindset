@@ -22,7 +22,7 @@ from utils import (
 from components import create_centered_card, create_error_alert
 from pages import (
     consent_page, demographics_page, tutorial_page, task_page, confidence_risk_page,
-    feedback_page, thank_you_page
+    feedback_page, debrief_page, thank_you_page
 )
 
 # Import INFO_COSTS and INITIAL_AMOUNT for cost confirmation and amount display
@@ -48,6 +48,7 @@ def register_callbacks(app, db_enabled, db_functions):
     save_confidence_risk = db_functions['save_confidence_risk']
     save_feedback = db_functions['save_feedback']
     update_participant_completion = db_functions['update_participant_completion']
+    update_participant_withdrawal = db_functions['update_participant_withdrawal']
     
     DB_ENABLED = db_enabled
     
@@ -124,7 +125,7 @@ def register_callbacks(app, db_enabled, db_functions):
     def display_page(page, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio, info_spent):
         """Display the appropriate page based on current page state with flow validation."""
         # Validate page access
-        demographics_completed = bool(demographics and demographics.get('age'))
+        demographics_completed = bool(demographics and demographics.get('age_range'))
         confidence_risk_completed = bool(confidence_risk and confidence_risk.get('confidence'))
         
         is_allowed, redirect_page, error_msg = validate_page_access(
@@ -158,6 +159,8 @@ def register_callbacks(app, db_enabled, db_functions):
             return confidence_risk_page(completed_tasks=completed_main_tasks), False, dash.no_update, {}
         elif page == PAGES['feedback']:
             return feedback_page(amount, portfolio or [], info_spent or 0), False, dash.no_update, {}
+        elif page == PAGES['debrief']:
+            return debrief_page(amount, portfolio or [], info_spent or 0), False, dash.no_update, {}
         elif page == PAGES['thank_you']:
             return thank_you_page(), False, dash.no_update, {}
         return html.Div("Page not found"), False, dash.no_update, {}
@@ -229,6 +232,28 @@ def register_callbacks(app, db_enabled, db_functions):
         return dash.no_update, dash.no_update
     
     
+    @app.callback(
+        Output('gender-self-describe', 'style'),
+        Input('gender-select', 'value')
+    )
+    def toggle_gender_self_describe(gender):
+        """Show/hide the gender self-describe field based on selection."""
+        if gender == 'prefer-to-self-describe':
+            return {'display': 'block'}
+        return {'display': 'none'}
+    
+    
+    @app.callback(
+        Output('race-other', 'style'),
+        Input('race-select', 'value')
+    )
+    def toggle_race_other(race):
+        """Show/hide the race other field based on selection."""
+        if race == 'other':
+            return {'display': 'block'}
+        return {'display': 'none'}
+    
+    
     # ============================================
     # DATA COLLECTION
     # ============================================
@@ -238,20 +263,25 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('demographics', 'data'),
         Output('demographics-error', 'children'),
         Input('demographics-submit', 'n_clicks'),
-        State('age-input', 'value'),
+        State('age-select', 'value'),
         State('gender-select', 'value'),
+        State('gender-self-describe', 'value'),
         State('education-select', 'value'),
+        State('income-select', 'value'),
         State('experience-select', 'value'),
+        State('hispanic-latino-select', 'value'),
+        State('race-select', 'value'),
+        State('race-other', 'value'),
         State('participant-id', 'data'),
         prevent_initial_call=True
     )
-    def submit_demographics(n_clicks, age, gender, education, experience, participant_id):
+    def submit_demographics(n_clicks, age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other, participant_id):
         """Handle demographics form submission with validation."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update
         
         # Validate
-        is_valid, error, demographics_data = validate_demographics(age, gender, education, experience)
+        is_valid, error, demographics_data = validate_demographics(age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other)
         
         if not is_valid:
             if participant_id:
@@ -272,7 +302,7 @@ def register_callbacks(app, db_enabled, db_functions):
         # Save
         if participant_id:
             try:
-                save_demographics(participant_id, age, gender, education, experience)
+                save_demographics(participant_id, age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other)
                 log_event(
                     participant_id=participant_id,
                     event_type='demographics_submit',
@@ -1518,14 +1548,13 @@ def register_callbacks(app, db_enabled, db_functions):
         prevent_initial_call=True
     )
     def submit_feedback(n_clicks, feedback_text, participant_id):
-        """Handle final feedback submission."""
+        """Handle final feedback submission and navigate to debrief page."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update
         
         if participant_id:
             try:
                 save_feedback(participant_id, feedback_text or "")
-                update_participant_completion(participant_id, completed=True)
                 log_event(
                     participant_id=participant_id,
                     event_type='feedback_submit',
@@ -1538,12 +1567,68 @@ def register_callbacks(app, db_enabled, db_functions):
                 )
                 log_event(
                     participant_id=participant_id,
+                    event_type='page_navigation',
+                    event_category='navigation',
+                    page_name='debrief',
+                    action='navigate'
+                )
+            except Exception as e:
+                print(f"Error saving feedback: {e}")
+        
+        return PAGES['debrief'], feedback_text or "", ""
+    
+    
+    @app.callback(
+        Output('current-page', 'data', allow_duplicate=True),
+        Output('debrief-message', 'children'),
+        Input('debrief-submit', 'n_clicks'),
+        State('withdrawal-choice', 'value'),
+        State('participant-id', 'data'),
+        prevent_initial_call=True
+    )
+    def submit_debrief(n_clicks, withdrawal_choice, participant_id):
+        """Handle debrief submission and data withdrawal option."""
+        if not n_clicks:
+            return dash.no_update, dash.no_update
+        
+        if participant_id:
+            try:
+                # Log the withdrawal decision
+                log_event(
+                    participant_id=participant_id,
+                    event_type='debrief_submit',
+                    event_category='interaction',
+                    page_name='debrief',
+                    element_id='debrief-submit',
+                    element_type='button',
+                    action='submit',
+                    metadata={'withdrawal_requested': withdrawal_choice == 'yes'}
+                )
+                
+                # Mark as completed (they finished the study)
+                update_participant_completion(participant_id)
+                
+                # Update withdrawal status based on user choice
+                if withdrawal_choice == 'yes':
+                    update_participant_withdrawal(participant_id, withdrawn=True)
+                    log_event(
+                        participant_id=participant_id,
+                        event_type='data_withdrawal',
+                        event_category='navigation',
+                        page_name='debrief',
+                        action='withdraw'
+                    )
+                else:
+                    update_participant_withdrawal(participant_id, withdrawn=False)
+                
+                log_event(
+                    participant_id=participant_id,
                     event_type='study_completed',
                     event_category='navigation',
                     page_name='thank_you',
                     action='complete'
                 )
             except Exception as e:
-                print(f"Error saving feedback: {e}")
+                print(f"Error completing study: {e}")
         
-        return PAGES['thank_you'], feedback_text or "", ""
+        return PAGES['thank_you'], ""
