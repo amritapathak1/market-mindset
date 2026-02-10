@@ -887,7 +887,7 @@ def register_callbacks(app, db_enabled, db_functions):
         if not modal_is_open and purchased_info and len(purchased_info) > 0:
             return False, dbc.Alert([
                 html.I(className="bi bi-check-circle me-2"),
-                "Great! You've learned how to view information. Now enter an investment amount and click Continue."
+                "Great! You've learned how to view information. Now enter an investment amount and click Continue. You can also choose to not invest, in which case enter 0 and click Continue."
             ], color="success", className="text-center mt-3")
         
         return dash.no_update, dash.no_update
