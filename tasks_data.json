@@ -22,9 +22,7 @@
           "YTD": "+23.37%"
         },
         "info_costs": {
-          "show_more": 5.00,
-          "show_week": 10.00,
-          "show_month": 15.00
+          "purchase_bundle": 30.0
         }
       }
     ]
@@ -52,9 +50,7 @@
           "YTD": "+0.16%"
         },
         "info_costs": {
-          "show_more": 0,
-          "show_week": 8.00,
-          "show_month": 12.00
+          "purchase_bundle": 20.0
         }
       }
     ]
@@ -82,9 +78,7 @@
           "YTD": "+59.62%"
         },
         "info_costs": {
-          "show_more": 3.00,
-          "show_week": 0,
-          "show_month": 10.00
+          "purchase_bundle": 13.0
         }
       }
     ]
@@ -112,9 +106,7 @@
           "YTD": "+31.11%"
         },
         "info_costs": {
-          "show_more": 4.00,
-          "show_week": 9.00,
-          "show_month": 0
+          "purchase_bundle": 13.0
         }
       }
     ]
@@ -142,9 +134,7 @@
           "YTD": "-42.35%"
         },
         "info_costs": {
-          "show_more": 0,
-          "show_week": 0,
-          "show_month": 0
+          "purchase_bundle": 0
         }
       }
     ]
@@ -172,9 +162,7 @@
           "YTD": "+150.98%"
         },
         "info_costs": {
-          "show_more": 7.00,
-          "show_week": 12.00,
-          "show_month": 18.00
+          "purchase_bundle": 37.0
         }
       }
     ]
@@ -202,9 +190,7 @@
           "YTD": "+12.29%"
         },
         "info_costs": {
-          "show_more": 2.00,
-          "show_week": 6.00,
-          "show_month": 11.00
+          "purchase_bundle": 19.0
         }
       }
     ]
@@ -232,9 +218,7 @@
           "YTD": "-53.76%"
         },
         "info_costs": {
-          "show_more": 6.00,
-          "show_week": 0,
-          "show_month": 14.00
+          "purchase_bundle": 20.0
         }
       }
     ]
@@ -262,9 +246,7 @@
           "YTD": "+105.74%"
         },
         "info_costs": {
-          "show_more": 0,
-          "show_week": 7.00,
-          "show_month": 13.00
+          "purchase_bundle": 20.0
         }
       }
     ]
@@ -292,9 +274,7 @@
           "YTD": "-11.16%"
         },
         "info_costs": {
-          "show_more": 5.00,
-          "show_week": 10.00,
-          "show_month": 0
+          "purchase_bundle": 15.0
         }
       }
     ]
@@ -322,9 +302,7 @@
           "YTD": "+11.00%"
         },
         "info_costs": {
-          "show_more": 4.00,
-          "show_week": 8.00,
-          "show_month": 15.00
+          "purchase_bundle": 27.0
         }
       }
     ]
@@ -352,9 +330,7 @@
           "YTD": "+1.89%"
         },
         "info_costs": {
-          "show_more": 3.00,
-          "show_week": 9.00,
-          "show_month": 16.00
+          "purchase_bundle": 28.0
         }
       }
     ]
@@ -382,9 +358,7 @@
           "YTD": "+16.52%"
         },
         "info_costs": {
-          "show_more": 0,
-          "show_week": 11.00,
-          "show_month": 17.00
+          "purchase_bundle": 28.0
         }
       }
     ]
@@ -412,9 +386,7 @@
           "YTD": "+25.29%"
         },
         "info_costs": {
-          "show_more": 5.00,
-          "show_week": 10.00,
-          "show_month": 15.00
+          "purchase_bundle": 30.0
         }
       }
     ]

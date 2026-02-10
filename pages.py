@@ -57,14 +57,24 @@ def create_stock_card(stock, stock_index, task_id, amount=None):
                 
                 # Right column - Buttons and inputs
                 dbc.Col([
-                    # Three buttons for different time periods
+                    # Purchase information button
+                    dbc.Button(
+                        "Purchase Information",
+                        id={'type': 'purchase-info', 'task': task_id, 'stock': stock_index},
+                        color="primary",
+                        size="sm",
+                        className="w-100 mb-3"
+                    ),
+                    
+                    # Three buttons for different time periods (disabled by default)
                     dbc.Button(
                         "Show More Details",
                         id={'type': 'show-more', 'task': task_id, 'stock': stock_index},
                         color="info",
                         outline=True,
                         size="sm",
-                        className="w-100 mb-2"
+                        className="w-100 mb-2",
+                        disabled=True
                     ),
                     
                     dbc.Button(
@@ -73,7 +83,8 @@ def create_stock_card(stock, stock_index, task_id, amount=None):
                         color="secondary",
                         outline=True,
                         size="sm",
-                        className="w-100 mb-2"
+                        className="w-100 mb-2",
+                        disabled=True
                     ),
                     
                     dbc.Button(
@@ -82,7 +93,8 @@ def create_stock_card(stock, stock_index, task_id, amount=None):
                         color="secondary",
                         outline=True,
                         size="sm",
-                        className="w-100 mb-3"
+                        className="w-100 mb-3",
+                        disabled=True
                     ),
                     
                     html.Hr(),
@@ -240,11 +252,16 @@ def tutorial_page(tutorial_num, amount):
             html.Hr(),
             html.P([
                 html.Strong("Step 1: "),
-                "Click on one of the information buttons below (Show More Details, Week's Chart, or Month's Chart). ",
-                "Notice that some information costs money."
+                "Click on the 'Purchase Information' button to buy access to all information about this stock. ",
+                "Notice that purchasing information costs money and is deducted from your available amount."
             ], className="mb-2"),
             html.P([
                 html.Strong("Step 2: "),
+                "After purchasing, the three information buttons (Show More Details, Week's Chart, Month's Chart) will be enabled. ",
+                "Click on them to view different types of information about the stock."
+            ], className="mb-2"),
+            html.P([
+                html.Strong("Step 3: "),
                 "After viewing the information, click Continue to proceed to the next tutorial."
             ], className="mb-0")
         ], color="primary", className="mb-4")

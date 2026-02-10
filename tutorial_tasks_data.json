@@ -6,7 +6,7 @@
         "name": "Tutorial Company Alpha",
         "ticker": "TUT1",
         "image": "/assets/images/a1_intraday.png",
-        "return_percent": 12.50,
+        "return_percent": 12.5,
         "week_image": "/assets/images/a1_week.png",
         "month_image": "/assets/images/a1_month.png",
         "week_analysis": "This is a tutorial example. The stock showed steady upward movement throughout the week, with minor fluctuations. This demonstrates a typical positive trend pattern.",
@@ -22,9 +22,7 @@
           "YTD": "+15.30%"
         },
         "info_costs": {
-          "show_more": 5.00,
-          "show_week": 10.00,
-          "show_month": 15.00
+          "purchase_bundle": 30.0
         }
       }
     ]
@@ -52,9 +50,7 @@
           "YTD": "+10.20%"
         },
         "info_costs": {
-          "show_more": 5.00,
-          "show_week": 10.00,
-          "show_month": 15.00
+          "purchase_bundle": 30.0
         }
       }
     ]

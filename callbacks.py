@@ -304,6 +304,7 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('cost-modal', 'is_open'),
         Output('cost-modal-body', 'children'),
         Output('pending-info-request', 'data'),
+        Input({'type': 'purchase-info', 'task': ALL, 'stock': ALL}, 'n_clicks'),
         Input({'type': 'show-more', 'task': ALL, 'stock': ALL}, 'n_clicks'),
         Input({'type': 'show-week', 'task': ALL, 'stock': ALL}, 'n_clicks'),
         Input({'type': 'show-month', 'task': ALL, 'stock': ALL}, 'n_clicks'),
@@ -314,7 +315,7 @@ def register_callbacks(app, db_enabled, db_functions):
         State('purchased-info', 'data'),
         prevent_initial_call=True
     )
-    def handle_cost_confirmation(show_more_clicks, show_week_clicks, show_month_clicks, 
+    def handle_cost_confirmation(purchase_info_clicks, show_more_clicks, show_week_clicks, show_month_clicks, 
                                   cancel_clicks, pending_request, current_task, participant_id, purchased_info):
         """Handle cost confirmation modal for information requests."""
         if not ctx.triggered:
@@ -325,6 +326,7 @@ def register_callbacks(app, db_enabled, db_functions):
         
         # CRITICAL: Check that something was actually clicked (not just component rendered)
         if not button_id or (isinstance(button_id, dict) and not any([
+            purchase_info_clicks and any(c for c in purchase_info_clicks if c),
             show_more_clicks and any(c for c in show_more_clicks if c),
             show_week_clicks and any(c for c in show_week_clicks if c),
             show_month_clicks and any(c for c in show_month_clicks if c)
@@ -361,7 +363,8 @@ def register_callbacks(app, db_enabled, db_functions):
             task_id = button_id.get('task')
             stock_index = button_id.get('stock')
             
-            if info_type in ['show-more', 'show-week', 'show-month']:
+            # Handle purchase-info button - bundle purchase
+            if info_type == 'purchase-info':
                 # Get task data to retrieve stock info
                 task_data, error = get_task_data_safe(task_id)
                 if error:
@@ -369,25 +372,16 @@ def register_callbacks(app, db_enabled, db_functions):
                 
                 stock = task_data['stocks'][stock_index]
                 
-                # Get cost from stock data
-                cost_key = info_type.replace('-', '_')
-                cost = stock.get('info_costs', {}).get(cost_key, 0)
+                # Get bundle cost from stock data
+                cost = stock.get('info_costs', {}).get('purchase_bundle', 0)
                 
-                # Check if this info has already been purchased for current task
-                info_identifier = f'{info_type}-{stock_index}'
+                # Check if bundle has already been purchased for this stock
+                info_identifier = f'bundle-{stock_index}'
                 already_purchased = info_identifier in (purchased_info or [])
                 
-                # If already purchased, treat as free
+                # If already purchased, treat as free (shouldn't happen since button should be disabled)
                 if already_purchased:
                     cost = 0
-                
-                # Determine info type label
-                info_type_labels = {
-                    'show-more': 'Additional Details',
-                    'show-week': "Week's Chart & Analysis",
-                    'show-month': "Month's Chart & Analysis"
-                }
-                info_label = info_type_labels.get(info_type, 'Information')
                 
                 # Log the initial request
                 if participant_id:
@@ -398,13 +392,13 @@ def register_callbacks(app, db_enabled, db_functions):
                             event_category='interaction',
                             page_name='task',
                             task_id=current_task,
-                            element_id=f'{info_type}-{stock_index}',
+                            element_id=f'purchase-info-{stock_index}',
                             element_type='button',
                             action='click',
                             stock_ticker=stock['ticker'],
                             metadata={
                                 'cost': cost,
-                                'info_type': info_type,
+                                'info_type': 'purchase-info',
                                 'stock_name': stock['name'],
                                 'stock_index': stock_index
                             }
@@ -420,26 +414,74 @@ def register_callbacks(app, db_enabled, db_functions):
                     'stock_ticker': stock['ticker'],
                     'stock_name': stock['name'],
                     'cost': cost,
-                    'element_id': f'{info_type}-{stock_index}'
+                    'element_id': f'purchase-info-{stock_index}'
                 }
                 
-                # If cost is $0, skip the confirmation modal - directly store pending request
+                # If cost is $0, skip the confirmation modal
                 if cost == 0:
                     return False, "", pending
                 
-                # Create modal body for non-zero cost
+                # Create modal body for bundle purchase
                 modal_body = html.Div([
                     html.P([
-                        f"Viewing {info_label} for ",
+                        "Purchasing information access for ",
                         html.Strong(stock['name']),
                         f" ({stock['ticker']}) will cost ",
                         html.Strong(f"${cost:.2f}"),
                         "."
                     ], className="mb-3"),
+                    html.P("This will enable all information buttons (Show More Details, Week's Chart, and Month's Chart).", className="mb-3"),
                     html.P("Do you want to proceed?", className="mb-0")
                 ])
                 
                 return True, modal_body, pending
+            
+            if info_type in ['show-more', 'show-week', 'show-month']:
+                # Individual info buttons are now free after bundle purchase
+                # These buttons are only enabled after bundle is purchased
+                # Get task data to retrieve stock info
+                task_data, error = get_task_data_safe(task_id)
+                if error:
+                    return False, "", {}
+                
+                stock = task_data['stocks'][stock_index]
+                
+                # Log the request
+                if participant_id:
+                    try:
+                        log_event(
+                            participant_id=participant_id,
+                            event_type='info_request',
+                            event_category='interaction',
+                            page_name='task',
+                            task_id=current_task,
+                            element_id=f'{info_type}-{stock_index}',
+                            element_type='button',
+                            action='click',
+                            stock_ticker=stock['ticker'],
+                            metadata={
+                                'cost': 0,  # Free after bundle purchase
+                                'info_type': info_type,
+                                'stock_name': stock['name'],
+                                'stock_index': stock_index
+                            }
+                        )
+                    except Exception as e:
+                        print(f"Error logging event: {e}")
+                
+                # Create pending request with $0 cost (already paid via bundle)
+                pending = {
+                    'info_type': info_type,
+                    'task_id': task_id,
+                    'stock_index': stock_index,
+                    'stock_ticker': stock['ticker'],
+                    'stock_name': stock['name'],
+                    'cost': 0,
+                    'element_id': f'{info_type}-{stock_index}'
+                }
+                
+                # No confirmation modal needed - directly open info modal
+                return False, "", pending
         
         return dash.no_update, dash.no_update, dash.no_update
     
@@ -527,15 +569,17 @@ def register_callbacks(app, db_enabled, db_functions):
                 
                 stock = task_data['stocks'][stock_index]
                 
-                # Add to purchased list
-                info_identifier = f'{info_type}-{stock_index}'
-                updated_purchased = list(purchased_info or [])
-                if info_identifier not in updated_purchased:
-                    updated_purchased.append(info_identifier)
+                # Handle purchase-info (bundle) - no modal, just mark as purchased
+                if info_type == 'purchase-info':
+                    bundle_identifier = f'bundle-{stock_index}'
+                    updated_purchased = list(purchased_info or [])
+                    if bundle_identifier not in updated_purchased:
+                        updated_purchased.append(bundle_identifier)
+                    # Don't open modal, just update purchased list
+                    return False, "", "", {}, dash.no_update, False, current_amount, info_spent, updated_purchased
                 
-                # Don't log acceptance for free information (cost = 0)
-                
-                # Handle different info types (same logic as OK button handler)
+                # Handle different info types (show-more, show-week, show-month)
+                # These are free to view after bundle purchase, just open the modal
                 if info_type == 'show-more':
                     modal_ctx = {
                         'element_id': f'show-more-{stock_index}',
@@ -582,7 +626,7 @@ def register_callbacks(app, db_enabled, db_functions):
                             ], bordered=True, hover=True, striped=True, className="mb-0")
                         )
                     
-                    return True, stock['name'], html.Div(modal_content), modal_ctx, dash.no_update, False, current_amount, info_spent, updated_purchased
+                    return True, stock['name'], html.Div(modal_content), modal_ctx, dash.no_update, False, current_amount, info_spent, dash.no_update
                 
                 elif info_type == 'show-week':
                     modal_ctx = {
@@ -617,7 +661,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         ),
                         html.H6("Weekly Performance Analysis", className="mb-2"),
                         html.P(stock.get('week_analysis', 'Weekly performance data for this stock.'))
-                    ]), modal_ctx, dash.no_update, False, current_amount, info_spent, updated_purchased
+                    ]), modal_ctx, dash.no_update, False, current_amount, info_spent, dash.no_update
                 
                 elif info_type == 'show-month':
                     modal_ctx = {
@@ -652,7 +696,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         ),
                         html.H6("Monthly Performance Analysis", className="mb-2"),
                         html.P(stock.get('month_analysis', 'Monthly performance data for this stock.'))
-                    ]), modal_ctx, dash.no_update, False, current_amount, info_spent, updated_purchased
+                    ]), modal_ctx, dash.no_update, False, current_amount, info_spent, dash.no_update
         
         # Handle OK button on cost modal - close cost modal and open info modal
         if 'cost-modal-ok' in triggered_id and pending_request and ok_clicks:
@@ -706,157 +750,23 @@ def register_callbacks(app, db_enabled, db_functions):
             
             stock = task_data['stocks'][stock_index]
             
-            # Add to purchased list
-            info_identifier = f'{info_type}-{stock_index}'
-            updated_purchased = list(purchased_info or [])
-            if info_identifier not in updated_purchased:
-                updated_purchased.append(info_identifier)
+            # Handle purchase-info - bundle purchase (this is the only type that goes through cost confirmation now)
+            if info_type == 'purchase-info':
+                # Add bundle to purchased list
+                bundle_identifier = f'bundle-{stock_index}'
+                updated_purchased = list(purchased_info or [])
+                if bundle_identifier not in updated_purchased:
+                    updated_purchased.append(bundle_identifier)
+                
+                # Close both modals and update amount, don't open any info modal
+                return False, "", "", {}, {}, False, new_amount, new_info_spent, updated_purchased
             
-            # Handle show-more
-            if info_type == 'show-more':
-                # Store modal context for close event
-                modal_ctx = {
-                    'element_id': f'show-more-{stock_index}',
-                    'stock_ticker': stock['ticker'],
-                    'metadata': {'stock_name': stock['name'], 'stock_index': stock_index}
-                }
-                
-                if participant_id:
-                    try:
-                        log_event(
-                            participant_id=participant_id,
-                            event_type='modal_open',
-                            event_category='interaction',
-                            page_name='task',
-                            task_id=current_task,
-                            element_id=modal_ctx['element_id'],
-                            element_type='button',
-                            action='click',
-                            stock_ticker=modal_ctx['stock_ticker'],
-                            metadata=modal_ctx['metadata']
-                        )
-                    except Exception as e:
-                        print(f"Error logging event: {e}")
-                
-                # Build modal body content
-                modal_content = [
-                    html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
-                    html.P(stock['detailed_description'])
-                ]
-                
-                # Add performance metrics table if available
-                if 'performance_metrics' in stock:
-                    metrics = stock['performance_metrics']
-                    modal_content.append(html.Hr(className="my-4"))
-                    modal_content.append(html.H5("Performance Metrics", className="mb-3"))
-                    modal_content.append(
-                        dbc.Table([
-                            html.Tbody([
-                                html.Tr([
-                                    html.Td("5-day", style={'fontWeight': 'bold', 'width': '40%'}),
-                                    html.Td(metrics.get('5-day', 'N/A'), style={'textAlign': 'right'})
-                                ]),
-                                html.Tr([
-                                    html.Td("10-day", style={'fontWeight': 'bold'}),
-                                    html.Td(metrics.get('10-day', 'N/A'), style={'textAlign': 'right'})
-                                ]),
-                                html.Tr([
-                                    html.Td("1-month", style={'fontWeight': 'bold'}),
-                                    html.Td(metrics.get('1-month', 'N/A'), style={'textAlign': 'right'})
-                                ]),
-                                html.Tr([
-                                    html.Td("3-month", style={'fontWeight': 'bold'}),
-                                    html.Td(metrics.get('3-month', 'N/A'), style={'textAlign': 'right'})
-                                ]),
-                                html.Tr([
-                                    html.Td("6-month", style={'fontWeight': 'bold'}),
-                                    html.Td(metrics.get('6-month', 'N/A'), style={'textAlign': 'right'})
-                                ]),
-                                html.Tr([
-                                    html.Td("YTD", style={'fontWeight': 'bold'}),
-                                    html.Td(metrics.get('YTD', 'N/A'), style={'textAlign': 'right'})
-                                ])
-                            ])
-                        ], bordered=True, hover=True, striped=True, className="mb-0")
-                    )
-                
-                # Don't clear pending_request here - let it be cleared when modal closes or page changes
-                # Close cost modal and open info modal, deduct cost from amount
-                return True, stock['name'], html.Div(modal_content), modal_ctx, dash.no_update, False, new_amount, new_info_spent, updated_purchased
+            # Note: Individual info buttons (show-more, show-week, show-month) no longer go through
+            # this cost confirmation path since they are free after bundle purchase
+            # They go directly through the pending-info-request handler
             
-            # Handle show-week
-            elif info_type == 'show-week':
-                # Store modal context for close event
-                modal_ctx = {
-                    'element_id': f'show-week-{stock_index}',
-                    'stock_ticker': stock['ticker'],
-                    'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'week'}
-                }
-                
-                if participant_id:
-                    try:
-                        log_event(
-                            participant_id=participant_id,
-                            event_type='modal_open',
-                            event_category='interaction',
-                            page_name='task',
-                            task_id=current_task,
-                            element_id=modal_ctx['element_id'],
-                            element_type='button',
-                            action='click',
-                            stock_ticker=modal_ctx['stock_ticker'],
-                            metadata=modal_ctx['metadata']
-                        )
-                    except Exception as e:
-                        print(f"Error logging event: {e}")
-                
-                return True, f"{stock['name']} - Weekly Analysis", html.Div([
-                    html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
-                    html.Img(
-                        src=stock.get('week_image', 'https://via.placeholder.com/600x300?text=Weekly+Chart'),
-                        style={'width': '100%', 'maxWidth': '600px'},
-                        className="mb-3 d-block mx-auto"
-                    ),
-                    html.H6("Weekly Performance Analysis", className="mb-2"),
-                    html.P(stock.get('week_analysis', 'Weekly performance data for this stock.'))
-                ]), modal_ctx, dash.no_update, False, new_amount, new_info_spent, updated_purchased
-            
-            # Handle show-month
-            elif info_type == 'show-month':
-                # Store modal context for close event
-                modal_ctx = {
-                    'element_id': f'show-month-{stock_index}',
-                    'stock_ticker': stock['ticker'],
-                    'metadata': {'stock_name': stock['name'], 'stock_index': stock_index, 'view_type': 'month'}
-                }
-                
-                if participant_id:
-                    try:
-                        log_event(
-                            participant_id=participant_id,
-                            event_type='modal_open',
-                            event_category='interaction',
-                            page_name='task',
-                            task_id=current_task,
-                            element_id=modal_ctx['element_id'],
-                            element_type='button',
-                            action='click',
-                            stock_ticker=modal_ctx['stock_ticker'],
-                            metadata=modal_ctx['metadata']
-                        )
-                    except Exception as e:
-                        print(f"Error logging event: {e}")
-                
-                return True, f"{stock['name']} - Monthly Analysis", html.Div([
-                    html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
-                    html.Img(
-                        src=stock.get('month_image', 'https://via.placeholder.com/600x300?text=Monthly+Chart'),
-                        style={'width': '100%', 'maxWidth': '600px'},
-                        className="mb-3 d-block mx-auto"
-                    ),
-                    html.H6("Monthly Performance Analysis", className="mb-2"),
-                    html.P(stock.get('month_analysis', 'Monthly performance data for this stock.'))
-                ]), modal_ctx, dash.no_update, False, new_amount, new_info_spent, updated_purchased
+            # If somehow we get here with another type, just close modals
+            return False, "", "", {}, {}, False, dash.no_update, dash.no_update, dash.no_update
         
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
     
@@ -883,6 +793,55 @@ def register_callbacks(app, db_enabled, db_functions):
         
         # Return list of same content for each display (pattern matching ALL)
         return [display_content] * len(dash.callback_context.outputs_list)
+    
+    
+    # ============================================
+    # BUTTON STATE UPDATE (Enable/Disable Purchase and Display Buttons)
+    # ============================================
+    
+    @app.callback(
+        Output({'type': 'purchase-info', 'task': ALL, 'stock': ALL}, 'disabled'),
+        Output({'type': 'show-more', 'task': ALL, 'stock': ALL}, 'disabled'),
+        Output({'type': 'show-week', 'task': ALL, 'stock': ALL}, 'disabled'),
+        Output({'type': 'show-month', 'task': ALL, 'stock': ALL}, 'disabled'),
+        Input('purchased-info', 'data'),
+        State('current-task', 'data'),
+        State('task-order', 'data'),
+        prevent_initial_call=False
+    )
+    def update_button_states(purchased_info, current_task, task_order):
+        """Enable/disable buttons based on purchase status."""
+        # Get the actual task ID from the randomized order
+        if current_task and task_order and not str(task_order[current_task - 1]).startswith('tutorial_'):
+            actual_task_id = task_order[current_task - 1] if task_order else current_task
+        else:
+            actual_task_id = current_task
+        
+        # Get task data to check bundle cost
+        task_data, error = get_task_data_safe(actual_task_id)
+        
+        purchase_disabled = []
+        more_disabled = []
+        week_disabled = []
+        month_disabled = []
+        
+        if not error and task_data and 'stocks' in task_data:
+            for stock_idx in range(len(task_data['stocks'])):
+                stock = task_data['stocks'][stock_idx]
+                bundle_identifier = f'bundle-{stock_idx}'
+                bundle_purchased = bundle_identifier in (purchased_info or [])
+                
+                # Check if bundle cost is $0 (free)
+                bundle_cost = stock.get('info_costs', {}).get('purchase_bundle', 0)
+                is_free = bundle_cost == 0
+                
+                # If bundle is purchased or free, disable purchase button and enable display buttons
+                purchase_disabled.append(bundle_purchased or is_free)
+                more_disabled.append(not (bundle_purchased or is_free))
+                week_disabled.append(not (bundle_purchased or is_free))
+                month_disabled.append(not (bundle_purchased or is_free))
+        
+        return purchase_disabled, more_disabled, week_disabled, month_disabled
     
     
     # ============================================
