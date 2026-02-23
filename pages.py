@@ -39,6 +39,82 @@ def create_amount_display(amount):
 def create_stock_card(stock, stock_index, task_id, amount=None):
     """Create a card displaying information about a single stock."""
     
+    # Check if purchase bundle cost is 0
+    purchase_bundle_cost = stock.get('info_costs', {}).get('purchase_bundle', 0)
+    show_purchase_button = purchase_bundle_cost > 0
+    
+    # Build the right column content conditionally
+    right_column_content = []
+    
+    # Add purchase button only if cost > 0
+    if show_purchase_button:
+        right_column_content.append(
+            dbc.Button(
+                "Purchase Information",
+                id={'type': 'purchase-info', 'task': task_id, 'stock': stock_index},
+                color="primary",
+                size="sm",
+                className="w-100 mb-3"
+            )
+        )
+    
+    # Add the three info buttons (always shown)
+    right_column_content.extend([
+        dbc.Button(
+            "Show More Details",
+            id={'type': 'show-more', 'task': task_id, 'stock': stock_index},
+            color="info",
+            outline=True,
+            size="sm",
+            className="w-100 mb-2",
+            disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
+        ),
+        
+        dbc.Button(
+            "Week's Chart & Analysis",
+            id={'type': 'show-week', 'task': task_id, 'stock': stock_index},
+            color="secondary",
+            outline=True,
+            size="sm",
+            className="w-100 mb-2",
+            disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
+        ),
+        
+        dbc.Button(
+            "Month's Chart & Analysis",
+            id={'type': 'show-month', 'task': task_id, 'stock': stock_index},
+            color="secondary",
+            outline=True,
+            size="sm",
+            className="w-100 mb-3",
+            disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
+        ),
+        
+        html.Hr(),
+        
+        # Available amount display - made reactive with ID
+        html.H5([
+            html.I(className="bi bi-wallet2 me-2"),
+            f"Available: ${amount:,.2f}" if amount is not None else "Available: $0.00"
+        ],
+            id={'type': 'amount-display', 'task': task_id, 'stock': stock_index},
+            className="text-success mb-3"
+        ),
+        
+        dbc.Label(f"Amount to invest in {stock['name']}:"),
+        dbc.InputGroup([
+            dbc.InputGroupText("$"),
+            dbc.Input(
+                id={'type': 'investment-input', 'task': task_id, 'stock': stock_index},
+                type="number",
+                min=0,
+                step=0.01,
+                placeholder="0.00",
+                value=0
+            )
+        ])
+    ])
+    
     return dbc.Card([
         dbc.CardBody([
             # Header - Company name and ticker
@@ -57,71 +133,7 @@ def create_stock_card(stock, stock_index, task_id, amount=None):
                 ], md=6),
                 
                 # Right column - Buttons and inputs
-                dbc.Col([
-                    # Purchase information button
-                    dbc.Button(
-                        "Purchase Information",
-                        id={'type': 'purchase-info', 'task': task_id, 'stock': stock_index},
-                        color="primary",
-                        size="sm",
-                        className="w-100 mb-3"
-                    ),
-                    
-                    # Three buttons for different time periods (disabled by default)
-                    dbc.Button(
-                        "Show More Details",
-                        id={'type': 'show-more', 'task': task_id, 'stock': stock_index},
-                        color="info",
-                        outline=True,
-                        size="sm",
-                        className="w-100 mb-2",
-                        disabled=True
-                    ),
-                    
-                    dbc.Button(
-                        "Week's Chart & Analysis",
-                        id={'type': 'show-week', 'task': task_id, 'stock': stock_index},
-                        color="secondary",
-                        outline=True,
-                        size="sm",
-                        className="w-100 mb-2",
-                        disabled=True
-                    ),
-                    
-                    dbc.Button(
-                        "Month's Chart & Analysis",
-                        id={'type': 'show-month', 'task': task_id, 'stock': stock_index},
-                        color="secondary",
-                        outline=True,
-                        size="sm",
-                        className="w-100 mb-3",
-                        disabled=True
-                    ),
-                    
-                    html.Hr(),
-                    
-                    # Available amount display - made reactive with ID
-                    html.H5([
-                        html.I(className="bi bi-wallet2 me-2"),
-                        f"Available: ${amount:,.2f}" if amount is not None else "Available: $0.00"
-                    ],
-                        id={'type': 'amount-display', 'task': task_id, 'stock': stock_index},
-                        className="text-success mb-3"
-                    ),
-                    
-                    dbc.Label(f"Amount to invest in {stock['name']}:"),
-                    dbc.InputGroup([
-                        dbc.InputGroupText("$"),
-                        dbc.Input(
-                            id={'type': 'investment-input', 'task': task_id, 'stock': stock_index},
-                            type="number",
-                            min=0,
-                            step=0.01,
-                            placeholder="0.00",
-                            value=0
-                        )
-                    ])
-                ], md=6)
+                dbc.Col(right_column_content, md=6)
             ])
         ])
     ])

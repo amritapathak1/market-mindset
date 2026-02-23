@@ -865,8 +865,12 @@ def register_callbacks(app, db_enabled, db_functions):
                 bundle_cost = stock.get('info_costs', {}).get('purchase_bundle', 0)
                 is_free = bundle_cost == 0
                 
-                # If bundle is purchased or free, disable purchase button and enable display buttons
-                purchase_disabled.append(bundle_purchased or is_free)
+                # Only add to purchase_disabled if the button was actually rendered (cost > 0)
+                if bundle_cost > 0:
+                    # If bundle is purchased, disable purchase button
+                    purchase_disabled.append(bundle_purchased)
+                
+                # Info buttons should be enabled if bundle is purchased or free
                 more_disabled.append(not (bundle_purchased or is_free))
                 week_disabled.append(not (bundle_purchased or is_free))
                 month_disabled.append(not (bundle_purchased or is_free))
