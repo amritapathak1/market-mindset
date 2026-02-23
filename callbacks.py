@@ -1374,15 +1374,48 @@ def register_callbacks(app, db_enabled, db_functions):
             except Exception as e:
                 print(f"Error saving task response: {e}")
         
-        # Determine profit/loss message
+        # Determine profit/loss message based on task configuration
+        show_profit_loss = task_data.get('show_profit_loss', False)
+        
         if total_investment == 0:
-            modal_message = "You did not invest in this task."
-        elif total_profit_loss > 0:
-            modal_message = "Your investment made a profit! 📈"
-        elif total_profit_loss < 0:
-            modal_message = "Your investment made a loss. 📉"
+            modal_message = html.Div([
+                html.P("You did not invest in this task.", className="mb-0")
+            ])
         else:
-            modal_message = "Your investment broke even."
+            if show_profit_loss:
+                # Show detailed profit/loss information
+                if total_profit_loss > 0:
+                    color = "success"
+                    icon = "📈"
+                    title = "Your investment made a profit!"
+                elif total_profit_loss < 0:
+                    color = "danger"
+                    icon = "📉"
+                    title = "Your investment made a loss."
+                else:
+                    color = "info"
+                    icon = "➡️"
+                    title = "Your investment broke even."
+                
+                modal_message = html.Div([
+                    html.H5([icon, " ", title], className=f"text-{color} mb-3"),
+                    html.Hr(),
+                    html.Div([
+                        html.P([html.Strong("Investment Amount: "), f"${total_investment:,.2f}"], className="mb-2"),
+                        html.P([html.Strong("Final Value: "), f"${(total_investment + total_profit_loss):,.2f}"], className="mb-2"),
+                        html.P([
+                            html.Strong("Profit/Loss: "), 
+                            html.Span(
+                                f"${abs(total_profit_loss):,.2f}" if total_profit_loss >= 0 else f"-${abs(total_profit_loss):,.2f}",
+                                className=f"text-{color}"
+                            )
+                        ], className="mb-2"),
+                        html.P([html.Strong("New Available Amount: "), f"${new_amount:,.2f}"], className="mb-0")
+                    ])
+                ])
+            else:
+                # Simple message without details
+                modal_message = html.P("Your investment has been recorded.", className="mb-0")
         
         next_task = current_task + 1
         
