@@ -6,7 +6,7 @@ Participants make investment decisions across multiple scenarios with stock info
 """
 
 import dash
-from dash import html, dcc
+from dash import html, dcc, Input, Output
 import dash_bootstrap_components as dbc
 import os
 from dotenv import load_dotenv
@@ -99,6 +99,19 @@ from config import INITIAL_AMOUNT, TUTORIAL_INITIAL_AMOUNT, PAGES, MODAL_SIZE, I
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 app.title = "Stock Market Mindset"
+
+# Add clientside callback to scroll to top when page changes
+app.clientside_callback(
+    """
+    function(page) {
+        window.scrollTo({top: 0, behavior: 'instant'});
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output('page-content', 'style', allow_duplicate=True),
+    Input('current-page', 'data'),
+    prevent_initial_call=True
+)
 
 # App layout
 app.layout = dbc.Container([

@@ -347,6 +347,20 @@ def tutorial_page(tutorial_num, amount):
     
     stocks = task_data['stocks']
     
+    # Important notice about real data (shown on first tutorial only)
+    real_data_notice = None
+    if tutorial_num == 1:
+        real_data_notice = dbc.Alert([
+            html.H5([html.I(className="bi bi-info-circle me-2"), "Important Information"], className="mb-3"),
+            html.P([
+                "In the main study, your ",
+                html.Strong("investments will be based on real historical stock data"),
+                ". Your investment performance will be ",
+                html.Strong("evaluated based on how the stock actually performed after 1 month"),
+                "."
+            ], className="mb-0")
+        ], color="info", className="mb-4")
+    
     # Instructions for each tutorial
     if tutorial_num == 1:
         instructions = dbc.Alert([
@@ -386,6 +400,7 @@ def tutorial_page(tutorial_num, amount):
         ], color="primary", className="mb-4")
     
     return dbc.Container([
+        real_data_notice if tutorial_num == 1 else None,
         instructions,
         
         html.H2(f"Tutorial {tutorial_num} of {NUM_TUTORIAL_TASKS}", className="text-center mb-2"),
