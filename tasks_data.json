@@ -2,6 +2,7 @@
   {
     "task_id": 1,
     "show_profit_loss": false,
+    "show_information": false,
     "stocks": [
       {
         "name": "Company A1",
@@ -31,6 +32,7 @@
   {
     "task_id": 2,
     "show_profit_loss": true,
+    "show_information": false,
     "stocks": [
       {
         "name": "Company A2",
@@ -60,6 +62,7 @@
   {
     "task_id": 3,
     "show_profit_loss": false,
+    "show_information": false,
     "stocks": [
       {
         "name": "Company A3",
@@ -89,6 +92,7 @@
   {
     "task_id": 4,
     "show_profit_loss": true,
+    "show_information": false,
     "stocks": [
       {
         "name": "Company A4",
@@ -118,6 +122,7 @@
   {
     "task_id": 5,
     "show_profit_loss": false,
+    "show_information": false,
     "stocks": [
       {
         "name": "Company A5",
@@ -147,6 +152,7 @@
   {
     "task_id": 6,
     "show_profit_loss": true,
+    "show_information": false,
     "stocks": [
       {
         "name": "Company A6",
@@ -176,6 +182,7 @@
   {
     "task_id": 7,
     "show_profit_loss": false,
+    "show_information": false,
     "stocks": [
       {
         "name": "Company A7",
@@ -205,6 +212,7 @@
   {
     "task_id": 8,
     "show_profit_loss": true,
+    "show_information": true,
     "stocks": [
       {
         "name": "Company A8",
@@ -226,7 +234,7 @@
           "YTD": "-53.76%"
         },
         "info_costs": {
-          "purchase_bundle": 20.0
+          "purchase_bundle": 0
         }
       }
     ]
@@ -234,6 +242,7 @@
   {
     "task_id": 9,
     "show_profit_loss": false,
+    "show_information": true,
     "stocks": [
       {
         "name": "Company A9",
@@ -255,7 +264,7 @@
           "YTD": "+105.74%"
         },
         "info_costs": {
-          "purchase_bundle": 20.0
+          "purchase_bundle": 0
         }
       }
     ]
@@ -263,6 +272,7 @@
   {
     "task_id": 10,
     "show_profit_loss": true,
+    "show_information": true,
     "stocks": [
       {
         "name": "Company A10",
@@ -284,7 +294,7 @@
           "YTD": "-11.16%"
         },
         "info_costs": {
-          "purchase_bundle": 15.0
+          "purchase_bundle": 0
         }
       }
     ]
@@ -292,6 +302,7 @@
   {
     "task_id": 11,
     "show_profit_loss": false,
+    "show_information": true,
     "stocks": [
       {
         "name": "Company A11",
@@ -321,6 +332,7 @@
   {
     "task_id": 12,
     "show_profit_loss": true,
+    "show_information": true,
     "stocks": [
       {
         "name": "Company A12",
@@ -350,6 +362,7 @@
   {
     "task_id": 13,
     "show_profit_loss": false,
+    "show_information": true,
     "stocks": [
       {
         "name": "Company A13",
@@ -379,6 +392,7 @@
   {
     "task_id": 14,
     "show_profit_loss": true,
+    "show_information": true,
     "stocks": [
       {
         "name": "Company A14",

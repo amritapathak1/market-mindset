@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS task_responses (
     stock_2_investment DECIMAL(10, 2),
     total_investment DECIMAL(10, 2),
     remaining_amount DECIMAL(10, 2),
+    show_profit_loss BOOLEAN DEFAULT TRUE,
+    show_information BOOLEAN DEFAULT TRUE,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     time_spent_seconds INTEGER
 );

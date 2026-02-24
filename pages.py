@@ -36,7 +36,7 @@ def create_amount_display(amount):
     ], color="success", className="text-center mb-4")
 
 
-def create_stock_card(stock, stock_index, task_id, amount=None):
+def create_stock_card(stock, stock_index, task_id, amount=None, show_information=True):
     """Create a card displaying information about a single stock."""
     
     # Check if purchase bundle cost is 0
@@ -46,52 +46,57 @@ def create_stock_card(stock, stock_index, task_id, amount=None):
     # Build the right column content conditionally
     right_column_content = []
     
-    # Add purchase button only if cost > 0
-    if show_purchase_button:
-        right_column_content.append(
-            dbc.Button(
-                "Purchase Information",
-                id={'type': 'purchase-info', 'task': task_id, 'stock': stock_index},
-                color="primary",
-                size="sm",
-                className="w-100 mb-3"
+    # Only show information buttons if show_information is True
+    if show_information:
+        # Add purchase button only if cost > 0
+        if show_purchase_button:
+            right_column_content.append(
+                dbc.Button(
+                    "Purchase Information",
+                    id={'type': 'purchase-info', 'task': task_id, 'stock': stock_index},
+                    color="primary",
+                    size="sm",
+                    className="w-100 mb-3"
+                )
             )
-        )
+        
+        # Add the three info buttons
+        right_column_content.extend([
+            dbc.Button(
+                "Show More Details",
+                id={'type': 'show-more', 'task': task_id, 'stock': stock_index},
+                color="info",
+                outline=True,
+                size="sm",
+                className="w-100 mb-2",
+                disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
+            ),
+            
+            dbc.Button(
+                "Week's Chart & Analysis",
+                id={'type': 'show-week', 'task': task_id, 'stock': stock_index},
+                color="secondary",
+                outline=True,
+                size="sm",
+                className="w-100 mb-2",
+                disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
+            ),
+            
+            dbc.Button(
+                "Month's Chart & Analysis",
+                id={'type': 'show-month', 'task': task_id, 'stock': stock_index},
+                color="secondary",
+                outline=True,
+                size="sm",
+                className="w-100 mb-3",
+                disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
+            ),
+            
+            html.Hr(),
+        ])
     
-    # Add the three info buttons (always shown)
+    # Add amount display and investment input (always shown)
     right_column_content.extend([
-        dbc.Button(
-            "Show More Details",
-            id={'type': 'show-more', 'task': task_id, 'stock': stock_index},
-            color="info",
-            outline=True,
-            size="sm",
-            className="w-100 mb-2",
-            disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
-        ),
-        
-        dbc.Button(
-            "Week's Chart & Analysis",
-            id={'type': 'show-week', 'task': task_id, 'stock': stock_index},
-            color="secondary",
-            outline=True,
-            size="sm",
-            className="w-100 mb-2",
-            disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
-        ),
-        
-        dbc.Button(
-            "Month's Chart & Analysis",
-            id={'type': 'show-month', 'task': task_id, 'stock': stock_index},
-            color="secondary",
-            outline=True,
-            size="sm",
-            className="w-100 mb-3",
-            disabled=show_purchase_button  # Enabled by default if no purchase needed, disabled if purchase required
-        ),
-        
-        html.Hr(),
-        
         # Available amount display - made reactive with ID
         html.H5([
             html.I(className="bi bi-wallet2 me-2"),
@@ -358,6 +363,13 @@ def tutorial_page(tutorial_num, amount):
         ])
     
     stocks = task_data['stocks']
+    show_information = task_data.get('show_information', True)  # Default to True for tutorials
+    
+    # Check if tutorial 1 requires purchase (show_information=true AND cost > 0)
+    requires_purchase = False
+    if tutorial_num == 1 and show_information:
+        purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
+        requires_purchase = purchase_cost > 0
     
     # Important notice about real data (shown on first tutorial only)
     real_data_notice = None
@@ -421,7 +433,7 @@ def tutorial_page(tutorial_num, amount):
                className="text-center text-muted mb-4"),
         
         # Stock card
-        create_stock_card(stocks[0], 0, tutorial_task_id, amount),
+        create_stock_card(stocks[0], 0, tutorial_task_id, amount, show_information=show_information),
         
         html.Div(id="tutorial-error", className="text-danger text-center mb-3 mt-3"),
         
@@ -436,7 +448,7 @@ def tutorial_page(tutorial_num, amount):
                     color="success" if tutorial_num < NUM_TUTORIAL_TASKS else "primary",
                     size="lg",
                     className="w-100",
-                    disabled=(tutorial_num == 1)  # Only tutorial 1 starts disabled
+                    disabled=requires_purchase  # Tutorial 1 starts disabled only if purchase is required
                 )
             ], md=6, className="mx-auto")
         ]),
@@ -471,6 +483,7 @@ def task_page(task_id, amount, sequential_task_num=None):
         ])
     
     stocks = task_data['stocks']
+    show_information = task_data.get('show_information', True)  # Default to True if not specified
     
     return dbc.Container([
         html.H2(f"Investment Decision {display_task_num} of {NUM_TASKS}", className="text-center mb-4"),
@@ -479,7 +492,7 @@ def task_page(task_id, amount, sequential_task_num=None):
                className="text-center text-muted mb-4"),
         
         # Stock card - now full width
-        create_stock_card(stocks[0], 0, task_id, amount),
+        create_stock_card(stocks[0], 0, task_id, amount, show_information=show_information),
         
         html.Div(id="task-error", className="text-danger text-center mb-3 mt-3"),
         

@@ -218,6 +218,7 @@ def get_demographics(participant_id):
 def save_task_response(participant_id, task_id, stock_1_ticker, stock_1_name, 
                        stock_1_investment, stock_2_ticker, stock_2_name,
                        stock_2_investment, total_investment, remaining_amount,
+                       show_profit_loss=True, show_information=True,
                        time_spent_seconds=None):
     """Save task response data."""
     with get_db_connection() as conn:
@@ -226,12 +227,12 @@ def save_task_response(participant_id, task_id, stock_1_ticker, stock_1_name,
                 INSERT INTO task_responses (
                     participant_id, task_id, stock_1_ticker, stock_1_name, stock_1_investment,
                     stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
-                    remaining_amount, time_spent_seconds
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    remaining_amount, show_profit_loss, show_information, time_spent_seconds
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 participant_id, task_id, stock_1_ticker, stock_1_name, stock_1_investment,
                 stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
-                remaining_amount, time_spent_seconds
+                remaining_amount, show_profit_loss, show_information, time_spent_seconds
             ))
 
 

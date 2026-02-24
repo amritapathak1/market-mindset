@@ -837,13 +837,30 @@ def register_callbacks(app, db_enabled, db_functions):
         Input('purchased-info', 'data'),
         State('current-task', 'data'),
         State('task-order', 'data'),
+        State('current-page', 'data'),
         prevent_initial_call=False
     )
-    def update_button_states(purchased_info, current_task, task_order):
+    def update_button_states(purchased_info, current_task, task_order, current_page):
         """Enable/disable buttons based on purchase status."""
-        # Get the actual task ID from the randomized order
-        if current_task and task_order and (current_task - 1) < len(task_order) and not str(task_order[current_task - 1]).startswith('tutorial_'):
-            actual_task_id = task_order[current_task - 1] if task_order else current_task
+        # Get the number of outputs for each type to ensure we return the right number of values
+        ctx = dash.callback_context
+        num_purchase_outputs = len(ctx.outputs_list[0])
+        num_more_outputs = len(ctx.outputs_list[1])
+        num_week_outputs = len(ctx.outputs_list[2])
+        num_month_outputs = len(ctx.outputs_list[3])
+        
+        # If no buttons are rendered, return empty lists
+        if num_purchase_outputs == 0 and num_more_outputs == 0 and num_week_outputs == 0 and num_month_outputs == 0:
+            return [], [], [], []
+        
+        # Determine the actual task ID based on current page
+        if current_page == PAGES['tutorial_1']:
+            actual_task_id = 'tutorial_1'
+        elif current_page == PAGES['tutorial_2']:
+            actual_task_id = 'tutorial_2'
+        elif current_task and task_order and (current_task - 1) < len(task_order):
+            # Get the actual task ID from the randomized order
+            actual_task_id = task_order[current_task - 1]
         else:
             actual_task_id = current_task
         
@@ -856,24 +873,39 @@ def register_callbacks(app, db_enabled, db_functions):
         month_disabled = []
         
         if not error and task_data and 'stocks' in task_data:
-            for stock_idx in range(len(task_data['stocks'])):
-                stock = task_data['stocks'][stock_idx]
-                bundle_identifier = f'bundle-{stock_idx}'
-                bundle_purchased = bundle_identifier in (purchased_info or [])
-                
-                # Check if bundle cost is $0 (free)
-                bundle_cost = stock.get('info_costs', {}).get('purchase_bundle', 0)
-                is_free = bundle_cost == 0
-                
-                # Only add to purchase_disabled if the button was actually rendered (cost > 0)
-                if bundle_cost > 0:
-                    # If bundle is purchased, disable purchase button
-                    purchase_disabled.append(bundle_purchased)
-                
-                # Info buttons should be enabled if bundle is purchased or free
-                more_disabled.append(not (bundle_purchased or is_free))
-                week_disabled.append(not (bundle_purchased or is_free))
-                month_disabled.append(not (bundle_purchased or is_free))
+            # Check if information buttons should be shown at all
+            show_information = task_data.get('show_information', True)
+            
+            if show_information:
+                for stock_idx in range(len(task_data['stocks'])):
+                    stock = task_data['stocks'][stock_idx]
+                    bundle_identifier = f'bundle-{stock_idx}'
+                    bundle_purchased = bundle_identifier in (purchased_info or [])
+                    
+                    # Check if bundle cost is $0 (free)
+                    bundle_cost = stock.get('info_costs', {}).get('purchase_bundle', 0)
+                    is_free = bundle_cost == 0
+                    
+                    # Only add to purchase_disabled if the button was actually rendered (cost > 0)
+                    if bundle_cost > 0:
+                        # If bundle is purchased, disable purchase button
+                        purchase_disabled.append(bundle_purchased)
+                    
+                    # Info buttons should be enabled if bundle is purchased or free
+                    more_disabled.append(not (bundle_purchased or is_free))
+                    week_disabled.append(not (bundle_purchased or is_free))
+                    month_disabled.append(not (bundle_purchased or is_free))
+        
+        # Ensure we return the correct number of values matching the number of outputs
+        # Pad with True (disabled) if we don't have enough values
+        while len(purchase_disabled) < num_purchase_outputs:
+            purchase_disabled.append(True)
+        while len(more_disabled) < num_more_outputs:
+            more_disabled.append(True)
+        while len(week_disabled) < num_week_outputs:
+            week_disabled.append(True)
+        while len(month_disabled) < num_month_outputs:
+            month_disabled.append(True)
         
         return purchase_disabled, more_disabled, week_disabled, month_disabled
     
@@ -894,9 +926,19 @@ def register_callbacks(app, db_enabled, db_functions):
         prevent_initial_call=True
     )
     def reset_tutorial_1_button(current_page):
-        """Ensure tutorial 1 button starts disabled and reset purchased info."""
+        """Ensure tutorial 1 button starts disabled (if purchase required) and reset purchased info."""
         if current_page == PAGES['tutorial_1']:
-            return True, []  # Reset purchased-info to empty list
+            # Check if tutorial 1 requires purchase
+            task_data, error = get_task_data_safe('tutorial_1')
+            if not error and task_data:
+                show_information = task_data.get('show_information', True)
+                if show_information:
+                    stocks = task_data.get('stocks', [])
+                    if stocks:
+                        purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
+                        requires_purchase = purchase_cost > 0
+                        return requires_purchase, []  # Reset purchased-info to empty list
+            return False, []  # If no purchase required, button is enabled
         elif current_page == PAGES['tutorial_2']:
             return dash.no_update, []  # Reset purchased-info but don't touch tutorial 2 button
         return dash.no_update, dash.no_update
@@ -912,17 +954,32 @@ def register_callbacks(app, db_enabled, db_functions):
         prevent_initial_call=True
     )
     def enable_tutorial_1_button(modal_is_open, current_page, purchased_info):
-        """Enable tutorial 1 button after viewing info."""
+        """Enable tutorial 1 button after viewing info (only if purchase is required)."""
         # Only act on tutorial 1 page
         if current_page != PAGES['tutorial_1']:
             return dash.no_update, dash.no_update
         
-        # Check if modal just closed AND user has viewed at least one piece of info
-        if not modal_is_open and purchased_info and len(purchased_info) > 0:
-            return False, dbc.Alert([
-                html.I(className="bi bi-check-circle me-2"),
-                "Great! You've learned how to view information. Now enter an investment amount and click Continue. You can also choose to not invest, in which case enter 0 and click Continue."
-            ], color="success", className="text-center mt-3")
+        # Check if tutorial 1 requires purchase
+        task_data, error = get_task_data_safe('tutorial_1')
+        if error or not task_data:
+            return dash.no_update, dash.no_update
+        
+        show_information = task_data.get('show_information', True)
+        requires_purchase = False
+        if show_information:
+            stocks = task_data.get('stocks', [])
+            if stocks:
+                purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
+                requires_purchase = purchase_cost > 0
+        
+        # Only enable button after purchase if purchase is required
+        if requires_purchase:
+            # Check if modal just closed AND user has viewed at least one piece of info
+            if not modal_is_open and purchased_info and len(purchased_info) > 0:
+                return False, dbc.Alert([
+                    html.I(className="bi bi-check-circle me-2"),
+                    "Great! You've learned how to view information. Now enter an investment amount and click Continue. You can also choose to not invest, in which case enter 0 and click Continue."
+                ], color="success", className="text-center mt-3")
         
         return dash.no_update, dash.no_update
     
@@ -973,41 +1030,52 @@ def register_callbacks(app, db_enabled, db_functions):
                 profit_loss = final_value - investment_amount
                 total_profit_loss += profit_loss
         
-        # Create result modal content - similar to task result but with profit/loss details
-        # Determine profit/loss message like in tasks
+        # Check if we should show profit/loss details (configurable via task data)
+        show_profit_loss = task_data.get('show_profit_loss', True)  # Default to True for tutorials
+        show_information = task_data.get('show_information', True)  # For logging purposes
+        
+        # Create result modal content
+        # If show_profit_loss is True: show detailed breakdown with investment/profit amounts
+        # If show_profit_loss is False: show simple "investment recorded" message
         if total_investment == 0:
             main_message = "You did not invest in this task."
-        elif total_profit_loss > 0:
-            main_message = "Your investment made a profit! 📈"
-        elif total_profit_loss < 0:
-            main_message = "Your investment made a loss. 📉"
+            result_content_parts = [html.H5(main_message, className="text-center mb-4")]
         else:
-            main_message = "Your investment broke even."
+            if show_profit_loss:
+                # Show detailed profit/loss information
+                if total_profit_loss > 0:
+                    main_message = "Your investment made a profit! 📈"
+                elif total_profit_loss < 0:
+                    main_message = "Your investment made a loss. 📉"
+                else:
+                    main_message = "Your investment broke even."
+                
+                result_content_parts = [
+                    html.H5(main_message, className="text-center mb-4"),
+                    html.Div([
+                        html.P([
+                            html.Strong("Investment: "),
+                            f"${total_investment:,.2f}"
+                        ], className="mb-2"),
+                        html.P([
+                            html.Strong("Profit/Loss: "),
+                            html.Span(
+                                f"${total_profit_loss:+,.2f}",
+                                style={
+                                    'color': 'green' if total_profit_loss >= 0 else 'red',
+                                    'fontWeight': 'bold'
+                                }
+                            )
+                        ], className="mb-4"),
+                    ], className="text-center"),
+                    html.Hr(),
+                ]
+            else:
+                # Simple message without details - matching main task behavior
+                result_content_parts = [html.P("Your investment has been recorded.", className="mb-0")]
         
-        result_content = html.Div([
-            html.H5(main_message, className="text-center mb-4"),
-            
-            # Show profit/loss amount (only in tutorial)
-            html.Div([
-                html.P([
-                    html.Strong("Investment: "),
-                    f"${total_investment:,.2f}"
-                ], className="mb-2"),
-                html.P([
-                    html.Strong("Profit/Loss: "),
-                    html.Span(
-                        f"${total_profit_loss:+,.2f}",
-                        style={
-                            'color': 'green' if total_profit_loss >= 0 else 'red',
-                            'fontWeight': 'bold'
-                        }
-                    )
-                ], className="mb-4"),
-            ], className="text-center"),
-            
-            html.Hr(),
-            
-            # Message for tutorial 1
+        # Message for tutorial 1
+        result_content_parts.append(
             html.Div([
                 html.P([
                     html.I(className="bi bi-lightbulb-fill me-2"),
@@ -1018,7 +1086,9 @@ def register_callbacks(app, db_enabled, db_functions):
                     "In the main study, you will NOT see profit/loss details after each task—only at the very end."
                 ], className="text-muted mb-0")
             ], style={'backgroundColor': '#f8f9fa', 'padding': '15px', 'borderRadius': '8px'})
-        ])
+        )
+        
+        result_content = html.Div(result_content_parts)
         
         if participant_id:
             try:
@@ -1029,7 +1099,12 @@ def register_callbacks(app, db_enabled, db_functions):
                     page_name='tutorial_1',
                     element_id='tutorial-1-submit',
                     action='submit',
-                    metadata={'investment': total_investment, 'profit_loss': total_profit_loss}
+                    metadata={
+                        'investment': total_investment, 
+                        'profit_loss': total_profit_loss,
+                        'show_profit_loss': show_profit_loss,
+                        'show_information': show_information
+                    }
                 )
             except Exception as e:
                 print(f"Error logging tutorial: {e}")
@@ -1111,41 +1186,52 @@ def register_callbacks(app, db_enabled, db_functions):
                 profit_loss = final_value - investment_amount
                 total_profit_loss += profit_loss
         
-        # Create result modal content - similar to task result but with profit/loss details
-        # Determine profit/loss message like in tasks
+        # Check if we should show profit/loss details (configurable via task data)
+        show_profit_loss = task_data.get('show_profit_loss', True)  # Default to True for tutorials
+        show_information = task_data.get('show_information', True)  # For logging purposes
+        
+        # Create result modal content
+        # If show_profit_loss is True: show detailed breakdown with investment/profit amounts
+        # If show_profit_loss is False: show simple "investment recorded" message
         if total_investment == 0:
             main_message = "You did not invest in this task."
-        elif total_profit_loss > 0:
-            main_message = "Your investment made a profit! 📈"
-        elif total_profit_loss < 0:
-            main_message = "Your investment made a loss. 📉"
+            result_content_parts = [html.H5(main_message, className="text-center mb-4")]
         else:
-            main_message = "Your investment broke even."
+            if show_profit_loss:
+                # Show detailed profit/loss information
+                if total_profit_loss > 0:
+                    main_message = "Your investment made a profit! 📈"
+                elif total_profit_loss < 0:
+                    main_message = "Your investment made a loss. 📉"
+                else:
+                    main_message = "Your investment broke even."
+                
+                result_content_parts = [
+                    html.H5(main_message, className="text-center mb-4"),
+                    html.Div([
+                        html.P([
+                            html.Strong("Investment: "),
+                            f"${total_investment:,.2f}"
+                        ], className="mb-2"),
+                        html.P([
+                            html.Strong("Profit/Loss: "),
+                            html.Span(
+                                f"${total_profit_loss:+,.2f}",
+                                style={
+                                    'color': 'green' if total_profit_loss >= 0 else 'red',
+                                    'fontWeight': 'bold'
+                                }
+                            )
+                        ], className="mb-4"),
+                    ], className="text-center"),
+                    html.Hr(),
+                ]
+            else:
+                # Simple message without details - matching main task behavior
+                result_content_parts = [html.P("Your investment has been recorded.", className="mb-0")]
         
-        result_content = html.Div([
-            html.H5(main_message, className="text-center mb-4"),
-            
-            # Show profit/loss amount (only in tutorial)
-            html.Div([
-                html.P([
-                    html.Strong("Investment: "),
-                    f"${total_investment:,.2f}"
-                ], className="mb-2"),
-                html.P([
-                    html.Strong("Profit/Loss: "),
-                    html.Span(
-                        f"${total_profit_loss:+,.2f}",
-                        style={
-                            'color': 'green' if total_profit_loss >= 0 else 'red',
-                            'fontWeight': 'bold'
-                        }
-                    )
-                ], className="mb-4"),
-            ], className="text-center"),
-            
-            html.Hr(),
-            
-            # Important note about main study
+        # Important note about main study
+        result_content_parts.append(
             html.Div([
                 html.P([
                     html.I(className="bi bi-info-circle-fill me-2"),
@@ -1162,7 +1248,9 @@ def register_callbacks(app, db_enabled, db_functions):
                     " Your decisions will be recorded from this point forward."
                 ], className="text-center mb-0")
             ], style={'backgroundColor': '#f8f9fa', 'padding': '20px', 'borderRadius': '8px'})
-        ])
+        )
+        
+        result_content = html.Div(result_content_parts)
         
         if participant_id:
             try:
@@ -1173,7 +1261,12 @@ def register_callbacks(app, db_enabled, db_functions):
                     page_name='tutorial_2',
                     element_id='tutorial-2-submit',
                     action='submit',
-                    metadata={'investment': total_investment, 'profit_loss': total_profit_loss}
+                    metadata={
+                        'investment': total_investment, 
+                        'profit_loss': total_profit_loss,
+                        'show_profit_loss': show_profit_loss,
+                        'show_information': show_information
+                    }
                 )
             except Exception as e:
                 print(f"Error logging tutorial: {e}")
@@ -1351,7 +1444,9 @@ def register_callbacks(app, db_enabled, db_functions):
                     stock_2_name=stocks[0]['name'] if len(stocks) > 1 else "",
                     stock_2_investment=0,
                     total_investment=total_investment,
-                    remaining_amount=new_amount
+                    remaining_amount=new_amount,
+                    show_profit_loss=task_data.get('show_profit_loss', False),
+                    show_information=task_data.get('show_information', True)
                 )
                 log_event(
                     participant_id=participant_id,
@@ -1368,13 +1463,17 @@ def register_callbacks(app, db_enabled, db_functions):
                         'investments': validated_investments,
                         'total_investment': total_investment,
                         'remaining_amount': new_amount,
-                        'profit_loss': total_profit_loss
+                        'profit_loss': total_profit_loss,
+                        'show_profit_loss': task_data.get('show_profit_loss', False),
+                        'show_information': task_data.get('show_information', True)
                     }
                 )
             except Exception as e:
                 print(f"Error saving task response: {e}")
         
         # Determine profit/loss message based on task configuration
+        # If show_profit_loss is True: show detailed breakdown with investment/profit amounts
+        # If show_profit_loss is False: show simple "investment recorded" message
         show_profit_loss = task_data.get('show_profit_loss', False)
         
         if total_investment == 0:

@@ -77,7 +77,8 @@ def save_demographics(participant_id=None, age_range=None, gender=None,
 def save_task_response(participant_id=None, task_id=None, stock_1_ticker=None,
                       stock_1_name=None, stock_1_investment=None,
                       stock_2_ticker=None, stock_2_name=None, stock_2_investment=None,
-                      total_investment=None, remaining_amount=None, **kwargs):
+                      total_investment=None, remaining_amount=None, 
+                      show_profit_loss=None, show_information=None, **kwargs):
     """Save task response to file."""
     _write_log_entry(participant_id, 'tasks', {
         'task_id': task_id,
@@ -88,7 +89,9 @@ def save_task_response(participant_id=None, task_id=None, stock_1_ticker=None,
         'stock_2_name': stock_2_name,
         'stock_2_investment': stock_2_investment,
         'total_investment': total_investment,
-        'remaining_amount': remaining_amount
+        'remaining_amount': remaining_amount,
+        'show_profit_loss': show_profit_loss,
+        'show_information': show_information
     })
 
 
