@@ -95,6 +95,7 @@ if not DB_ENABLED:
 # ============================================
 
 from config import INITIAL_AMOUNT, TUTORIAL_INITIAL_AMOUNT, PAGES, MODAL_SIZE, INFO_COSTS
+from components import create_slider_with_labels
 
 # Initialize the app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
@@ -132,6 +133,7 @@ app.layout = dbc.Container([
     dcc.Store(id='pending-info-request', data={}, storage_type='memory'),  # Store for pending info requests
     dcc.Store(id='info-cost-spent', data=0, storage_type='memory'),  # Track total spent on information
     dcc.Store(id='purchased-info', data=[], storage_type='memory'),  # Track purchased info for current task
+    dcc.Store(id='pending-result', data=None, storage_type='memory'),  # Store result data shown after CR modal
     
     # Modal for cost confirmation
     dbc.Modal([
@@ -151,6 +153,25 @@ app.layout = dbc.Container([
             dbc.Button("Close", id="close-modal", className="ms-auto", n_clicks=0)
         ),
     ], id="stock-modal", size=MODAL_SIZE, is_open=False, backdrop="static"),
+    
+    # Confidence/Risk modal (shown after each task submission)
+    dbc.Modal([
+        dbc.ModalHeader(dbc.ModalTitle("Quick Check-In"), close_button=False),
+        dbc.ModalBody([
+            html.P(id='cr-modal-message', className="mb-3 text-muted"),
+            html.H6("How confident are you in the investment decisions you've made so far?", className="mt-3 mb-2"),
+            create_slider_with_labels('cr-modal-confidence', 1, 7, 4, 1, 'Not at all confident', 'Extremely confident'),
+            html.H6("How would you rate the overall risk of your investment strategy?", className="mt-4 mb-2"),
+            create_slider_with_labels('cr-modal-risk', 1, 7, 4, 1, 'Very low risk', 'Very high risk'),
+            html.Div([
+                html.H6(id='cr-modal-attention-prompt', className="mt-4 mb-2", style={'color': '#0066cc'}),
+                create_slider_with_labels('cr-modal-attention', 1, 7, 4, 1, '1', '7'),
+            ], id='cr-modal-attention-section', style={'display': 'none'}),
+        ]),
+        dbc.ModalFooter(
+            dbc.Button("Continue", id="cr-modal-submit", color="primary")
+        ),
+    ], id="cr-modal", size="lg", is_open=False, centered=True, backdrop="static", keyboard=False),
     
     # Main content area
     dcc.Loading(

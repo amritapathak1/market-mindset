@@ -14,7 +14,7 @@ from dash import html, ctx, Input, Output, State, ALL
 import dash_bootstrap_components as dbc
 from flask import request
 
-from config import PAGES, NUM_TASKS, NUM_TUTORIAL_TASKS, CONFIDENCE_RISK_CHECKPOINTS
+from config import PAGES, NUM_TASKS, NUM_TUTORIAL_TASKS, CONFIDENCE_RISK_CHECKPOINTS, ATTENTION_CHECK_TASKS
 from utils import (
     validate_investment, validate_total_investment, get_task_data_safe,
     validate_demographics, validate_page_access
@@ -1311,8 +1311,8 @@ def register_callbacks(app, db_enabled, db_functions):
     # ============================================
     
     @app.callback(
-        Output('result-modal', 'is_open'),
-        Output('result-modal-body', 'children'),
+        Output('cr-modal', 'is_open'),
+        Output('pending-result', 'data'),
         Output('current-page', 'data', allow_duplicate=True),
         Output('current-task', 'data'),
         Output('amount', 'data'),
@@ -1357,7 +1357,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         )
                     except Exception as e:
                         print(f"Error logging event: {e}")
-                return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
+                return False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
             validated_investments.append(amount)
         
         # Validate total
@@ -1376,12 +1376,12 @@ def register_callbacks(app, db_enabled, db_functions):
                     )
                 except Exception as e:
                     print(f"Error logging event: {e}")
-            return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
+            return False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
         
         # Get task data using the actual randomized task ID
         task_data, task_error = get_task_data_safe(actual_task_id)
         if task_error:
-            return False, "", dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, task_error
+            return False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, task_error, dash.no_update
         
         total_investment = sum(validated_investments)
         responses[f'task_{current_task}'] = {
@@ -1471,57 +1471,20 @@ def register_callbacks(app, db_enabled, db_functions):
             except Exception as e:
                 print(f"Error saving task response: {e}")
         
-        # Determine profit/loss message based on task configuration
-        # If show_profit_loss is True: show detailed breakdown with investment/profit amounts
-        # If show_profit_loss is False: show simple "investment recorded" message
+        # Store result data to be displayed in the result modal after CR modal
         show_profit_loss = task_data.get('show_profit_loss', False)
-        
-        if total_investment == 0:
-            modal_message = html.Div([
-                html.P("You did not invest in this task.", className="mb-0")
-            ])
-        else:
-            if show_profit_loss:
-                # Show detailed profit/loss information
-                if total_profit_loss > 0:
-                    color = "success"
-                    icon = "📈"
-                    title = "Your investment made a profit!"
-                elif total_profit_loss < 0:
-                    color = "danger"
-                    icon = "📉"
-                    title = "Your investment made a loss."
-                else:
-                    color = "info"
-                    icon = "➡️"
-                    title = "Your investment broke even."
-                
-                modal_message = html.Div([
-                    html.H5([icon, " ", title], className=f"text-{color} mb-3"),
-                    html.Hr(),
-                    html.Div([
-                        html.P([html.Strong("Investment Amount: "), f"${total_investment:,.2f}"], className="mb-2"),
-                        html.P([html.Strong("Final Value: "), f"${(total_investment + total_profit_loss):,.2f}"], className="mb-2"),
-                        html.P([
-                            html.Strong("Profit/Loss: "), 
-                            html.Span(
-                                f"${abs(total_profit_loss):,.2f}" if total_profit_loss >= 0 else f"-${abs(total_profit_loss):,.2f}",
-                                className=f"text-{color}"
-                            )
-                        ], className="mb-2"),
-                        html.P([html.Strong("New Available Amount: "), f"${new_amount:,.2f}"], className="mb-0")
-                    ])
-                ])
-            else:
-                # Simple message without details
-                modal_message = html.P("Your investment has been recorded.", className="mb-0")
+        pending_result = {
+            'total_investment': total_investment,
+            'total_profit_loss': total_profit_loss,
+            'new_amount': new_amount,
+            'show_profit_loss': show_profit_loss
+        }
         
         next_task = current_task + 1
         
-        # Route to next page - but first show the modal
-        # We're not changing the page yet, the modal OK button will do that
+        # Show confidence/risk modal first; result modal will appear after CR is submitted
         # Clear purchased-info for next task
-        return True, modal_message, dash.no_update, next_task, new_amount, responses, portfolio, "", []
+        return True, pending_result, dash.no_update, next_task, new_amount, responses, portfolio, "", []
     
     
     # Handle modal OK button - navigate to next page
@@ -1535,15 +1498,13 @@ def register_callbacks(app, db_enabled, db_functions):
         prevent_initial_call=True
     )
     def handle_modal_ok(n_clicks, current_task, task_order, participant_id):
-        """Handle modal OK button click and navigate to appropriate next page."""
+        """Handle result modal OK button click and navigate to next task or feedback."""
         if not n_clicks:
             return dash.no_update, dash.no_update
         
         # current_task has already been incremented in submit_task
-        # So current_task - 1 is the task that was just completed
         completed_task = current_task - 1
         
-        # Log the modal OK button click
         if participant_id:
             try:
                 log_event(
@@ -1559,49 +1520,146 @@ def register_callbacks(app, db_enabled, db_functions):
             except Exception as e:
                 print(f"Error logging event: {e}")
         
-        # Route to next page based on completed task number
-        if completed_task in CONFIDENCE_RISK_CHECKPOINTS:
+        # Navigate to feedback after all tasks, otherwise continue to next task
+        if current_task > NUM_TASKS:
             if participant_id:
                 try:
-                    log_event(
-                        participant_id=participant_id,
-                        event_type='page_navigation',
-                        event_category='navigation',
-                        page_name='confidence_risk',
-                        action='navigate'
-                    )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
-            return False, PAGES['confidence_risk']
-        
-        if completed_task == NUM_TASKS:
-            if participant_id:
-                try:
-                    log_event(
-                        participant_id=participant_id,
-                        event_type='page_navigation',
-                        event_category='navigation',
-                        page_name='feedback',
-                        action='navigate'
-                    )
+                    log_event(participant_id=participant_id, event_type='page_navigation',
+                              event_category='navigation', page_name='feedback', action='navigate')
                 except Exception as e:
                     print(f"Error logging event: {e}")
             return False, PAGES['feedback']
         
-        # Continue to next task
         if participant_id:
             try:
-                log_event(
-                    participant_id=participant_id,
-                    event_type='page_navigation',
-                    event_category='navigation',
-                    page_name='task',
-                    task_id=current_task,
-                    action='navigate'
-                )
+                log_event(participant_id=participant_id, event_type='page_navigation',
+                          event_category='navigation', page_name='task',
+                          task_id=current_task, action='navigate')
             except Exception as e:
                 print(f"Error logging event: {e}")
         return False, PAGES['task']
+    
+    
+    # ============================================
+    # CONFIDENCE/RISK MODAL
+    # ============================================
+    
+    # Update cr-modal content (message and attention check visibility) when modal opens
+    @app.callback(
+        Output('cr-modal-attention-section', 'style'),
+        Output('cr-modal-attention-prompt', 'children'),
+        Output('cr-modal-message', 'children'),
+        Input('cr-modal', 'is_open'),
+        State('current-task', 'data'),
+        prevent_initial_call=True
+    )
+    def update_cr_modal_content(is_open, current_task):
+        """Show/hide attention check and update message when CR modal opens."""
+        if not is_open:
+            return dash.no_update, dash.no_update, dash.no_update
+        
+        completed_task = (current_task or 2) - 1
+        task_word = "decision" if completed_task == 1 else "decisions"
+        message = f"You've completed {completed_task} investment {task_word}. Please take a moment to rate the following."
+        
+        if completed_task in ATTENTION_CHECK_TASKS:
+            requested_option = 2 if completed_task == 3 else 4
+            prompt = f"Please select option {requested_option} for this item. This question is used to verify attentive responding."
+            return {'display': 'block'}, prompt, message
+        
+        return {'display': 'none'}, "", message
+    
+    # Handle CR modal submission: save data, then show result modal
+    @app.callback(
+        Output('cr-modal', 'is_open', allow_duplicate=True),
+        Output('result-modal', 'is_open'),
+        Output('result-modal-body', 'children'),
+        Output('confidence-risk', 'data', allow_duplicate=True),
+        Output('cr-modal-confidence', 'value'),
+        Output('cr-modal-risk', 'value'),
+        Output('cr-modal-attention', 'value'),
+        Input('cr-modal-submit', 'n_clicks'),
+        State('cr-modal-confidence', 'value'),
+        State('cr-modal-risk', 'value'),
+        State('cr-modal-attention', 'value'),
+        State('current-task', 'data'),
+        State('pending-result', 'data'),
+        State('participant-id', 'data'),
+        prevent_initial_call=True
+    )
+    def submit_cr_modal(n_clicks, confidence, risk, attention_check, current_task, pending_result, participant_id):
+        """Save confidence/risk data and open the result modal."""
+        if not n_clicks:
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        
+        completed_after_task = (current_task or 2) - 1
+        
+        # Only log attention check if it was actually shown; otherwise log as null
+        attention_logged = attention_check if completed_after_task in ATTENTION_CHECK_TASKS else None
+        
+        confidence_risk_data = {
+            'confidence': confidence,
+            'risk': risk,
+            'attention_check': attention_logged
+        }
+        
+        if participant_id:
+            try:
+                save_confidence_risk(participant_id, confidence, risk,
+                                     attention_check_response=attention_logged,
+                                     completed_after_task=completed_after_task)
+                log_event(
+                    participant_id=participant_id,
+                    event_type='confidence_risk_submit',
+                    event_category='interaction',
+                    page_name='confidence_risk',
+                    element_id='cr-modal-submit',
+                    element_type='button',
+                    action='submit',
+                    metadata={'confidence': confidence, 'risk': risk,
+                              'attention_check': attention_logged,
+                              'completed_after_task': completed_after_task}
+                )
+            except Exception as e:
+                print(f"Error saving confidence/risk: {e}")
+        
+        # Build result modal content from pending result data
+        if not pending_result:
+            result_body = html.P("Your investment has been recorded.", className="mb-0")
+        else:
+            total_investment = pending_result.get('total_investment', 0)
+            total_profit_loss = pending_result.get('total_profit_loss', 0)
+            new_amount = pending_result.get('new_amount', 0)
+            show_profit_loss = pending_result.get('show_profit_loss', False)
+            
+            if total_investment == 0:
+                result_body = html.P("You did not invest in this task.", className="mb-0")
+            elif show_profit_loss:
+                if total_profit_loss > 0:
+                    color, icon, title = "success", "📈", "Your investment made a profit!"
+                elif total_profit_loss < 0:
+                    color, icon, title = "danger", "📉", "Your investment made a loss."
+                else:
+                    color, icon, title = "info", "➡️", "Your investment broke even."
+                result_body = html.Div([
+                    html.H5([icon, " ", title], className=f"text-{color} mb-3"),
+                    html.Hr(),
+                    html.P([html.Strong("Investment Amount: "), f"${total_investment:,.2f}"], className="mb-2"),
+                    html.P([html.Strong("Final Value: "), f"${(total_investment + total_profit_loss):,.2f}"], className="mb-2"),
+                    html.P([
+                        html.Strong("Profit/Loss: "),
+                        html.Span(
+                            f"${abs(total_profit_loss):,.2f}" if total_profit_loss >= 0 else f"-${abs(total_profit_loss):,.2f}",
+                            className=f"text-{color}"
+                        )
+                    ], className="mb-2"),
+                    html.P([html.Strong("New Available Amount: "), f"${new_amount:,.2f}"], className="mb-0")
+                ])
+            else:
+                result_body = html.P("Your investment has been recorded.", className="mb-0")
+        
+        # Reset all sliders to default (4) for next round
+        return False, True, result_body, confidence_risk_data, 4, 4, 4
     
     
     # ============================================

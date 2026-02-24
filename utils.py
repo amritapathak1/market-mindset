@@ -272,10 +272,14 @@ def validate_page_access(requested_page, consent_given, demographics_completed, 
             return False, PAGES['demographics'], "Please complete demographics before starting tasks"
         return True, None, None
     
-    # Confidence/risk requires completing checkpoint tasks
+    # Confidence/risk page is accessible after any task is completed
     if requested_page == PAGES['confidence_risk']:
-        if current_task <= CONFIDENCE_RISK_CHECKPOINTS[0]:
-            return False, PAGES['task'], f"Please complete task {CONFIDENCE_RISK_CHECKPOINTS[0]} first"
+        if not consent_given:
+            return False, PAGES['consent'], "Please provide consent before continuing"
+        if not demographics_completed:
+            return False, PAGES['demographics'], "Please complete demographics first"
+        if current_task < 2:  # current_task is 2 after completing task 1
+            return False, PAGES['task'], "Please complete at least one task first"
         return True, None, None
     
     # Feedback requires all tasks completed

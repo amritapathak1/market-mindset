@@ -32,8 +32,13 @@ NUM_TUTORIAL_TASKS = 2
 NUM_TASKS = 14
 
 # Task numbers after which to show confidence/risk assessment
+# Note: Confidence and risk are shown after EVERY task (1-14)
+# These are relative to main tasks only (not including tutorial tasks)
+CONFIDENCE_RISK_CHECKPOINTS = [3, 9, 14]  # Deprecated - kept for compatibility
+
+# Task numbers at which to show attention check questions
 # Note: These are relative to main tasks only (not including tutorial tasks)
-CONFIDENCE_RISK_CHECKPOINTS = [3, 9, 14]
+ATTENTION_CHECK_TASKS = [3, 9]
 
 # ============================================
 # VALIDATION SETTINGS
