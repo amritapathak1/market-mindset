@@ -1422,7 +1422,7 @@ def register_callbacks(app, db_enabled, db_functions):
             return False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, task_error, dash.no_update
         
         total_investment = sum(validated_investments)
-        responses[f'task_{current_task}'] = {
+        response_entry = {
             'investments': validated_investments,
             'total': total_investment
         }
@@ -1430,6 +1430,9 @@ def register_callbacks(app, db_enabled, db_functions):
         # Update portfolio and calculate profit/loss
         if portfolio is None:
             portfolio = []
+
+        updated_portfolio = list(portfolio)
+        portfolio_items_to_save = []
         
         total_profit_loss = 0
         for i, investment_amount in enumerate(validated_investments):
@@ -1449,22 +1452,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     'final_value': final_value,
                     'profit_loss': profit_loss
                 }
-                portfolio.append(portfolio_item)
-                
-                if participant_id:
-                    try:
-                        save_portfolio_investment(
-                            participant_id=participant_id,
-                            task_id=current_task,
-                            stock_name=stock['name'],
-                            ticker=stock['ticker'],
-                            invested_amount=investment_amount,
-                            return_percent=return_percent,
-                            final_value=final_value,
-                            profit_loss=final_value - investment_amount
-                        )
-                    except Exception as e:
-                        print(f"Error saving portfolio: {e}")
+                updated_portfolio.append(portfolio_item)
+                portfolio_items_to_save.append(portfolio_item)
         
         new_amount = current_amount - total_investment
         
@@ -1472,20 +1461,34 @@ def register_callbacks(app, db_enabled, db_functions):
         if participant_id:
             try:
                 stocks = task_data['stocks']
+                second_stock = stocks[1] if len(stocks) > 1 else None
                 save_task_response(
                     participant_id=participant_id,
                     task_id=current_task,
                     stock_1_ticker=stocks[0]['ticker'],
                     stock_1_name=stocks[0]['name'],
                     stock_1_investment=validated_investments[0] if len(validated_investments) > 0 else 0,
-                    stock_2_ticker=stocks[0]['ticker'] if len(stocks) > 1 else "",
-                    stock_2_name=stocks[0]['name'] if len(stocks) > 1 else "",
-                    stock_2_investment=0,
+                    stock_2_ticker=second_stock['ticker'] if second_stock else "",
+                    stock_2_name=second_stock['name'] if second_stock else "",
+                    stock_2_investment=validated_investments[1] if len(validated_investments) > 1 else 0,
                     total_investment=total_investment,
                     remaining_amount=new_amount,
                     show_profit_loss=task_data.get('show_profit_loss', False),
                     show_information=task_data.get('show_information', True)
                 )
+
+                for portfolio_item in portfolio_items_to_save:
+                    save_portfolio_investment(
+                        participant_id=participant_id,
+                        task_id=current_task,
+                        stock_name=portfolio_item['stock_name'],
+                        ticker=portfolio_item['ticker'],
+                        invested_amount=portfolio_item['invested'],
+                        return_percent=portfolio_item['return_percent'],
+                        final_value=portfolio_item['final_value'],
+                        profit_loss=portfolio_item['profit_loss']
+                    )
+
                 log_event(
                     participant_id=participant_id,
                     event_type='task_submit',
@@ -1508,6 +1511,21 @@ def register_callbacks(app, db_enabled, db_functions):
                 )
             except Exception as e:
                 print(f"Error saving task response: {e}")
+                return (
+                    False,
+                    dash.no_update,
+                    dash.no_update,
+                    dash.no_update,
+                    dash.no_update,
+                    dash.no_update,
+                    dash.no_update,
+                    "We couldn't save your task response. Please try again.",
+                    dash.no_update,
+                )
+
+        if responses is None:
+            responses = {}
+        responses[f'task_{current_task}'] = response_entry
         
         # Store result data to be displayed in the result modal after CR modal
         show_profit_loss = task_data.get('show_profit_loss', False)
@@ -1522,7 +1540,7 @@ def register_callbacks(app, db_enabled, db_functions):
         
         # Show confidence/risk modal first; result modal will appear after CR is submitted
         # Clear purchased-info for next task
-        return True, pending_result, dash.no_update, next_task, new_amount, responses, portfolio, "", []
+        return True, pending_result, dash.no_update, next_task, new_amount, responses, updated_portfolio, "", []
     
     
     # Handle modal OK button - navigate to next page
@@ -1646,6 +1664,11 @@ def register_callbacks(app, db_enabled, db_functions):
                 save_confidence_risk(participant_id, confidence, risk,
                                      attention_check_response=attention_logged,
                                      completed_after_task=completed_after_task)
+            except Exception as e:
+                print(f"Error saving confidence/risk: {e}")
+                return True, False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+
+            try:
                 log_event(
                     participant_id=participant_id,
                     event_type='confidence_risk_submit',
@@ -1659,7 +1682,7 @@ def register_callbacks(app, db_enabled, db_functions):
                               'completed_after_task': completed_after_task}
                 )
             except Exception as e:
-                print(f"Error saving confidence/risk: {e}")
+                print(f"Error logging event: {e}")
         
         # Build result modal content from pending result data
         if not pending_result:
@@ -1727,10 +1750,16 @@ def register_callbacks(app, db_enabled, db_functions):
         }
         
         if participant_id:
+            # Completed task number (already incremented, so -1)
+            completed_after_task = current_task - 1
+
             try:
-                # Completed task number (already incremented, so -1)
-                completed_after_task = current_task - 1
                 save_confidence_risk(participant_id, confidence, risk, attention_check_response=attention_check, completed_after_task=completed_after_task)
+            except Exception as e:
+                print(f"Error saving confidence/risk: {e}")
+                return dash.no_update, dash.no_update
+
+            try:
                 log_event(
                     participant_id=participant_id,
                     event_type='confidence_risk_submit',
@@ -1761,7 +1790,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         action='navigate'
                     )
             except Exception as e:
-                print(f"Error saving confidence/risk: {e}")
+                print(f"Error logging event: {e}")
         
         # Navigate to task or feedback based on whether we've completed all tasks
         if current_task <= NUM_TASKS:
@@ -1787,6 +1816,11 @@ def register_callbacks(app, db_enabled, db_functions):
         if participant_id:
             try:
                 save_feedback(participant_id, feedback_text or "")
+            except Exception as e:
+                print(f"Error saving feedback: {e}")
+                return dash.no_update, dash.no_update, "We couldn't save your feedback. Please try again."
+
+            try:
                 log_event(
                     participant_id=participant_id,
                     event_type='feedback_submit',
@@ -1805,7 +1839,7 @@ def register_callbacks(app, db_enabled, db_functions):
                     action='navigate'
                 )
             except Exception as e:
-                print(f"Error saving feedback: {e}")
+                print(f"Error logging event: {e}")
         
         return PAGES['debrief'], feedback_text or "", ""
     
@@ -1825,7 +1859,15 @@ def register_callbacks(app, db_enabled, db_functions):
         
         if participant_id:
             try:
-                # Log the withdrawal decision
+                # Mark as completed (they finished the study)
+                update_participant_completion(participant_id)
+                
+                # Update withdrawal status based on user choice
+                if withdrawal_choice == 'yes':
+                    update_participant_withdrawal(participant_id, withdrawn=True)
+                else:
+                    update_participant_withdrawal(participant_id, withdrawn=False)
+
                 log_event(
                     participant_id=participant_id,
                     event_type='debrief_submit',
@@ -1836,13 +1878,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     action='submit',
                     metadata={'withdrawal_requested': withdrawal_choice == 'yes'}
                 )
-                
-                # Mark as completed (they finished the study)
-                update_participant_completion(participant_id)
-                
-                # Update withdrawal status based on user choice
+
                 if withdrawal_choice == 'yes':
-                    update_participant_withdrawal(participant_id, withdrawn=True)
                     log_event(
                         participant_id=participant_id,
                         event_type='data_withdrawal',
@@ -1850,9 +1887,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         page_name='debrief',
                         action='withdraw'
                     )
-                else:
-                    update_participant_withdrawal(participant_id, withdrawn=False)
-                
+
                 log_event(
                     participant_id=participant_id,
                     event_type='study_completed',
@@ -1862,5 +1897,6 @@ def register_callbacks(app, db_enabled, db_functions):
                 )
             except Exception as e:
                 print(f"Error completing study: {e}")
+                return dash.no_update, "We couldn't save your completion status. Please try again."
         
         return PAGES['thank_you'], ""

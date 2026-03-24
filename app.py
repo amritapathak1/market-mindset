@@ -199,5 +199,5 @@ if __name__ == '__main__':
     if debug_mode:
         app.run_server(debug=True, dev_tools_hot_reload=True, dev_tools_ui=True, port=port)
     else:
-        print("⚠️  For production, run with: gunicorn -w 2 -b 0.0.0.0:8050 application:application")
+        print("⚠️  For production, run with: gunicorn -w 4 -b 0.0.0.0:8050 application:application")
         app.run_server(debug=False, port=port)

@@ -59,7 +59,8 @@ CREATE TABLE IF NOT EXISTS task_responses (
     show_profit_loss BOOLEAN DEFAULT TRUE,
     show_information BOOLEAN DEFAULT TRUE,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    time_spent_seconds INTEGER
+    time_spent_seconds INTEGER,
+    UNIQUE(participant_id, task_id)
 );
 
 -- Portfolio tracking (investments with returns)
@@ -73,7 +74,8 @@ CREATE TABLE IF NOT EXISTS portfolio (
     return_percent DECIMAL(10, 4),
     final_value DECIMAL(10, 2),
     profit_loss DECIMAL(10, 2),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(participant_id, task_id, ticker)
 );
 
 -- Confidence and risk ratings
@@ -84,7 +86,8 @@ CREATE TABLE IF NOT EXISTS confidence_risk (
     risk_rating INTEGER,
     attention_check_response INTEGER,
     completed_after_task INTEGER,
-    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(participant_id, completed_after_task)
 );
 
 -- Feedback

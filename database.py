@@ -6,9 +6,10 @@ Handles PostgreSQL connections and all data persistence.
 import os
 import psycopg2
 import psycopg2.extras
-from datetime import datetime
+from psycopg2.pool import ThreadedConnectionPool
 import json
 from contextlib import contextmanager
+from threading import Lock
 
 # Database configuration from environment variables
 DB_CONFIG = {
@@ -17,15 +18,39 @@ DB_CONFIG = {
     'database': os.getenv('DB_NAME', 'market-mindset'),
     'user': os.getenv('DB_USER', 'postgres'),
     'password': os.getenv('DB_PASSWORD', ''),
+    'connect_timeout': int(os.getenv('DB_CONNECT_TIMEOUT', '5')),
 }
+
+DB_POOL_MIN_CONN = int(os.getenv('DB_POOL_MIN_CONN', '1'))
+DB_POOL_MAX_CONN = int(os.getenv('DB_POOL_MAX_CONN', '20'))
+
+_db_pool = None
+_db_pool_lock = Lock()
+
+
+def get_db_pool():
+    """Get or initialize PostgreSQL connection pool."""
+    global _db_pool
+
+    if _db_pool is None:
+        with _db_pool_lock:
+            if _db_pool is None:
+                _db_pool = ThreadedConnectionPool(
+                    minconn=DB_POOL_MIN_CONN,
+                    maxconn=DB_POOL_MAX_CONN,
+                    **DB_CONFIG,
+                )
+    return _db_pool
 
 
 @contextmanager
 def get_db_connection():
-    """Context manager for database connections."""
+    """Context manager for pooled database connections."""
     conn = None
+    pool = None
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        pool = get_db_pool()
+        conn = pool.getconn()
         yield conn
         conn.commit()
     except Exception as e:
@@ -33,8 +58,8 @@ def get_db_connection():
             conn.rollback()
         raise e
     finally:
-        if conn:
-            conn.close()
+        if pool and conn:
+            pool.putconn(conn)
 
 
 def init_database():
@@ -262,6 +287,19 @@ def save_task_response(participant_id, task_id, stock_1_ticker, stock_1_name,
                     stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
                     remaining_amount, show_profit_loss, show_information, time_spent_seconds
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (participant_id, task_id) DO UPDATE
+                SET stock_1_ticker = EXCLUDED.stock_1_ticker,
+                    stock_1_name = EXCLUDED.stock_1_name,
+                    stock_1_investment = EXCLUDED.stock_1_investment,
+                    stock_2_ticker = EXCLUDED.stock_2_ticker,
+                    stock_2_name = EXCLUDED.stock_2_name,
+                    stock_2_investment = EXCLUDED.stock_2_investment,
+                    total_investment = EXCLUDED.total_investment,
+                    remaining_amount = EXCLUDED.remaining_amount,
+                    show_profit_loss = EXCLUDED.show_profit_loss,
+                    show_information = EXCLUDED.show_information,
+                    time_spent_seconds = EXCLUDED.time_spent_seconds,
+                    submitted_at = CURRENT_TIMESTAMP
             """, (
                 participant_id, task_id, stock_1_ticker, stock_1_name, stock_1_investment,
                 stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
@@ -279,6 +317,13 @@ def save_portfolio_investment(participant_id, task_id, stock_name, ticker,
                     participant_id, task_id, stock_name, ticker, invested_amount,
                     return_percent, final_value, profit_loss
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (participant_id, task_id, ticker) DO UPDATE
+                SET stock_name = EXCLUDED.stock_name,
+                    invested_amount = EXCLUDED.invested_amount,
+                    return_percent = EXCLUDED.return_percent,
+                    final_value = EXCLUDED.final_value,
+                    profit_loss = EXCLUDED.profit_loss,
+                    created_at = CURRENT_TIMESTAMP
             """, (
                 participant_id, task_id, stock_name, ticker, invested_amount,
                 return_percent, final_value, profit_loss
@@ -308,6 +353,11 @@ def save_confidence_risk(participant_id, confidence_rating, risk_rating, attenti
             cur.execute("""
                 INSERT INTO confidence_risk (participant_id, confidence_rating, risk_rating, attention_check_response, completed_after_task)
                 VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (participant_id, completed_after_task) DO UPDATE
+                SET confidence_rating = EXCLUDED.confidence_rating,
+                    risk_rating = EXCLUDED.risk_rating,
+                    attention_check_response = EXCLUDED.attention_check_response,
+                    submitted_at = CURRENT_TIMESTAMP
             """, (participant_id, confidence_rating, risk_rating, attention_check_response, completed_after_task))
 
 

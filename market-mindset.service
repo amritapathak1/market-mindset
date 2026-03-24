@@ -11,7 +11,7 @@ EnvironmentFile=/home/ubuntu/app/.env
 
 # Gunicorn command
 ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
-    --workers 2 \
+    --workers 4 \
     --bind 127.0.0.1:8050 \
     --timeout 120 \
     --error-logfile /home/ubuntu/app/logs/error.log \
