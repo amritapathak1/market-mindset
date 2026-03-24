@@ -92,7 +92,6 @@ The application will start on `http://127.0.0.1:8050/`
   - `participants`, `demographics`, `task_responses`, `portfolio`, `confidence_risk`, `feedback`, `page_visits`, `events`
 - **Fallback/runtime logs (secondary)**: Participant-scoped JSONL files in `logs/`
   - Example pattern: `logs/participant_<uuid>_events.jsonl`
-  - Fallback logger writes logs with restrictive file permissions
 - **Static research inputs**: Versioned files in repository root
   - `tasks_data.json`, `tutorial_tasks_data.json`
   - `market_mindset_final_dataset.csv`, `market_mindset_final_dataset_with_metadata.csv`
@@ -111,19 +110,19 @@ The platform stores the following categories of data for each participant record
 
 ### Security and data protection
 
-- **Encryption at rest**: PostgreSQL data is stored in AWS RDS with encryption-at-rest enabled
+- **Encryption at rest**: PostgreSQL data can be encrypted at rest using AWS RDS encryption settings (must be enabled in AWS configuration)
 - **Network access controls**: Database access is restricted at the network layer using AWS security groups
 - **Transport path**: Browser traffic terminates at Nginx and is proxied to Gunicorn internally on localhost
 - **Secrets handling**: Database credentials and runtime secrets are loaded from environment variables (`.env`) and are not hard-coded in application source
 - **Application-level data minimization target**: Study protocol is to avoid collecting direct identifiers (for example, names/contact details)
-- **Fallback log hardening**: JSONL log directory/files are created with owner-only permissions where supported by the host OS
 - **Proxy/service defaults**: Provided Nginx and Gunicorn production configs disable access logs and do not forward explicit client-IP headers by default
 
 ### Important implementation note for IRB alignment
 
 - Current app flow initializes participants without collecting request IP address or browser user-agent.
 - Current database schema and write paths do not include IP address or browser user-agent fields.
-- Current withdrawal behavior marks records as withdrawn (`withdrawn=true`) rather than automatically deleting existing records.
+- Current withdrawal behavior marks records as withdrawn (`withdrawn=true`) so responses are excluded from analysis rather than automatically deleted.
+- Compensation policy: participants who choose to withdraw before completing the study are not paid.
 
 ## Customization
 

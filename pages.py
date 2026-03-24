@@ -194,7 +194,7 @@ def consent_page():
             "Access to the study data is limited to the research team."
         ]),
         html.P([
-            "If a participant chooses to withdraw before completing the study, any data collected up to the point of withdrawal will not be saved or included in the analysis. ",
+            "If a participant chooses to withdraw before completing the study, any data collected up to the point of withdrawal will not be included in the analysis. ",
             "At the end of the study, you will have the opportunity to request that your data be excluded from the research analysis. ",
             "Because the study does not collect identifying information, data cannot be withdrawn after you have left the study session."
         ]),
@@ -898,8 +898,8 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
         html.H5("Data Withdrawal Option:", className="mt-4 mb-3"),
         html.P([
             "Now that we have explained this study more fully, you may request that your data be excluded from this research study. ",
-            "If you decide that you do not want the researchers to include your data in the analysis, there is no penalty. ",
-            "You will still receive compensation for this experiment."
+            "If you decide that you do not want the researchers to include your data in the analysis, your data will not be included in the analysis. ",
+            "Participants who choose to withdraw before completing the study will not receive payment."
         ]),
         
         html.P([html.Strong("Do you wish to exclude your data from the study?")], className="mt-3 mb-3"),

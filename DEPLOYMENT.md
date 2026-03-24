@@ -199,7 +199,7 @@ ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
     --bind 127.0.0.1:8050 \
     --timeout 120 \
     --error-logfile /home/ubuntu/app/logs/error.log \
-    app:app.server
+    application:application
 
 [Install]
 WantedBy=multi-user.target
