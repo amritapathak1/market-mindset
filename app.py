@@ -116,8 +116,11 @@ app.clientside_callback(
 
 # App layout
 app.layout = dbc.Container([
+    dcc.Location(id='url', refresh=False),
+
     # Store components for state management (memory only - no persistence)
     dcc.Store(id='participant-id', data=None, storage_type='memory'),
+    dcc.Store(id='experiment-key', data=None, storage_type='memory'),
     dcc.Store(id='current-page', data=PAGES['consent'], storage_type='memory'),
     dcc.Store(id='amount', data=TUTORIAL_INITIAL_AMOUNT, storage_type='memory'),
     dcc.Store(id='current-task', data=1, storage_type='memory'),  # Index into task-order (1-based)
@@ -199,5 +202,5 @@ if __name__ == '__main__':
     if debug_mode:
         app.run_server(debug=True, dev_tools_hot_reload=True, dev_tools_ui=True, port=port)
     else:
-        print("⚠️  For production, run with: gunicorn -w 4 -b 0.0.0.0:8050 application:application")
+        print("⚠️  For production, run with: gunicorn -w 6 -b 0.0.0.0:8050 application:application")
         app.run_server(debug=False, port=port)

@@ -19,6 +19,114 @@ TASKS_DATA_FILE = os.path.join(os.path.dirname(__file__), 'tasks_data.json')
 with open(TASKS_DATA_FILE, 'r') as f:
     TASKS_DATA = json.load(f)
 
+# Experiment routing and condition configuration
+# Slug-based URLs:
+# /qvmtx, /nrpld, /kzwhc, /tbjsm, /fyqra, /mdxlu
+EXPERIMENTS = {
+    'e1': {
+        'slug': 'qvmtx',
+        'task_file': 'tasks_data_e1.json',
+        'tutorial_file': 'tutorial_tasks_data_e1.json',
+        'target_participants': 100,
+        'show_profit_loss': True,
+        'show_information': True,
+        'info_cost_mode': 'fixed'
+    },
+    'e2': {
+        'slug': 'nrpld',
+        'task_file': 'tasks_data_e2.json',
+        'tutorial_file': 'tutorial_tasks_data_e2.json',
+        'target_participants': 100,
+        'show_profit_loss': True,
+        'show_information': True,
+        'info_cost_mode': 'variable'
+    },
+    'e3': {
+        'slug': 'kzwhc',
+        'task_file': 'tasks_data_e3.json',
+        'tutorial_file': 'tutorial_tasks_data_e3.json',
+        'target_participants': 100,
+        'show_profit_loss': True,
+        'show_information': False,
+        'info_cost_mode': 'none'
+    },
+    'e4': {
+        'slug': 'tbjsm',
+        'task_file': 'tasks_data_e4.json',
+        'tutorial_file': 'tutorial_tasks_data_e4.json',
+        'target_participants': 100,
+        'show_profit_loss': False,
+        'show_information': True,
+        'info_cost_mode': 'fixed'
+    },
+    'e5': {
+        'slug': 'fyqra',
+        'task_file': 'tasks_data_e5.json',
+        'tutorial_file': 'tutorial_tasks_data_e5.json',
+        'target_participants': 100,
+        'show_profit_loss': False,
+        'show_information': True,
+        'info_cost_mode': 'variable'
+    },
+    'e6': {
+        'slug': 'mdxlu',
+        'task_file': 'tasks_data_e6.json',
+        'tutorial_file': 'tutorial_tasks_data_e6.json',
+        'target_participants': 100,
+        'show_profit_loss': False,
+        'show_information': False,
+        'info_cost_mode': 'none'
+    },
+}
+
+DEFAULT_EXPERIMENT_KEY = 'e1'
+
+EXPERIMENT_BY_SLUG = {
+    exp_config['slug']: exp_key
+    for exp_key, exp_config in EXPERIMENTS.items()
+}
+
+
+def _load_json_file(file_name):
+    file_path = os.path.join(os.path.dirname(__file__), file_name)
+    with open(file_path, 'r') as file_obj:
+        return json.load(file_obj)
+
+
+def get_experiment_key_from_path(pathname):
+    """Resolve experiment key from URL pathname like '/qvmtx'."""
+    if not pathname:
+        return None
+
+    slug = pathname.strip('/').split('/')[0].strip().lower()
+    if not slug:
+        return None
+
+    return EXPERIMENT_BY_SLUG.get(slug)
+
+
+def get_experiment_config(experiment_key):
+    """Get experiment configuration dict for a valid experiment key."""
+    if not experiment_key:
+        return None
+    return EXPERIMENTS.get(experiment_key)
+
+
+def load_experiment_task_data(experiment_key):
+    """Load main task data for a configured experiment."""
+    exp_config = get_experiment_config(experiment_key)
+    if not exp_config:
+        raise ValueError(f"Invalid experiment key: {experiment_key}")
+    return _load_json_file(exp_config['task_file'])
+
+
+def load_experiment_tutorial_data(experiment_key):
+    """Load tutorial task data for a configured experiment."""
+    exp_config = get_experiment_config(experiment_key)
+    if not exp_config:
+        raise ValueError(f"Invalid experiment key: {experiment_key}")
+    return _load_json_file(exp_config['tutorial_file'])
+
 # Initial amount given to participants
 INITIAL_AMOUNT = 1000
 

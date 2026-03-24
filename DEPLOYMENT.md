@@ -1,29 +1,33 @@
-# AWS Deployment Guide - Free Tier
+# AWS Deployment Guide - Production Profile (Headroom for 250 Concurrent Users)
 
-## Total Estimated Cost: $0/month (first 12 months)
+## Target Profile
+
+- App tier: EC2 `t3.large` (or larger)
+- Database tier: RDS PostgreSQL `db.t4g.medium` (or larger)
+- Goal: support 250 concurrent participants with margin and lower error risk
 
 ---
 
 ## Prerequisites
 
-1. AWS Account (free tier eligible)
+1. AWS Account
 2. Domain name (optional, ~$12/year) OR use EC2 public IP
 
 ---
 
-## Step 1: Setup RDS PostgreSQL (Free Tier)
+## Step 1: Setup RDS PostgreSQL (Production)
 
 ### Create RDS Instance
 ```bash
 # Via AWS Console:
 1. Go to RDS → Create Database
 2. Engine: PostgreSQL (latest version)
-3. Template: **Free tier**
-4. DB Instance: db.t2.micro (750 hrs/month free)
-5. Storage: 20 GB GP2 (max for free tier)
-6. Allocated Storage: 20 GB
-7. Storage Autoscaling: DISABLE (to stay in free tier)
-8. Multi-AZ: NO (required for free tier)
+3. Template: Production
+4. DB Instance: **db.t4g.medium** (minimum)
+5. Storage: gp3
+6. Allocated Storage: 100 GB
+7. Storage Autoscaling: ENABLED
+8. Multi-AZ: YES (recommended)
 9. Public Access: YES (for initial setup)
 10. VPC Security Group: Create new (allow port 5432)
 11. Database name: market-mindset
@@ -51,29 +55,29 @@
 
 ---
 
-## Step 2: Launch EC2 Instance (Free Tier)
+## Step 2: Launch EC2 Instance (Production)
 
 ### Create EC2 Instance
 ```bash
 # Via AWS Console:
 1. Go to EC2 → Launch Instance
 2. Name: market-mindset-server
-3. AMI: Ubuntu Server 22.04 LTS (free tier eligible)
-4. Instance Type: **t2.micro** (750 hrs/month free)
+3. AMI: Ubuntu Server 22.04 LTS
+4. Instance Type: **t3.large** (minimum recommended)
 5. Key Pair: Create new or use existing (download .pem file)
 6. Network Settings:
    - Create security group: market-mindset-sg
    - Allow SSH (port 22) from your IP
    - Allow HTTP (port 80) from anywhere (0.0.0.0/0)
    - Allow HTTPS (port 443) from anywhere (0.0.0.0/0)
-7. Storage: 30 GB GP2 (30 GB free tier limit)
+7. Storage: 60 GB gp3 (or more)
 8. Launch Instance
 
 # IMPORTANT: Note your security group ID (sg-xxxxx) 
 # You'll need this to configure RDS security group in Step 1
 ```
 
-### Allocate Elastic IP (Free while attached)
+### Allocate Elastic IP
 ```bash
 # Via AWS Console:
 1. EC2 → Elastic IPs → Allocate Elastic IP
@@ -157,15 +161,20 @@ DB_NAME=market-mindset
 DB_USER=postgres
 DB_PASSWORD=your-rds-password
 SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+
+# Pooling and DB reliability
+DB_POOL_MIN_CONN=2
+DB_POOL_MAX_CONN=30
+DB_CONNECT_TIMEOUT=5
 ```
 
-### Initialize Database
+### Initialize Database (First Deploy Only)
 ```bash
 # First, test the connection from EC2 to RDS:
 psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d market-mindset -c "SELECT version();"
 # You'll be prompted for the password you set during RDS creation
 
-# If connection works, initialize the database schema:
+# If connection works, initialize the database schema once on first deployment:
 psql -h your-rds-endpoint.us-east-1.rds.amazonaws.com -U postgres -d market-mindset -f schema.sql
 
 # Verify tables were created:
@@ -195,11 +204,24 @@ WorkingDirectory=/home/ubuntu/app
 Environment="PATH=/home/ubuntu/app/venv/bin"
 EnvironmentFile=/home/ubuntu/app/.env
 ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
-    --workers 2 \
+    --workers 6 \
+    --max-requests 1000 \
+    --max-requests-jitter 100 \
+    --graceful-timeout 60 \
+    --keep-alive 5 \
+    --worker-tmp-dir /dev/shm \
     --bind 127.0.0.1:8050 \
     --timeout 120 \
+    --access-logfile /home/ubuntu/app/logs/access.log \
     --error-logfile /home/ubuntu/app/logs/error.log \
     application:application
+
+Restart=always
+RestartSec=5
+TimeoutStartSec=180
+TimeoutStopSec=60
+
+LimitNOFILE=4096
 
 [Install]
 WantedBy=multi-user.target
@@ -249,6 +271,22 @@ server {
         proxy_connect_timeout 120s;
         proxy_send_timeout 120s;
         proxy_read_timeout 120s;
+
+        # Buffering
+        proxy_buffering off;
+    }
+
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+    }
+
+    location = /nginx_status {
+        stub_status;
+        access_log off;
+        allow 127.0.0.1;
+        deny all;
     }
 }
 ```
@@ -278,7 +316,21 @@ sudo certbot --nginx -d yourdomain.com
 
 ## Step 7: Update App for Production
 
-The app needs modifications to integrate with the database. I'll create those files next.
+The app is already integrated with PostgreSQL in this repository.
+
+Before launch, verify these are present on the server:
+- `database.py` (DB connection pool + persistence)
+- `schema.sql` (tables and view creation)
+- `.env` with valid `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+
+Quick DB integration check:
+```bash
+cd /home/ubuntu/app
+source venv/bin/activate
+python3 -c "from database import get_db_connection; \
+with get_db_connection() as conn: \
+    cur=conn.cursor(); cur.execute('SELECT 1'); print('DB OK')"
+```
 
 ---
 
@@ -303,10 +355,19 @@ The app needs modifications to integrate with the database. I'll create those fi
 ```bash
 # Application logs
 tail -f /home/ubuntu/app/logs/error.log
+tail -f /home/ubuntu/app/logs/access.log
 
 # System logs
 sudo journalctl -u market-mindset -n 100 -f
 sudo journalctl -u nginx -n 100 -f
+
+# Nginx app logs
+sudo tail -f /var/log/nginx/market-mindset_access.log
+sudo tail -f /var/log/nginx/market-mindset_error.log
+
+# Quick health checks
+curl -fsS http://127.0.0.1/healthz
+curl -fsS http://127.0.0.1/ >/dev/null && echo "app ok"
 ```
 
 ### Database Backup
@@ -315,26 +376,17 @@ sudo journalctl -u nginx -n 100 -f
 pg_dump -h your-rds-endpoint -U postgres market-mindset > backup_$(date +%Y%m%d).sql
 ```
 
-### Check Free Tier Usage
-- Go to AWS Console → Billing → Free Tier
-- Monitor RDS hours (should be <750/month)
-- Monitor EC2 hours (should be <750/month)
+### Capacity Checks
+- CloudWatch EC2: CPUUtilization, Memory (if agent), NetworkIn/Out
+- CloudWatch RDS: CPUUtilization, DatabaseConnections, FreeableMemory, Read/Write latency
+- Alert on sustained high CPU (>70%), elevated DB connections, or rising 5xx rates
 
 ---
 
-## Costs Breakdown
+## Cost Note
 
-- **EC2 t2.micro:** $0 (750 hrs/month free for 12 months)
-- **RDS db.t2.micro:** $0 (750 hrs/month free for 12 months)
-- **20 GB Storage:** $0 (included in RDS free tier)
-- **Elastic IP:** $0 (while attached to running instance)
-- **Data Transfer:** $0 (100 GB/month free for 12 months)
-- **Total:** **$0/month** for first year
-
-**After 12 months (if you keep it):**
-- EC2 t2.micro: ~$8-10/month
-- RDS db.t2.micro: ~$15-20/month
-- Total: ~$25-30/month
+This guide targets reliability rather than free-tier cost minimization.
+Exact cost depends on region and traffic, but this profile is intentionally above free tier to reduce failure risk under 250 concurrent participants.
 
 ---
 

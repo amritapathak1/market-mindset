@@ -13,7 +13,15 @@ import dash
 from dash import html, ctx, Input, Output, State, ALL
 import dash_bootstrap_components as dbc
 
-from config import PAGES, NUM_TASKS, NUM_TUTORIAL_TASKS, CONFIDENCE_RISK_CHECKPOINTS, ATTENTION_CHECK_TASKS
+from config import (
+    PAGES,
+    NUM_TASKS,
+    NUM_TUTORIAL_TASKS,
+    CONFIDENCE_RISK_CHECKPOINTS,
+    ATTENTION_CHECK_TASKS,
+    get_experiment_config,
+    get_experiment_key_from_path,
+)
 from utils import (
     validate_investment, validate_total_investment, get_task_data_safe,
     validate_demographics, validate_page_access
@@ -54,24 +62,38 @@ def register_callbacks(app, db_enabled, db_functions):
     # ============================================
     # INITIALIZATION CALLBACK
     # ============================================
+
+    @app.callback(
+        Output('experiment-key', 'data'),
+        Input('url', 'pathname')
+    )
+    def resolve_experiment_key(pathname):
+        """Resolve experiment key from opaque URL slug."""
+        experiment_key = get_experiment_key_from_path(pathname)
+        return experiment_key
     
     @app.callback(
         Output('participant-id', 'data'),
         Output('task-order', 'data'),
-        Input('participant-id', 'data')
+        Input('participant-id', 'data'),
+        Input('experiment-key', 'data')
     )
-    def initialize_participant(participant_id):
+    def initialize_participant(participant_id, experiment_key):
         """Create new participant on first load."""
+        if not experiment_key:
+            return participant_id or None, dash.no_update
+
         if participant_id is None:
             try:
                 if DB_ENABLED:
                     # Create new participant in database (no session tracking, no IP/user-agent capture)
                     new_participant_id = create_participant(
-                        session_id=None  # Not using sessions
+                        session_id=None,  # Not using sessions
+                        experiment_key=experiment_key,
                     )
                 else:
                     # Create participant ID for file-based logging
-                    new_participant_id = create_participant()
+                    new_participant_id = create_participant(experiment_key=experiment_key)
                 
                 # Log initial event
                 if new_participant_id:
@@ -80,7 +102,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         event_type='session_start',
                         event_category='navigation',
                         page_name='consent',
-                        action='load'
+                        action='load',
+                        metadata={'experiment_key': experiment_key}
                     )
                 
                 # Create randomized task order for main tasks only
@@ -113,10 +136,32 @@ def register_callbacks(app, db_enabled, db_functions):
         State('confidence-risk', 'data'),
         State('portfolio', 'data'),
         State('info-cost-spent', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call='initial_duplicate'
     )
-    def display_page(page, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio, info_spent):
+    def display_page(page, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio, info_spent, experiment_key):
         """Display the appropriate page based on current page state with flow validation."""
+        if not experiment_key:
+            error_content = create_centered_card([
+                create_error_alert(
+                    "Invalid Study Link",
+                    "This study URL is not active or is incomplete.",
+                    "Please use the exact study link provided by the researcher."
+                )
+            ])
+            return error_content, False, dash.no_update, {}
+
+        experiment_config = get_experiment_config(experiment_key)
+        if not experiment_config:
+            error_content = create_centered_card([
+                create_error_alert(
+                    "Invalid Study Link",
+                    "This study URL does not map to a configured experiment.",
+                    "Please use the exact study link provided by the researcher."
+                )
+            ])
+            return error_content, False, dash.no_update, {}
+
         # Validate page access
         demographics_completed = bool(demographics and demographics.get('age_range'))
         confidence_risk_completed = bool(confidence_risk and confidence_risk.get('confidence'))
@@ -139,13 +184,13 @@ def register_callbacks(app, db_enabled, db_functions):
         elif page == PAGES['demographics']:
             return demographics_page(), False, dash.no_update, {}
         elif page == PAGES['tutorial_1']:
-            return tutorial_page(1, amount), False, dash.no_update, {}
+            return tutorial_page(1, amount, experiment_key), False, dash.no_update, {}
         elif page == PAGES['tutorial_2']:
-            return tutorial_page(2, amount), False, dash.no_update, {}
+            return tutorial_page(2, amount, experiment_key), False, dash.no_update, {}
         elif page == PAGES['task']:
             # Use the randomized task order
             actual_task_id = task_order[current_task - 1] if task_order else current_task
-            return task_page(actual_task_id, amount, sequential_task_num=current_task), False, dash.no_update, {}
+            return task_page(actual_task_id, amount, sequential_task_num=current_task, experiment_key=experiment_key), False, dash.no_update, {}
         elif page == PAGES['confidence_risk']:
             # Calculate number of completed main tasks (excluding tutorials)
             completed_main_tasks = max(0, current_task - 1)
@@ -381,10 +426,11 @@ def register_callbacks(app, db_enabled, db_functions):
         State('current-task', 'data'),
         State('participant-id', 'data'),
         State('purchased-info', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call=True
     )
     def handle_cost_confirmation(purchase_info_clicks, show_more_clicks, show_week_clicks, show_month_clicks, 
-                                  cancel_clicks, pending_request, current_task, participant_id, purchased_info):
+                                  cancel_clicks, pending_request, current_task, participant_id, purchased_info, experiment_key):
         """Handle cost confirmation modal for information requests."""
         if not ctx.triggered:
             return dash.no_update, dash.no_update, dash.no_update
@@ -434,7 +480,7 @@ def register_callbacks(app, db_enabled, db_functions):
             # Handle purchase-info button - bundle purchase
             if info_type == 'purchase-info':
                 # Get task data to retrieve stock info
-                task_data, error = get_task_data_safe(task_id)
+                task_data, error = get_task_data_safe(task_id, experiment_key)
                 if error:
                     return False, "", {}
                 
@@ -508,7 +554,7 @@ def register_callbacks(app, db_enabled, db_functions):
                 # Individual info buttons are now free after bundle purchase
                 # These buttons are only enabled after bundle is purchased
                 # Get task data to retrieve stock info
-                task_data, error = get_task_data_safe(task_id)
+                task_data, error = get_task_data_safe(task_id, experiment_key)
                 if error:
                     return False, "", {}
                 
@@ -580,9 +626,10 @@ def register_callbacks(app, db_enabled, db_functions):
         State('info-cost-spent', 'data'),
         State('purchased-info', 'data'),
         State('current-page', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call=True
     )
-    def toggle_modal(ok_clicks, close_clicks, pending_request, is_open, current_task, task_order, participant_id, modal_context, current_amount, info_spent, purchased_info, current_page):
+    def toggle_modal(ok_clicks, close_clicks, pending_request, is_open, current_task, task_order, participant_id, modal_context, current_amount, info_spent, purchased_info, current_page, experiment_key):
         """Handle opening/closing of stock details modal after cost confirmation."""
         if not ctx.triggered:
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
@@ -631,7 +678,7 @@ def register_callbacks(app, db_enabled, db_functions):
                 if task_id is None or stock_index is None:
                     return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 
-                task_data, error = get_task_data_safe(task_id)
+                task_data, error = get_task_data_safe(task_id, experiment_key)
                 if error:
                     return True, "Error", html.P(error, className="text-danger"), {}, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 
@@ -812,7 +859,7 @@ def register_callbacks(app, db_enabled, db_functions):
             if task_id is None or stock_index is None:
                 return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, False, dash.no_update, dash.no_update, dash.no_update
             
-            task_data, error = get_task_data_safe(task_id)
+            task_data, error = get_task_data_safe(task_id, experiment_key)
             if error:
                 return True, "Error", html.P(error, className="text-danger"), {}, dash.no_update, False, dash.no_update, dash.no_update, dash.no_update
             
@@ -876,9 +923,10 @@ def register_callbacks(app, db_enabled, db_functions):
         State('current-task', 'data'),
         State('task-order', 'data'),
         State('current-page', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call=False
     )
-    def update_button_states(purchased_info, current_task, task_order, current_page):
+    def update_button_states(purchased_info, current_task, task_order, current_page, experiment_key):
         """Enable/disable buttons based on purchase status."""
         # Get the number of outputs for each type to ensure we return the right number of values
         ctx = dash.callback_context
@@ -903,7 +951,7 @@ def register_callbacks(app, db_enabled, db_functions):
             actual_task_id = current_task
         
         # Get task data to check bundle cost
-        task_data, error = get_task_data_safe(actual_task_id)
+        task_data, error = get_task_data_safe(actual_task_id, experiment_key)
         
         purchase_disabled = []
         more_disabled = []
@@ -961,13 +1009,14 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('tutorial-1-submit', 'disabled', allow_duplicate=True),
         Output('purchased-info', 'data', allow_duplicate=True),
         Input('current-page', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call=True
     )
-    def reset_tutorial_1_button(current_page):
+    def reset_tutorial_1_button(current_page, experiment_key):
         """Ensure tutorial 1 button starts disabled (if purchase required) and reset purchased info."""
         if current_page == PAGES['tutorial_1']:
             # Check if tutorial 1 requires purchase
-            task_data, error = get_task_data_safe('tutorial_1')
+            task_data, error = get_task_data_safe('tutorial_1', experiment_key)
             if not error and task_data:
                 show_information = task_data.get('show_information', True)
                 if show_information:
@@ -989,16 +1038,17 @@ def register_callbacks(app, db_enabled, db_functions):
         Input('stock-modal', 'is_open'),
         State('current-page', 'data'),
         State('purchased-info', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call=True
     )
-    def enable_tutorial_1_button(modal_is_open, current_page, purchased_info):
+    def enable_tutorial_1_button(modal_is_open, current_page, purchased_info, experiment_key):
         """Enable tutorial 1 button after viewing info (only if purchase is required)."""
         # Only act on tutorial 1 page
         if current_page != PAGES['tutorial_1']:
             return dash.no_update, dash.no_update
         
         # Check if tutorial 1 requires purchase
-        task_data, error = get_task_data_safe('tutorial_1')
+        task_data, error = get_task_data_safe('tutorial_1', experiment_key)
         if error or not task_data:
             return dash.no_update, dash.no_update
         
@@ -1031,9 +1081,10 @@ def register_callbacks(app, db_enabled, db_functions):
         State({'type': 'investment-input', 'task': ALL, 'stock': ALL}, 'value'),
         State('amount', 'data'),
         State('participant-id', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call=True
     )
-    def submit_tutorial_1(n_clicks, investment_values, current_amount, participant_id):
+    def submit_tutorial_1(n_clicks, investment_values, current_amount, participant_id, experiment_key):
         """Handle tutorial 1 submission."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update
@@ -1052,7 +1103,7 @@ def register_callbacks(app, db_enabled, db_functions):
             return False, "", error, dash.no_update
         
         # Get task data
-        task_data, task_error = get_task_data_safe('tutorial_1')
+        task_data, task_error = get_task_data_safe('tutorial_1', experiment_key)
         if task_error:
             return False, "", task_error, dash.no_update
         
@@ -1187,9 +1238,10 @@ def register_callbacks(app, db_enabled, db_functions):
         State({'type': 'investment-input', 'task': ALL, 'stock': ALL}, 'value'),
         State('amount', 'data'),
         State('participant-id', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call=True
     )
-    def submit_tutorial_2(n_clicks, investment_values, current_amount, participant_id):
+    def submit_tutorial_2(n_clicks, investment_values, current_amount, participant_id, experiment_key):
         """Handle tutorial 2 submission."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update
@@ -1208,7 +1260,7 @@ def register_callbacks(app, db_enabled, db_functions):
             return False, "", error, dash.no_update
         
         # Get task data
-        task_data, task_error = get_task_data_safe('tutorial_2')
+        task_data, task_error = get_task_data_safe('tutorial_2', experiment_key)
         if task_error:
             return False, "", task_error, dash.no_update
         
@@ -1366,9 +1418,10 @@ def register_callbacks(app, db_enabled, db_functions):
         State('task-responses', 'data'),
         State('portfolio', 'data'),
         State('participant-id', 'data'),
+        State('experiment-key', 'data'),
         prevent_initial_call=True
     )
-    def submit_task(n_clicks, investment_values, current_task, task_order, current_amount, responses, portfolio, participant_id):
+    def submit_task(n_clicks, investment_values, current_task, task_order, current_amount, responses, portfolio, participant_id, experiment_key):
         """Handle task submission with investment validation and portfolio tracking."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
@@ -1417,7 +1470,7 @@ def register_callbacks(app, db_enabled, db_functions):
             return False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
         
         # Get task data using the actual randomized task ID
-        task_data, task_error = get_task_data_safe(actual_task_id)
+        task_data, task_error = get_task_data_safe(actual_task_id, experiment_key)
         if task_error:
             return False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, task_error, dash.no_update
         
@@ -1474,7 +1527,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     total_investment=total_investment,
                     remaining_amount=new_amount,
                     show_profit_loss=task_data.get('show_profit_loss', False),
-                    show_information=task_data.get('show_information', True)
+                    show_information=task_data.get('show_information', True),
+                    experiment_key=experiment_key,
                 )
 
                 for portfolio_item in portfolio_items_to_save:

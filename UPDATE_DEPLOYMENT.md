@@ -15,23 +15,10 @@ ssh -i ~/.ssh/market-mindset.pem ubuntu@your-elastic-ip
 # Navigate to app directory
 cd /home/ubuntu/app
 
-# Activate virtual environment
-source venv/bin/activate
+# Run hardened deployment script (includes preflight + DB check + health check)
+./deploy.sh
 
-# Pull latest changes
-git pull origin main
-# (or 'git pull origin master' depending on your branch name)
-
-# Install any new dependencies
-pip install -r requirements.txt
-
-# Restart the application
-sudo systemctl restart market-mindset
-
-# Check status
-sudo systemctl status market-mindset
-
-# Check logs for any errors
+# Optional: follow logs
 tail -f /home/ubuntu/app/logs/error.log
 ```
 
@@ -63,17 +50,8 @@ ssh -i ~/.ssh/market-mindset.pem ubuntu@your-elastic-ip
 # Navigate to app
 cd /home/ubuntu/app
 
-# Activate virtual environment
-source venv/bin/activate
-
-# Install any new dependencies (if requirements.txt changed)
-pip install -r requirements.txt
-
-# Restart the application
-sudo systemctl restart market-mindset
-
-# Check status
-sudo systemctl status market-mindset
+# Run hardened deployment script
+./deploy.sh
 ```
 
 ---
@@ -92,12 +70,7 @@ Add this content:
 ```bash
 #!/bin/bash
 cd /home/ubuntu/app
-source venv/bin/activate
-git pull origin main
-pip install -r requirements.txt
-sudo systemctl restart market-mindset
-echo "Deployment complete!"
-sudo systemctl status market-mindset
+./deploy.sh
 ```
 
 Make it executable:
@@ -116,16 +89,17 @@ Use it:
 
 ## Database Schema Changes
 
-If you update [schema.sql](schema.sql):
+Do not run full [schema.sql](schema.sql) on production after initial setup.
+Use additive SQL changes only (new indexes/constraints/columns) and apply explicitly.
 
 ```bash
 # SSH into EC2
 ssh -i ~/.ssh/market-mindset.pem ubuntu@your-elastic-ip
 
-# Apply schema changes
-psql -h your-rds-endpoint -U postgres -d market-mindset -f /home/ubuntu/app/schema.sql
+# Apply targeted migration SQL file
+psql -h your-rds-endpoint -U postgres -d market-mindset -f /home/ubuntu/app/migrations/<migration_file>.sql
 
-# Or run specific SQL commands
+# Or run specific SQL commands manually
 psql -h your-rds-endpoint -U postgres -d market-mindset
 # Then type your SQL commands
 # \q to exit
@@ -145,11 +119,15 @@ sudo systemctl status market-mindset
 # Application error logs
 tail -f /home/ubuntu/app/logs/error.log
 
+# Application access logs
+tail -f /home/ubuntu/app/logs/access.log
+
 # System logs
 sudo journalctl -u market-mindset -f
 
 # Nginx logs
-sudo tail -f /var/log/nginx/error.log
+sudo tail -f /var/log/nginx/market-mindset_error.log
+sudo tail -f /var/log/nginx/market-mindset_access.log
 ```
 
 ### Restart Services
@@ -168,6 +146,9 @@ sudo netstat -tlnp | grep 8050
 
 # Or
 curl http://localhost:8050
+
+# Health endpoint
+curl -fsS http://localhost/healthz
 ```
 
 ---
@@ -217,6 +198,8 @@ Before deploying:
 - [ ] Backup current production (optional): `git log` to note current commit
 - [ ] Check [requirements.txt](requirements.txt) is up to date
 - [ ] Review error logs after deployment
+- [ ] Confirm `sudo nginx -t` passes
+- [ ] Confirm `curl -fsS http://localhost/healthz` succeeds
 - [ ] Test the live site in browser
 
 ---

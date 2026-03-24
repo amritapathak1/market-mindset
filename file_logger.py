@@ -95,7 +95,8 @@ def save_task_response(participant_id=None, task_id=None, stock_1_ticker=None,
         'total_investment': total_investment,
         'remaining_amount': remaining_amount,
         'show_profit_loss': show_profit_loss,
-        'show_information': show_information
+        'show_information': show_information,
+        'experiment_key': kwargs.get('experiment_key')
     })
 
 

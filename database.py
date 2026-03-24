@@ -77,12 +77,13 @@ def init_database():
 # PARTICIPANT MANAGEMENT
 # ============================================
 
-def create_participant(session_id=None):
+def create_participant(session_id=None, experiment_key=None):
     """
     Create a new participant record.
     
     Args:
         session_id: Optional session identifier (None for anonymous participants)
+        experiment_key: Optional experiment identifier (e1-e6)
         
     Returns:
         UUID: The participant_id
@@ -90,10 +91,10 @@ def create_participant(session_id=None):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO participants (session_id)
-                VALUES (%s)
+                INSERT INTO participants (session_id, experiment_key)
+                VALUES (%s, %s)
                 RETURNING participant_id
-            """, (session_id,))
+            """, (session_id, experiment_key))
             return cur.fetchone()[0]
 
 
@@ -277,7 +278,7 @@ def save_task_response(participant_id, task_id, stock_1_ticker, stock_1_name,
                        stock_1_investment, stock_2_ticker, stock_2_name,
                        stock_2_investment, total_investment, remaining_amount,
                        show_profit_loss=True, show_information=True,
-                       time_spent_seconds=None):
+                       time_spent_seconds=None, experiment_key=None):
     """Save task response data."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
@@ -285,8 +286,8 @@ def save_task_response(participant_id, task_id, stock_1_ticker, stock_1_name,
                 INSERT INTO task_responses (
                     participant_id, task_id, stock_1_ticker, stock_1_name, stock_1_investment,
                     stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
-                    remaining_amount, show_profit_loss, show_information, time_spent_seconds
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    remaining_amount, show_profit_loss, show_information, time_spent_seconds, experiment_key
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (participant_id, task_id) DO UPDATE
                 SET stock_1_ticker = EXCLUDED.stock_1_ticker,
                     stock_1_name = EXCLUDED.stock_1_name,
@@ -298,12 +299,13 @@ def save_task_response(participant_id, task_id, stock_1_ticker, stock_1_name,
                     remaining_amount = EXCLUDED.remaining_amount,
                     show_profit_loss = EXCLUDED.show_profit_loss,
                     show_information = EXCLUDED.show_information,
+                    experiment_key = EXCLUDED.experiment_key,
                     time_spent_seconds = EXCLUDED.time_spent_seconds,
                     submitted_at = CURRENT_TIMESTAMP
             """, (
                 participant_id, task_id, stock_1_ticker, stock_1_name, stock_1_investment,
                 stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
-                remaining_amount, show_profit_loss, show_information, time_spent_seconds
+                remaining_amount, show_profit_loss, show_information, time_spent_seconds, experiment_key
             ))
 
 

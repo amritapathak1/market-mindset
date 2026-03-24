@@ -11,15 +11,23 @@ EnvironmentFile=/home/ubuntu/app/.env
 
 # Gunicorn command
 ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
-    --workers 4 \
+    --workers 6 \
+    --max-requests 1000 \
+    --max-requests-jitter 100 \
+    --graceful-timeout 60 \
+    --keep-alive 5 \
+    --worker-tmp-dir /dev/shm \
     --bind 127.0.0.1:8050 \
     --timeout 120 \
+    --access-logfile /home/ubuntu/app/logs/access.log \
     --error-logfile /home/ubuntu/app/logs/error.log \
     application:application
 
 # Restart policy
 Restart=always
-RestartSec=3
+RestartSec=5
+TimeoutStartSec=180
+TimeoutStopSec=60
 
 # Resource limits (optional, for stability)
 LimitNOFILE=4096

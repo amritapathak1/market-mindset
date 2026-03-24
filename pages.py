@@ -372,13 +372,13 @@ def demographics_page():
     ])
 
 
-def tutorial_page(tutorial_num, amount):
+def tutorial_page(tutorial_num, amount, experiment_key=None):
     """Render a tutorial page (practice round)."""
     # Get tutorial task ID
     tutorial_task_id = f'tutorial_{tutorial_num}'
     
     # Safely get task data
-    task_data, error = get_task_data_safe(tutorial_task_id)
+    task_data, error = get_task_data_safe(tutorial_task_id, experiment_key)
     
     if error:
         return dbc.Container([
@@ -492,13 +492,13 @@ def tutorial_page(tutorial_num, amount):
     ])
 
 
-def task_page(task_id, amount, sequential_task_num=None):
+def task_page(task_id, amount, sequential_task_num=None, experiment_key=None):
     """Render the main investment task page for a given task number."""
     # Use sequential number for display if provided, otherwise use task_id
     display_task_num = sequential_task_num if sequential_task_num is not None else task_id
     
     # Safely get task data
-    task_data, error = get_task_data_safe(task_id)
+    task_data, error = get_task_data_safe(task_id, experiment_key)
     
     if error:
         return dbc.Container([

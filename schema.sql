@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS participants CASCADE;
 CREATE TABLE IF NOT EXISTS participants (
     participant_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id VARCHAR(255),  -- Nullable for anonymous participants
+    experiment_key VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     completed BOOLEAN DEFAULT FALSE,
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS task_responses (
     id SERIAL PRIMARY KEY,
     participant_id UUID REFERENCES participants(participant_id) ON DELETE CASCADE,
     task_id INTEGER NOT NULL,
+    experiment_key VARCHAR(20),
     stock_1_ticker VARCHAR(10),
     stock_1_name VARCHAR(255),
     stock_1_investment DECIMAL(10, 2),
@@ -130,6 +132,7 @@ CREATE TABLE IF NOT EXISTS events (
 
 -- Indexes for better query performance
 CREATE INDEX idx_participants_session ON participants(session_id);
+CREATE INDEX idx_participants_experiment ON participants(experiment_key);
 CREATE INDEX idx_participants_created ON participants(created_at);
 CREATE INDEX idx_events_participant ON events(participant_id);
 CREATE INDEX idx_events_type ON events(event_type);
@@ -145,6 +148,7 @@ CREATE OR REPLACE VIEW participant_summary AS
 SELECT 
     p.participant_id,
     p.session_id,
+    p.experiment_key,
     p.created_at,
     p.completed,
     p.completed_at,
@@ -170,6 +174,7 @@ LEFT JOIN demographics d ON p.participant_id = d.participant_id
 LEFT JOIN task_responses tr ON p.participant_id = tr.participant_id
 LEFT JOIN confidence_risk cr ON p.participant_id = cr.participant_id
 GROUP BY p.participant_id, p.session_id, p.created_at, p.completed, p.completed_at,
+         p.experiment_key,
          p.withdrawn, p.withdrawn_at,
          d.age_range, d.gender, d.gender_self_describe, d.education, d.income, 
          d.experience, d.hispanic_latino, d.race, d.race_other,

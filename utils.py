@@ -2,7 +2,30 @@
 Utility functions for the Stock Market Mindset application.
 """
 
-from config import ERROR_MESSAGES, MAX_DECIMAL_PLACES, MIN_INVESTMENT, TASKS_DATA, TUTORIAL_TASKS_DATA
+from config import (
+    DEFAULT_EXPERIMENT_KEY,
+    ERROR_MESSAGES,
+    MAX_DECIMAL_PLACES,
+    MIN_INVESTMENT,
+    load_experiment_task_data,
+    load_experiment_tutorial_data,
+)
+
+
+_EXPERIMENT_TASK_CACHE = {}
+_EXPERIMENT_TUTORIAL_CACHE = {}
+
+
+def _get_experiment_datasets(experiment_key):
+    key = experiment_key or DEFAULT_EXPERIMENT_KEY
+
+    if key not in _EXPERIMENT_TASK_CACHE:
+        _EXPERIMENT_TASK_CACHE[key] = load_experiment_task_data(key)
+
+    if key not in _EXPERIMENT_TUTORIAL_CACHE:
+        _EXPERIMENT_TUTORIAL_CACHE[key] = load_experiment_tutorial_data(key)
+
+    return _EXPERIMENT_TASK_CACHE[key], _EXPERIMENT_TUTORIAL_CACHE[key]
 
 
 def validate_investment(value, stock_name=None):
@@ -65,7 +88,7 @@ def validate_total_investment(investments, available_amount):
     return True, None
 
 
-def get_task_data_safe(task_id):
+def get_task_data_safe(task_id, experiment_key=None):
     """
     Safely retrieve task data with error handling.
     Supports both tutorial tasks (string IDs like 'tutorial_1') and main tasks (integer IDs).
@@ -79,10 +102,12 @@ def get_task_data_safe(task_id):
             - If error: (None, error_string)
     """
     try:
+        tasks_data, tutorial_tasks_data = _get_experiment_datasets(experiment_key)
+
         # Check if this is a tutorial task
         if isinstance(task_id, str) and task_id.startswith('tutorial_'):
             # Find tutorial task by task_id field
-            for task_data in TUTORIAL_TASKS_DATA:
+            for task_data in tutorial_tasks_data:
                 if task_data.get('task_id') == task_id:
                     # Validate required fields
                     if 'task_id' not in task_data or 'stocks' not in task_data:
@@ -105,11 +130,11 @@ def get_task_data_safe(task_id):
         
         # Handle main tasks (integer IDs)
         # Validate task_id range
-        if not isinstance(task_id, int) or not 1 <= task_id <= len(TASKS_DATA):
+        if not isinstance(task_id, int) or not 1 <= task_id <= len(tasks_data):
             return None, f"Invalid task ID: {task_id}"
         
         # Get task data (convert to 0-indexed)
-        task_data = TASKS_DATA[task_id - 1]
+        task_data = tasks_data[task_id - 1]
         
         # Validate required fields
         if 'task_id' not in task_data or 'stocks' not in task_data:

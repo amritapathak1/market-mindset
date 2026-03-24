@@ -39,6 +39,16 @@ python app.py
 
 The application will start on `http://127.0.0.1:8050/`
 
+Use one of the experiment-specific opaque links (not the root URL):
+- `http://127.0.0.1:8050/qvmtx`
+- `http://127.0.0.1:8050/nrpld`
+- `http://127.0.0.1:8050/kzwhc`
+- `http://127.0.0.1:8050/tbjsm`
+- `http://127.0.0.1:8050/fyqra`
+- `http://127.0.0.1:8050/mdxlu`
+
+Each link maps to a different condition and its own task/tutorial JSON files.
+
 ## Application Flow
 
 1. **Consent Page**: User must check consent box to continue
@@ -61,6 +71,8 @@ The application will start on `http://127.0.0.1:8050/`
 - `database.py`: PostgreSQL database operations
 - `file_logger.py`: File-based logging fallback when database unavailable
 - `tasks_data.json`: Stock information for all 7 tasks and investment scenarios
+- `tasks_data_e1.json` ... `tasks_data_e6.json`: Main-task variants for six experiment conditions
+- `tutorial_tasks_data_e1.json` ... `tutorial_tasks_data_e6.json`: Tutorial variants aligned to each experiment condition
 - `schema.sql`: PostgreSQL database schema
 - `requirements.txt`: Python dependencies
 - `deploy.sh`: Deployment script for AWS EC2
@@ -131,6 +143,8 @@ Edit `tasks_data.json` to change stock information, investment scenarios, or add
 - Stock details (name, ticker, images, descriptions)
 - Past week performance and return percentages
 - Weekly and monthly analysis text
+
+For the six-experiment setup, update the corresponding condition files (`tasks_data_e1.json` ... `tasks_data_e6.json` and matching tutorial files) rather than only the base files.
 
 ### Changing Initial Amount
 In `config.py`, modify the `INITIAL_AMOUNT` constant (default: 1000).
