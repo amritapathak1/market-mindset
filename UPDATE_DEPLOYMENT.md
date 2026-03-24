@@ -131,12 +131,6 @@ psql -h your-rds-endpoint -U postgres -d market-mindset
 # \q to exit
 ```
 
-If you only need to apply the March 2026 demographics additions on an existing database, run:
-
-```bash
-psql -h your-rds-endpoint -U postgres -d market-mindset -f /home/ubuntu/app/migrations/2026-03-24_add_demographics_screening_columns.sql
-```
-
 ---
 
 ## Troubleshooting

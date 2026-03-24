@@ -14,7 +14,7 @@ A Python Dash web application for conducting investment decision research studie
 - **Mid-Study Assessment**: After task 3, participants rate confidence and risk perception
 - **Final Results**: Shows starting amount, final amount, and net change
 - **Feedback Collection**: Optional feedback form at the end
-- **Data Persistence**: Study progress is saved in browser localStorage
+- **Data Persistence**: Participant data is written to PostgreSQL (with JSONL file fallback when DB is unavailable)
 - **Loading States**: Smooth transitions with loading indicators
 - **Error Handling**: Comprehensive validation and user-friendly error messages
 
@@ -69,6 +69,62 @@ The application will start on `http://127.0.0.1:8050/`
 - `DEPLOYMENT.md`: Complete AWS deployment guide
 - `README.md`: This file
 
+## Platform development
+
+### System architecture
+
+- **Application language**: Python 3.8+
+- **Web framework**: Dash (`dash==2.14.2`) with Dash Bootstrap Components for the UI
+- **App server**: Gunicorn (`application:application`) managed by systemd in production
+- **Reverse proxy**: Nginx forwards requests to Gunicorn on `127.0.0.1:8050`
+- **Primary data layer**: PostgreSQL via `psycopg2` (AWS RDS deployment target)
+- **Fallback data layer**: File-based JSONL logging in `logs/` when DB connectivity is unavailable
+
+### Hosting and infrastructure
+
+- **Production target**: AWS EC2 (application host) + AWS RDS PostgreSQL (database)
+- **Network model**: RDS access is restricted via security group rules to the application host security group
+- **Process supervision**: systemd service (`market-mindset.service`) for restart/recovery behavior
+
+### Data storage model (where and how data is stored)
+
+- **Transactional study data (primary)**: Stored in PostgreSQL tables defined in `schema.sql`
+  - `participants`, `demographics`, `task_responses`, `portfolio`, `confidence_risk`, `feedback`, `page_visits`, `events`
+- **Fallback/runtime logs (secondary)**: Participant-scoped JSONL files in `logs/`
+  - Example pattern: `logs/participant_<uuid>_events.jsonl`
+  - Fallback logger writes logs with restrictive file permissions
+- **Static research inputs**: Versioned files in repository root
+  - `tasks_data.json`, `tutorial_tasks_data.json`
+  - `market_mindset_final_dataset.csv`, `market_mindset_final_dataset_with_metadata.csv`
+
+### Data captured (participant and study data)
+
+The platform stores the following categories of data for each participant record:
+
+- **Study record metadata**: Random UUID participant ID, created/last-active timestamps, completion flag/time, withdrawal flag/time
+- **Demographics**: Age range, gender (and optional self-describe), Hispanic/Latino, race (and optional other), education, employment, executive/shareholder status, exchange/brokerage status, income band, investment experience
+- **Task responses**: Task ID, stock tickers/names presented, investment amounts, total invested, remaining amount, task timing
+- **Portfolio outcomes**: Invested amount, return %, final value, profit/loss per task
+- **Confidence/risk assessments**: Confidence rating, risk rating, attention-check response, checkpoint index
+- **Feedback**: Optional free-text feedback
+- **Behavioral telemetry**: Page navigation, element interactions (button/input/modal/slider events), event timestamps, and event metadata used for quality control and analysis
+
+### Security and data protection
+
+- **Encryption at rest**: PostgreSQL data is stored in AWS RDS with encryption-at-rest enabled
+- **Network access controls**: Database access is restricted at the network layer using AWS security groups
+- **Transport path**: Browser traffic terminates at Nginx and is proxied to Gunicorn internally on localhost
+- **Secrets handling**: Database credentials and runtime secrets are loaded from environment variables (`.env`) and are not hard-coded in application source
+- **Application-level data minimization target**: Study protocol is to avoid collecting direct identifiers (for example, names/contact details)
+- **Fallback log hardening**: JSONL log directory/files are created with owner-only permissions where supported by the host OS
+- **Proxy/service defaults**: Provided Nginx and Gunicorn production configs disable access logs and do not forward explicit client-IP headers by default
+
+### Important implementation note for IRB alignment
+
+- Current app flow initializes participants without collecting request IP address or browser user-agent.
+- Current database schema and write paths do not include IP address or browser user-agent fields.
+- Current withdrawal behavior marks records as withdrawn (`withdrawn=true`) rather than automatically deleting existing records.
+
 ## Customization
 
 ### Modifying Stock Data
@@ -85,24 +141,8 @@ Update `NUM_TASKS` in `config.py` and add/remove task objects in `tasks_data.jso
 
 ### Modifying Confidence/Risk Checkpoint
 Change `CONFIDENCE_RISK_CHECKPOINT` in `config.py` (default: 3).
-localStorage:
-- Consent status
-- Demographics (age, gender, education, investment experience)
-- Task responses (investment amounts for each stock)
-- Confidence and risk ratings
-- Feedback text
-- Current progress (page, task number, available amount)
 
-**Note**: Data persists in browser localStorage. Users can resume if they close the browser accidentally. For production use, implement server-side storage for permanent data retention
-
-The application stores the following data in browser session:
-- Consent status
-- Demographics (age, gender, education, investment experience)
-- Task responses (investment amounts for each stock)
-- Confidence and risk ratings
-- Feedback text
-
-**Note**: This demo stores data in browser memory only. For production use, implement server-side storage.
+For data architecture and security details, see the **Platform development** section above.
 
 ## Deployment
 

@@ -17,8 +17,6 @@ CREATE TABLE IF NOT EXISTS participants (
     session_id VARCHAR(255),  -- Nullable for anonymous participants
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_active TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
     completed BOOLEAN DEFAULT FALSE,
     completed_at TIMESTAMP,
     withdrawn BOOLEAN DEFAULT FALSE,

@@ -52,14 +52,12 @@ def init_database():
 # PARTICIPANT MANAGEMENT
 # ============================================
 
-def create_participant(session_id=None, ip_address=None, user_agent=None):
+def create_participant(session_id=None):
     """
     Create a new participant record.
     
     Args:
         session_id: Optional session identifier (None for anonymous participants)
-        ip_address: Client IP address
-        user_agent: Browser user agent string
         
     Returns:
         UUID: The participant_id
@@ -67,10 +65,10 @@ def create_participant(session_id=None, ip_address=None, user_agent=None):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO participants (session_id, ip_address, user_agent)
-                VALUES (%s, %s, %s)
+                INSERT INTO participants (session_id)
+                VALUES (%s)
                 RETURNING participant_id
-            """, (session_id, ip_address, user_agent))
+            """, (session_id,))
             return cur.fetchone()[0]
 
 

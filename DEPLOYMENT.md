@@ -198,7 +198,6 @@ ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
     --workers 2 \
     --bind 127.0.0.1:8050 \
     --timeout 120 \
-    --access-logfile /home/ubuntu/app/logs/access.log \
     --error-logfile /home/ubuntu/app/logs/error.log \
     app:app.server
 
@@ -239,8 +238,6 @@ server {
     location / {
         proxy_pass http://127.0.0.1:8050;
         proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         
         # WebSocket support
@@ -305,7 +302,6 @@ The app needs modifications to integrate with the database. I'll create those fi
 ### View Logs
 ```bash
 # Application logs
-tail -f /home/ubuntu/app/logs/access.log
 tail -f /home/ubuntu/app/logs/error.log
 
 # System logs

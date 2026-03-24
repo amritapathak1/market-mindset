@@ -12,7 +12,6 @@ This module contains all Dash callback functions that handle:
 import dash
 from dash import html, ctx, Input, Output, State, ALL
 import dash_bootstrap_components as dbc
-from flask import request
 
 from config import PAGES, NUM_TASKS, NUM_TUTORIAL_TASKS, CONFIDENCE_RISK_CHECKPOINTS, ATTENTION_CHECK_TASKS
 from utils import (
@@ -65,16 +64,10 @@ def register_callbacks(app, db_enabled, db_functions):
         """Create new participant on first load."""
         if participant_id is None:
             try:
-                # Get client info
-                ip_address = request.remote_addr if request else None
-                user_agent = request.headers.get('User-Agent') if request else None
-                
                 if DB_ENABLED:
-                    # Create new participant in database (no session tracking)
+                    # Create new participant in database (no session tracking, no IP/user-agent capture)
                     new_participant_id = create_participant(
-                        session_id=None,  # Not using sessions
-                        ip_address=ip_address,
-                        user_agent=user_agent
+                        session_id=None  # Not using sessions
                     )
                 else:
                     # Create participant ID for file-based logging

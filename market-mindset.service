@@ -14,7 +14,6 @@ ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
     --workers 2 \
     --bind 127.0.0.1:8050 \
     --timeout 120 \
-    --access-logfile /home/ubuntu/app/logs/access.log \
     --error-logfile /home/ubuntu/app/logs/error.log \
     application:application
 
