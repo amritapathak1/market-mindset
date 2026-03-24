@@ -13,6 +13,7 @@ from config import (
     INITIAL_AMOUNT, NUM_TASKS, NUM_TUTORIAL_TASKS, CONFIDENCE_RISK_CHECKPOINTS,
     SLIDER_CONFIG, GENDER_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_OPTIONS,
     AGE_RANGE_OPTIONS, INCOME_OPTIONS, HISPANIC_LATINO_OPTIONS, RACE_OPTIONS,
+    EMPLOYMENT_OPTIONS, YES_NO_UNSURE_OPTIONS,
     MIN_AGE, MAX_AGE, COLORS, ATTENTION_CHECK_TASKS
 )
 from utils import (
@@ -276,35 +277,8 @@ def demographics_page():
                             style={'display': 'none'}
                         ),
                         
-                        # Education Level
-                        dbc.Label("3. What is the highest level of education you have completed?"),
-                        dbc.Select(
-                            id="education-select",
-                            options=EDUCATION_OPTIONS,
-                            value="",
-                            className="mb-3"
-                        ),
-                        
-                        # Income
-                        dbc.Label("4. Which of the following best describes your total annual personal income before taxes?"),
-                        dbc.Select(
-                            id="income-select",
-                            options=INCOME_OPTIONS,
-                            value="",
-                            className="mb-3"
-                        ),
-                        
-                        # Investment Experience
-                        dbc.Label("5. Which of the following best describes your personal investment experience?"),
-                        dbc.Select(
-                            id="experience-select",
-                            options=EXPERIENCE_OPTIONS,
-                            value="",
-                            className="mb-3"
-                        ),
-                        
                         # Hispanic/Latino
-                        dbc.Label("6. Are you Hispanic/Latino?"),
+                        dbc.Label("3. Are you Hispanic/Latino?"),
                         dbc.Select(
                             id="hispanic-latino-select",
                             options=HISPANIC_LATINO_OPTIONS,
@@ -313,7 +287,7 @@ def demographics_page():
                         ),
                         
                         # Race
-                        dbc.Label("7. Regardless of your answer to the prior question, please indicate how you identify yourself:"),
+                        dbc.Label("4. Regardless of your answer to the prior question, please indicate how you identify yourself."),
                         dbc.Select(
                             id="race-select",
                             options=RACE_OPTIONS,
@@ -327,6 +301,60 @@ def demographics_page():
                             placeholder="Please specify",
                             className="mb-3",
                             style={'display': 'none'}
+                        ),
+
+                        # Education Level
+                        dbc.Label("5. What is the highest level of education you have completed?"),
+                        dbc.Select(
+                            id="education-select",
+                            options=EDUCATION_OPTIONS,
+                            value="",
+                            className="mb-3"
+                        ),
+
+                        # Employment Status
+                        dbc.Label("6. Are you employed?"),
+                        dbc.Select(
+                            id="employment-select",
+                            options=EMPLOYMENT_OPTIONS,
+                            value="",
+                            className="mb-3"
+                        ),
+
+                        # Executive/Shareholder Screening
+                        dbc.Label("7. Are you or a family member a senior executive or 10% shareholder at a publicly traded company?"),
+                        dbc.Select(
+                            id="executive-shareholder-select",
+                            options=YES_NO_UNSURE_OPTIONS,
+                            value="",
+                            className="mb-3"
+                        ),
+
+                        # Exchange/Brokerage Screening
+                        dbc.Label("8. Do you or any of your family members work for a stock exchange or brokerage?"),
+                        dbc.Select(
+                            id="exchange-brokerage-select",
+                            options=YES_NO_UNSURE_OPTIONS,
+                            value="",
+                            className="mb-3"
+                        ),
+
+                        # Income
+                        dbc.Label("9. Which of the following best describes your total annual personal income before taxes?"),
+                        dbc.Select(
+                            id="income-select",
+                            options=INCOME_OPTIONS,
+                            value="",
+                            className="mb-3"
+                        ),
+
+                        # Investment Experience
+                        dbc.Label("10. Which of the following best describes your personal investment experience"),
+                        dbc.Select(
+                            id="experience-select",
+                            options=EXPERIENCE_OPTIONS,
+                            value="",
+                            className="mb-3"
                         ),
                         
                         html.Div(id="demographics-error", className="text-danger mb-2"),

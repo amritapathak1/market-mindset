@@ -185,20 +185,55 @@ def end_page_visit(visit_id, duration_seconds=None):
 # DEMOGRAPHICS
 # ============================================
 
-def save_demographics(participant_id, age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other):
+def save_demographics(
+    participant_id,
+    age_range,
+    gender,
+    gender_self_describe,
+    hispanic_latino,
+    race,
+    race_other,
+    education,
+    employment,
+    executive_shareholder,
+    exchange_brokerage,
+    income,
+    experience,
+):
     """Save participant demographics."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                INSERT INTO demographics (participant_id, age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO demographics (
+                    participant_id, age_range, gender, gender_self_describe,
+                    hispanic_latino, race, race_other, education, employment,
+                    executive_shareholder, exchange_brokerage, income, experience
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (participant_id) DO UPDATE
                 SET age_range = EXCLUDED.age_range, gender = EXCLUDED.gender,
                     gender_self_describe = EXCLUDED.gender_self_describe,
-                    education = EXCLUDED.education, income = EXCLUDED.income,
-                    experience = EXCLUDED.experience, hispanic_latino = EXCLUDED.hispanic_latino,
-                    race = EXCLUDED.race, race_other = EXCLUDED.race_other
-            """, (participant_id, age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other))
+                    hispanic_latino = EXCLUDED.hispanic_latino, race = EXCLUDED.race,
+                    race_other = EXCLUDED.race_other, education = EXCLUDED.education,
+                    employment = EXCLUDED.employment,
+                    executive_shareholder = EXCLUDED.executive_shareholder,
+                    exchange_brokerage = EXCLUDED.exchange_brokerage,
+                    income = EXCLUDED.income, experience = EXCLUDED.experience
+            """, (
+                participant_id,
+                age_range,
+                gender,
+                gender_self_describe,
+                hispanic_latino,
+                race,
+                race_other,
+                education,
+                employment,
+                executive_shareholder,
+                exchange_brokerage,
+                income,
+                experience,
+            ))
 
 
 def get_demographics(participant_id):

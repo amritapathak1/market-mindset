@@ -266,22 +266,53 @@ def register_callbacks(app, db_enabled, db_functions):
         State('age-select', 'value'),
         State('gender-select', 'value'),
         State('gender-self-describe', 'value'),
-        State('education-select', 'value'),
-        State('income-select', 'value'),
-        State('experience-select', 'value'),
         State('hispanic-latino-select', 'value'),
         State('race-select', 'value'),
         State('race-other', 'value'),
+        State('education-select', 'value'),
+        State('employment-select', 'value'),
+        State('executive-shareholder-select', 'value'),
+        State('exchange-brokerage-select', 'value'),
+        State('income-select', 'value'),
+        State('experience-select', 'value'),
         State('participant-id', 'data'),
         prevent_initial_call=True
     )
-    def submit_demographics(n_clicks, age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other, participant_id):
+    def submit_demographics(
+        n_clicks,
+        age_range,
+        gender,
+        gender_self_describe,
+        hispanic_latino,
+        race,
+        race_other,
+        education,
+        employment,
+        executive_shareholder,
+        exchange_brokerage,
+        income,
+        experience,
+        participant_id,
+    ):
         """Handle demographics form submission with validation."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update
         
         # Validate
-        is_valid, error, demographics_data = validate_demographics(age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other)
+        is_valid, error, demographics_data = validate_demographics(
+            age_range,
+            gender,
+            gender_self_describe,
+            hispanic_latino,
+            race,
+            race_other,
+            education,
+            employment,
+            executive_shareholder,
+            exchange_brokerage,
+            income,
+            experience,
+        )
         
         if not is_valid:
             if participant_id:
@@ -302,7 +333,21 @@ def register_callbacks(app, db_enabled, db_functions):
         # Save
         if participant_id:
             try:
-                save_demographics(participant_id, age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other)
+                save_demographics(
+                    participant_id,
+                    age_range,
+                    gender,
+                    gender_self_describe,
+                    hispanic_latino,
+                    race,
+                    race_other,
+                    education,
+                    employment,
+                    executive_shareholder,
+                    exchange_brokerage,
+                    income,
+                    experience,
+                )
                 log_event(
                     participant_id=participant_id,
                     event_type='demographics_submit',

@@ -134,7 +134,20 @@ def get_task_data_safe(task_id):
         return None, f"{ERROR_MESSAGES['unknown_error']} ({str(e)})"
 
 
-def validate_demographics(age_range, gender, gender_self_describe, education, income, experience, hispanic_latino, race, race_other):
+def validate_demographics(
+    age_range,
+    gender,
+    gender_self_describe,
+    hispanic_latino,
+    race,
+    race_other,
+    education,
+    employment,
+    executive_shareholder,
+    exchange_brokerage,
+    income,
+    experience,
+):
     """
     Validate demographics form data.
     
@@ -142,12 +155,15 @@ def validate_demographics(age_range, gender, gender_self_describe, education, in
         age_range: Age range selection
         gender: Gender selection
         gender_self_describe: Self-described gender (if applicable)
-        education: Education level selection
-        income: Income range selection
-        experience: Investment experience selection
         hispanic_latino: Hispanic/Latino identification
         race: Race identification
         race_other: Other race specification (if applicable)
+        education: Education level selection
+        employment: Employment status
+        executive_shareholder: Executive/shareholder screening response
+        exchange_brokerage: Exchange/brokerage screening response
+        income: Income range selection
+        experience: Investment experience selection
         
     Returns:
         tuple: (is_valid, error_message, validated_data)
@@ -164,18 +180,6 @@ def validate_demographics(age_range, gender, gender_self_describe, education, in
     if gender == "prefer-to-self-describe" and not gender_self_describe:
         return False, "Please specify your gender", None
     
-    # Validate education
-    if not education or education == "":
-        return False, ERROR_MESSAGES['education_required'], None
-    
-    # Validate income
-    if not income or income == "":
-        return False, "Please select your income range", None
-    
-    # Validate experience
-    if not experience or experience == "":
-        return False, ERROR_MESSAGES['experience_required'], None
-    
     # Validate hispanic/latino
     if not hispanic_latino or hispanic_latino == "":
         return False, "Please indicate whether you are Hispanic/Latino", None
@@ -187,18 +191,45 @@ def validate_demographics(age_range, gender, gender_self_describe, education, in
     # If "other" is selected for race, validate the text input
     if race == "other" and not race_other:
         return False, "Please specify your race/ethnicity", None
+
+    # Validate education
+    if not education or education == "":
+        return False, ERROR_MESSAGES['education_required'], None
+
+    # Validate employment
+    if not employment or employment == "":
+        return False, "Please select your employment status", None
+
+    # Validate executive/shareholder question
+    if not executive_shareholder or executive_shareholder == "":
+        return False, "Please answer the senior executive/shareholder question", None
+
+    # Validate exchange/brokerage question
+    if not exchange_brokerage or exchange_brokerage == "":
+        return False, "Please answer the stock exchange or brokerage question", None
+
+    # Validate income
+    if not income or income == "":
+        return False, "Please select your income range", None
+
+    # Validate experience
+    if not experience or experience == "":
+        return False, ERROR_MESSAGES['experience_required'], None
     
     # Return validated data
     validated_data = {
         'age_range': age_range,
         'gender': gender,
         'gender_self_describe': gender_self_describe if gender == "prefer-to-self-describe" else None,
-        'education': education,
-        'income': income,
-        'experience': experience,
         'hispanic_latino': hispanic_latino,
         'race': race,
-        'race_other': race_other if race == "other" else None
+        'race_other': race_other if race == "other" else None,
+        'education': education,
+        'employment': employment,
+        'executive_shareholder': executive_shareholder,
+        'exchange_brokerage': exchange_brokerage,
+        'income': income,
+        'experience': experience,
     }
     
     return True, None, validated_data

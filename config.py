@@ -219,5 +219,20 @@ RACE_OPTIONS = [
     {"label": "Black or African American", "value": "black-african-american"},
     {"label": "Native Hawaiian and Other Pacific Islander", "value": "native-hawaiian-pacific-islander"},
     {"label": "White", "value": "white"},
-    {"label": "Other", "value": "other"}
+    {"label": "Other - please specify", "value": "other"}
+]
+
+EMPLOYMENT_OPTIONS = [
+    {"label": "Select...", "value": ""},
+    {"label": "Employed", "value": "employed"},
+    {"label": "Unemployed", "value": "unemployed"},
+    {"label": "Retired", "value": "retired"},
+    {"label": "Student", "value": "student"}
+]
+
+YES_NO_UNSURE_OPTIONS = [
+    {"label": "Select...", "value": ""},
+    {"label": "Yes", "value": "yes"},
+    {"label": "No", "value": "no"},
+    {"label": "I am not sure", "value": "not-sure"}
 ]

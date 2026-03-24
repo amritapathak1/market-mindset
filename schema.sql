@@ -32,12 +32,15 @@ CREATE TABLE IF NOT EXISTS demographics (
     age_range VARCHAR(20),
     gender VARCHAR(50),
     gender_self_describe VARCHAR(100),
-    education VARCHAR(100),
-    income VARCHAR(50),
-    experience VARCHAR(100),
     hispanic_latino VARCHAR(10),
     race VARCHAR(100),
     race_other VARCHAR(100),
+    education VARCHAR(100),
+    employment VARCHAR(30),
+    executive_shareholder VARCHAR(10),
+    exchange_brokerage VARCHAR(10),
+    income VARCHAR(50),
+    experience VARCHAR(100),
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(participant_id)
 );

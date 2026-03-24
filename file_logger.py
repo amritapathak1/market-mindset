@@ -57,20 +57,24 @@ def log_event(participant_id=None, event_type=None, event_category=None,
 
 
 def save_demographics(participant_id=None, age_range=None, gender=None, 
-                     gender_self_describe=None, education=None, income=None,
-                     experience=None, hispanic_latino=None, race=None, 
-                     race_other=None, **kwargs):
+                     gender_self_describe=None, hispanic_latino=None, race=None,
+                     race_other=None, education=None, employment=None,
+                     executive_shareholder=None, exchange_brokerage=None,
+                     income=None, experience=None, **kwargs):
     """Save demographics to file."""
     _write_log_entry(participant_id, 'demographics', {
         'age_range': age_range,
         'gender': gender,
         'gender_self_describe': gender_self_describe,
-        'education': education,
-        'income': income,
-        'experience': experience,
         'hispanic_latino': hispanic_latino,
         'race': race,
-        'race_other': race_other
+        'race_other': race_other,
+        'education': education,
+        'employment': employment,
+        'executive_shareholder': executive_shareholder,
+        'exchange_brokerage': exchange_brokerage,
+        'income': income,
+        'experience': experience,
     })
 
 
