@@ -770,10 +770,12 @@ def feedback_page(uninvested_amount, portfolio, info_cost_spent=0, task_order=No
         portfolio_rows = []
         for inv in portfolio:
             color = 'success' if inv['profit_loss'] >= 0 else 'danger'
+            risk_text = "Risky" if inv.get('is_risky') is True else "Safe" if inv.get('is_risky') is False else "Unknown"
             portfolio_rows.append(
                 html.Tr([
                     html.Td(f"Task {inv['task_id']}"),
                     html.Td([html.Strong(inv['stock_name']), html.Br(), html.Small(inv['ticker'], className="text-muted")]),
+                    html.Td(risk_text),
                     html.Td(format_currency(inv['invested']), className="text-end"),
                     html.Td(
                         f"{inv['return_percent']:+.1f}%",
@@ -795,6 +797,7 @@ def feedback_page(uninvested_amount, portfolio, info_cost_spent=0, task_order=No
                 html.Thead(html.Tr([
                     html.Th("Task"),
                     html.Th("Stock"),
+                    html.Th("Risk"),
                     html.Th("Invested", className="text-end"),
                     html.Th("Return %", className="text-end"),
                     html.Th("Current Value", className="text-end"),
@@ -802,7 +805,7 @@ def feedback_page(uninvested_amount, portfolio, info_cost_spent=0, task_order=No
                 ])),
                 html.Tbody(portfolio_rows),
                 html.Tfoot(html.Tr([
-                    html.Th("Total", colSpan=2),
+                    html.Th("Total", colSpan=3),
                     html.Th(format_currency(total_invested_original), className="text-end"),
                     html.Th(""),
                     html.Th(format_currency(total_invested_current), className="text-end"),
@@ -815,92 +818,10 @@ def feedback_page(uninvested_amount, portfolio, info_cost_spent=0, task_order=No
             ], bordered=True, hover=True, responsive=True, striped=True, size='sm')
         ])
 
-    # Task-by-task results in shown order
-    portfolio_by_task = {}
-    for inv in portfolio:
-        task_id = inv.get('task_id')
-        if task_id is None:
-            continue
-        portfolio_by_task.setdefault(task_id, []).append(inv)
-
-    task_detail_cards = []
-    running_cash_before = INITIAL_AMOUNT
-    for shown_task in range(1, NUM_TASKS + 1):
-        response = task_responses.get(f'task_{shown_task}', {})
-        investments = response.get('investments', [])
-        total_invested_task = response.get('total', sum(investments) if investments else 0)
-        cash_after_task = running_cash_before - total_invested_task
-
-        invested_rows = portfolio_by_task.get(shown_task, [])
-        task_final_value = sum(item.get('final_value', 0) for item in invested_rows)
-        task_profit_loss = sum(item.get('profit_loss', 0) for item in invested_rows)
-        task_return_percent = (task_profit_loss / total_invested_task * 100) if total_invested_task > 0 else None
-
-        actual_task_id = response.get('actual_task_id')
-        if actual_task_id is None and len(task_order) >= shown_task:
-            actual_task_id = task_order[shown_task - 1]
-
-        stock_labels = []
-        for stock in response.get('stocks', []):
-            name = stock.get('name', '').strip()
-            ticker = stock.get('ticker', '').strip()
-            risk_label = "Risky" if stock.get('is_risky') is True else "Safe"
-            if name and ticker:
-                stock_labels.append(f"{name} ({ticker}) - {risk_label}")
-            elif name:
-                stock_labels.append(f"{name} - {risk_label}")
-            elif ticker:
-                stock_labels.append(f"{ticker} - {risk_label}")
-
-        if not stock_labels and invested_rows:
-            stock_labels = [f"{item.get('stock_name', '')} ({item.get('ticker', '')}) - Risk unknown".strip() for item in invested_rows]
-
-        stock_text = ", ".join(label for label in stock_labels if label) if stock_labels else "Not available"
-        return_text = format_percentage(task_return_percent) if task_return_percent is not None else "No investment"
-
-        task_title = f"Task {shown_task}"
-        if actual_task_id is not None:
-            task_title += f""
-
-        task_detail_cards.append(
-            dbc.Card(
-                dbc.CardBody([
-                    html.H6(task_title, className="mb-3"),
-                    html.P([html.Strong("Stocks shown: "), stock_text], className="mb-2"),
-                    dbc.Row([
-                        dbc.Col(html.P([html.Strong("Invested: "), format_currency(total_invested_task)], className="mb-1"), md=3),
-                        dbc.Col(html.P([html.Strong("Uninvested: "), format_currency(cash_after_task)], className="mb-1"), md=3),
-                        dbc.Col(html.P([html.Strong("Return / outcome: "), return_text], className="mb-1"), md=3),
-                        dbc.Col(
-                            html.P(
-                                [
-                                    html.Strong("Final value / P&L: "),
-                                    f"{format_currency(task_final_value)} / ",
-                                    format_currency(task_profit_loss) if task_profit_loss < 0 else f"+{format_currency(task_profit_loss)[1:]}"
-                                ],
-                                className="mb-1",
-                                style={'color': 'green' if task_profit_loss >= 0 else 'red'}
-                            ),
-                            md=3
-                        )
-                    ])
-                ]),
-                className="mb-2"
-            )
-        )
-
-        running_cash_before = cash_after_task
-
-    task_details_section = html.Details([
-        html.Summary("View Individual Task Results", className="fw-bold"),
-        html.Div(task_detail_cards, className="mt-3")
-    ], className="mt-4")
-    
     content = [
         html.H3("Final Results", className="text-center mb-4"),
         stats_row,
         portfolio_table if portfolio_table else html.Div(),
-        task_details_section,
         html.Hr(className="my-4"),
         html.H5("Feedback (Optional)", className="mb-3"),
         html.P("Please share any thoughts about your experience in this study:"),
@@ -960,10 +881,12 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
         portfolio_rows = []
         for inv in portfolio:
             color = 'success' if inv['profit_loss'] >= 0 else 'danger'
+            risk_text = "Risky" if inv.get('is_risky') is True else "Safe" if inv.get('is_risky') is False else "Unknown"
             portfolio_rows.append(
                 html.Tr([
                     html.Td(f"Task {inv['task_id']}"),
                     html.Td([html.Strong(inv['stock_name']), html.Br(), html.Small(inv['ticker'], className="text-muted")]),
+                    html.Td(risk_text),
                     html.Td(format_currency(inv['invested']), className="text-end"),
                     html.Td(
                         f"{inv['return_percent']:+.1f}%",
@@ -985,6 +908,7 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
                 html.Thead(html.Tr([
                     html.Th("Task"),
                     html.Th("Stock"),
+                    html.Th("Risk"),
                     html.Th("Invested", className="text-end"),
                     html.Th("Return %", className="text-end"),
                     html.Th("Current Value", className="text-end"),
@@ -992,7 +916,7 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
                 ])),
                 html.Tbody(portfolio_rows),
                 html.Tfoot(html.Tr([
-                    html.Th("Total", colSpan=2),
+                    html.Th("Total", colSpan=3),
                     html.Th(format_currency(total_invested_original), className="text-end"),
                     html.Th(""),
                     html.Th(format_currency(total_invested_current), className="text-end"),

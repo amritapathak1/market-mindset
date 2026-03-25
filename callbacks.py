@@ -1575,6 +1575,7 @@ def register_callbacks(app, db_enabled, db_functions):
                     'task_id': current_task,
                     'stock_name': stock['name'],
                     'ticker': stock['ticker'],
+                    'is_risky': bool(stock.get('is_risky', False)),
                     'invested': investment_amount,
                     'return_percent': return_percent,
                     'final_value': final_value,
