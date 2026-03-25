@@ -18,6 +18,11 @@ if [ ! -d "venv" ]; then
     exit 1
 fi
 
+echo "🔐 Loading environment variables from .env..."
+set -a
+source .env
+set +a
+
 echo "🔎 Running preflight checks..."
 required_tools=(python3 pip systemctl nginx curl)
 for tool in "${required_tools[@]}"; do
