@@ -116,7 +116,7 @@ sudo systemctl status market-mindset
 
 ### View Real-Time Logs
 ```bash
-# Application error logs
+# Application error logs (includes app stdout/stderr via Gunicorn --capture-output)
 tail -f /home/ubuntu/app/logs/error.log
 
 # Application access logs
@@ -149,6 +149,18 @@ curl http://localhost:8050
 
 # Health endpoint
 curl -fsS http://localhost/healthz
+```
+
+### Configure Log Rotation (One-Time Per Server)
+```bash
+# Install policy from repo
+sudo cp /home/ubuntu/app/market-mindset.logrotate /etc/logrotate.d/market-mindset
+
+# Validate
+sudo logrotate -d /etc/logrotate.d/market-mindset
+
+# Optional: force immediate rotation for testing
+sudo logrotate -f /etc/logrotate.d/market-mindset
 ```
 
 ---

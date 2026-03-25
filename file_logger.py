@@ -7,8 +7,11 @@ JSONL files instead of a PostgreSQL database.
 
 import json
 import uuid
+import logging
 from datetime import datetime
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Create logs directory
 LOGS_DIR = Path(__file__).parent / 'logs'
@@ -29,8 +32,8 @@ def _write_log_entry(participant_id, log_type, data):
     try:
         with open(log_file, 'a') as f:
             f.write(json.dumps(entry) + '\n')
-    except Exception as e:
-        print(f"Error writing to log file: {e}")
+    except Exception:
+        logger.exception("Error writing to log file")
 
 
 def create_participant(**kwargs): 

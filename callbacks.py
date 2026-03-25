@@ -12,6 +12,7 @@ This module contains all Dash callback functions that handle:
 import dash
 from dash import html, ctx, Input, Output, State, ALL
 import dash_bootstrap_components as dbc
+import logging
 
 from config import (
     PAGES,
@@ -34,6 +35,8 @@ from pages import (
 
 # Import INFO_COSTS and INITIAL_AMOUNT for cost confirmation and amount display
 from config import INFO_COSTS, INITIAL_AMOUNT
+
+logger = logging.getLogger(__name__)
 
 
 def register_callbacks(app, db_enabled, db_functions):
@@ -112,8 +115,8 @@ def register_callbacks(app, db_enabled, db_functions):
                 random.shuffle(task_order)
                 
                 return str(new_participant_id), task_order
-            except Exception as e:
-                print(f"Error creating participant: {e}")
+            except Exception:
+                logger.exception("Error creating participant")
                 return None, None
         return participant_id or None, dash.no_update
     
@@ -234,8 +237,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     action='change',
                     new_value=str(checked)
                 )
-            except Exception as e:
-                print(f"Error logging event: {e}")
+            except Exception:
+                logger.exception("Error logging event")
         
         return not checked
     
@@ -270,8 +273,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         page_name='demographics',
                         action='navigate'
                     )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
+                except Exception:
+                    logger.exception("Error logging event")
             
             return PAGES['demographics'], True
         return dash.no_update, dash.no_update
@@ -371,8 +374,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         action='submit',
                         metadata={'error': error}
                     )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
+                except Exception:
+                    logger.exception("Error logging event")
             return dash.no_update, dash.no_update, error
         
         # Save
@@ -410,8 +413,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     page_name='tutorial_1',
                     action='navigate'
                 )
-            except Exception as e:
-                print(f"Error saving demographics: {e}")
+            except Exception:
+                logger.exception("Error saving demographics")
         
         return PAGES['tutorial_1'], demographics_data, ""
     
@@ -474,8 +477,8 @@ def register_callbacks(app, db_enabled, db_functions):
                             'stock_name': pending_request.get('stock_name')
                         }
                     )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
+                except Exception:
+                    logger.exception("Error logging event")
             return False, "", {}
         
         # Handle information request buttons
@@ -524,8 +527,8 @@ def register_callbacks(app, db_enabled, db_functions):
                                 'stock_index': stock_index
                             }
                         )
-                    except Exception as e:
-                        print(f"Error logging event: {e}")
+                    except Exception:
+                        logger.exception("Error logging event")
                 
                 # Create pending request
                 pending = {
@@ -587,8 +590,8 @@ def register_callbacks(app, db_enabled, db_functions):
                                 'stock_index': stock_index
                             }
                         )
-                    except Exception as e:
-                        print(f"Error logging event: {e}")
+                    except Exception:
+                        logger.exception("Error logging event")
                 
                 # Create pending request with $0 cost (already paid via bundle)
                 pending = {
@@ -658,8 +661,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         stock_ticker=modal_context.get('stock_ticker'),
                         metadata=modal_context.get('metadata')
                     )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
+                except Exception:
+                    logger.exception("Error logging event")
             # Clear pending request when closing info modal
             return False, "", "", {}, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
@@ -679,7 +682,7 @@ def register_callbacks(app, db_enabled, db_functions):
                     
                     # Validate that pending request matches current task
                     if task_id != actual_task_id:
-                        print(f"DEBUG: Task ID mismatch for free info - pending task_id={task_id}, actual_task_id={actual_task_id}")
+                        logger.warning("Task ID mismatch for free info - pending task_id=%s, actual_task_id=%s", task_id, actual_task_id)
                         return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, dash.no_update, dash.no_update, dash.no_update, dash.no_update
                 
                 if task_id is None or stock_index is None:
@@ -723,8 +726,8 @@ def register_callbacks(app, db_enabled, db_functions):
                                 stock_ticker=modal_ctx['stock_ticker'],
                                 metadata=modal_ctx['metadata']
                             )
-                        except Exception as e:
-                            print(f"Error logging event: {e}")
+                        except Exception:
+                            logger.exception("Error logging event")
                     
                     modal_content = [
                         html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
@@ -771,8 +774,8 @@ def register_callbacks(app, db_enabled, db_functions):
                                 stock_ticker=modal_ctx['stock_ticker'],
                                 metadata=modal_ctx['metadata']
                             )
-                        except Exception as e:
-                            print(f"Error logging event: {e}")
+                        except Exception:
+                            logger.exception("Error logging event")
                     
                     return True, f"{stock['name']} - Weekly Analysis", html.Div([
                         html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
@@ -806,8 +809,8 @@ def register_callbacks(app, db_enabled, db_functions):
                                 stock_ticker=modal_ctx['stock_ticker'],
                                 metadata=modal_ctx['metadata']
                             )
-                        except Exception as e:
-                            print(f"Error logging event: {e}")
+                        except Exception:
+                            logger.exception("Error logging event")
                     
                     return True, f"{stock['name']} - Monthly Analysis", html.Div([
                         html.H5(f"{stock['ticker']}", className="text-muted mb-3"),
@@ -846,8 +849,8 @@ def register_callbacks(app, db_enabled, db_functions):
                             'stock_name': pending_request.get('stock_name')
                         }
                     )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
+                except Exception:
+                    logger.exception("Error logging event")
             
             info_type = pending_request.get('info_type')
             task_id = pending_request.get('task_id')
@@ -860,7 +863,7 @@ def register_callbacks(app, db_enabled, db_functions):
                 
                 # Validate that pending request matches current task - prevents stale data issues
                 if task_id != actual_task_id:
-                    print(f"DEBUG: Task ID mismatch - pending task_id={task_id}, actual_task_id={actual_task_id}")
+                    logger.warning("Task ID mismatch - pending task_id=%s, actual_task_id=%s", task_id, actual_task_id)
                     return dash.no_update, dash.no_update, dash.no_update, dash.no_update, {}, False, dash.no_update, dash.no_update, dash.no_update
             
             if task_id is None or stock_index is None:
@@ -1227,8 +1230,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         'show_information': show_information
                     }
                 )
-            except Exception as e:
-                print(f"Error logging tutorial: {e}")
+            except Exception:
+                logger.exception("Error logging tutorial")
         
         # Deduct investment from amount
         new_amount = current_amount - total_investment
@@ -1255,8 +1258,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     page_name='tutorial_2',
                     action='navigate'
                 )
-            except Exception as e:
-                print(f"Error logging event: {e}")
+            except Exception:
+                logger.exception("Error logging event")
         
         return PAGES['tutorial_2']
     
@@ -1419,8 +1422,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         'show_information': show_information
                     }
                 )
-            except Exception as e:
-                print(f"Error logging tutorial: {e}")
+            except Exception:
+                logger.exception("Error logging tutorial")
         
         # Deduct investment from amount
         new_amount = current_amount - total_investment
@@ -1453,8 +1456,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     action='navigate',
                     metadata={'tutorials_completed': True, 'amount_reset': INITIAL_AMOUNT}
                 )
-            except Exception as e:
-                print(f"Error logging event: {e}")
+            except Exception:
+                logger.exception("Error logging event")
         
         return PAGES['task'], True, INITIAL_AMOUNT, {}, []
     
@@ -1509,8 +1512,8 @@ def register_callbacks(app, db_enabled, db_functions):
                             action='submit',
                             metadata={'error': error}
                         )
-                    except Exception as e:
-                        print(f"Error logging event: {e}")
+                    except Exception:
+                        logger.exception("Error logging event")
                 return False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
             validated_investments.append(amount)
         
@@ -1528,8 +1531,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         action='submit',
                         metadata={'error': error, 'total_investment': sum(validated_investments)}
                     )
-                except Exception as e:
-                    print(f"Error logging event: {e}")
+                except Exception:
+                    logger.exception("Error logging event")
             return False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, error, dash.no_update
         
         # Get task data using the actual randomized task ID
@@ -1635,8 +1638,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         'show_information': task_data.get('show_information', True)
                     }
                 )
-            except Exception as e:
-                print(f"Error saving task response: {e}")
+            except Exception:
+                logger.exception("Error saving task response")
                 return (
                     False,
                     dash.no_update,
@@ -1699,8 +1702,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     element_type='button',
                     action='click'
                 )
-            except Exception as e:
-                print(f"Error logging event: {e}")
+            except Exception:
+                logger.exception("Error logging event")
         
         # Navigate to feedback after all tasks, otherwise continue to next task
         if current_task > NUM_TASKS:
@@ -1708,8 +1711,8 @@ def register_callbacks(app, db_enabled, db_functions):
                 try:
                     log_event(participant_id=participant_id, event_type='page_navigation',
                               event_category='navigation', page_name='feedback', action='navigate')
-                except Exception as e:
-                    print(f"Error logging event: {e}")
+                except Exception:
+                    logger.exception("Error logging event")
             return False, PAGES['feedback']
         
         if participant_id:
@@ -1717,8 +1720,8 @@ def register_callbacks(app, db_enabled, db_functions):
                 log_event(participant_id=participant_id, event_type='page_navigation',
                           event_category='navigation', page_name='task',
                           task_id=current_task, action='navigate')
-            except Exception as e:
-                print(f"Error logging event: {e}")
+            except Exception:
+                logger.exception("Error logging event")
         return False, PAGES['task']
     
     
@@ -1790,8 +1793,8 @@ def register_callbacks(app, db_enabled, db_functions):
                 save_confidence_risk(participant_id, confidence, risk,
                                      attention_check_response=attention_logged,
                                      completed_after_task=completed_after_task)
-            except Exception as e:
-                print(f"Error saving confidence/risk: {e}")
+            except Exception:
+                logger.exception("Error saving confidence/risk")
                 return True, False, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
             try:
@@ -1807,8 +1810,8 @@ def register_callbacks(app, db_enabled, db_functions):
                               'attention_check': attention_logged,
                               'completed_after_task': completed_after_task}
                 )
-            except Exception as e:
-                print(f"Error logging event: {e}")
+            except Exception:
+                logger.exception("Error logging event")
         
         # Build result modal content from pending result data
         if not pending_result:
@@ -1881,8 +1884,8 @@ def register_callbacks(app, db_enabled, db_functions):
 
             try:
                 save_confidence_risk(participant_id, confidence, risk, attention_check_response=attention_check, completed_after_task=completed_after_task)
-            except Exception as e:
-                print(f"Error saving confidence/risk: {e}")
+            except Exception:
+                logger.exception("Error saving confidence/risk")
                 return dash.no_update, dash.no_update
 
             try:
@@ -1915,8 +1918,8 @@ def register_callbacks(app, db_enabled, db_functions):
                         page_name='feedback',
                         action='navigate'
                     )
-            except Exception as e:
-                print(f"Error logging event: {e}")
+            except Exception:
+                logger.exception("Error logging event")
         
         # Navigate to task or feedback based on whether we've completed all tasks
         if current_task <= NUM_TASKS:
@@ -1942,8 +1945,8 @@ def register_callbacks(app, db_enabled, db_functions):
         if participant_id:
             try:
                 save_feedback(participant_id, feedback_text or "")
-            except Exception as e:
-                print(f"Error saving feedback: {e}")
+            except Exception:
+                logger.exception("Error saving feedback")
                 return dash.no_update, dash.no_update, "We couldn't save your feedback. Please try again."
 
             try:
@@ -1964,8 +1967,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     page_name='debrief',
                     action='navigate'
                 )
-            except Exception as e:
-                print(f"Error logging event: {e}")
+            except Exception:
+                logger.exception("Error logging event")
         
         return PAGES['debrief'], feedback_text or "", ""
     
@@ -2021,8 +2024,8 @@ def register_callbacks(app, db_enabled, db_functions):
                     page_name='thank_you',
                     action='complete'
                 )
-            except Exception as e:
-                print(f"Error completing study: {e}")
+            except Exception:
+                logger.exception("Error completing study")
                 return dash.no_update, "We couldn't save your completion status. Please try again."
         
         return PAGES['thank_you'], ""

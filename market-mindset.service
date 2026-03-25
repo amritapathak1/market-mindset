@@ -7,6 +7,7 @@ User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/app
 Environment="PATH=/home/ubuntu/app/venv/bin"
+Environment="PYTHONUNBUFFERED=1"
 EnvironmentFile=/home/ubuntu/app/.env
 
 # Gunicorn command
@@ -21,6 +22,7 @@ ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
     --timeout 120 \
     --access-logfile /home/ubuntu/app/logs/access.log \
     --error-logfile /home/ubuntu/app/logs/error.log \
+    --capture-output \
     application:application
 
 # Restart policy

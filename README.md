@@ -79,6 +79,7 @@ Each link maps to a different condition and its own task/tutorial JSON files.
 - `deploy.sh`: Deployment script for AWS EC2
 - `nginx.conf`: Nginx reverse proxy configuration
 - `market-mindset.service`: Systemd service file for Gunicorn
+- `market-mindset.logrotate`: Logrotate policy for Gunicorn access/error logs
 - `DEPLOYMENT.md`: Complete AWS deployment guide
 - `README.md`: This file
 
@@ -194,7 +195,7 @@ The platform stores the following categories of data for each participant record
 - **Transport path**: Browser traffic terminates at Nginx and is proxied to Gunicorn internally on localhost
 - **Secrets handling**: Database credentials and runtime secrets are loaded from environment variables (`.env`) and are not hard-coded in application source
 - **Application-level data minimization target**: Study protocol is to avoid collecting direct identifiers (for example, names/contact details)
-- **Proxy/service defaults**: Provided Nginx and Gunicorn production configs disable access logs and do not forward explicit client-IP headers by default
+- **Proxy/service defaults**: Gunicorn production config writes access/error logs to files under `logs/`; app stdout/stderr can be captured into Gunicorn error logs via `--capture-output`
 
 ### Important implementation note for IRB alignment
 

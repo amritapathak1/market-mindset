@@ -231,6 +231,7 @@ User=ubuntu
 Group=www-data
 WorkingDirectory=/home/ubuntu/app
 Environment="PATH=/home/ubuntu/app/venv/bin"
+Environment="PYTHONUNBUFFERED=1"
 EnvironmentFile=/home/ubuntu/app/.env
 ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
     --workers 6 \
@@ -243,6 +244,7 @@ ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
     --timeout 120 \
     --access-logfile /home/ubuntu/app/logs/access.log \
     --error-logfile /home/ubuntu/app/logs/error.log \
+    --capture-output \
     application:application
 
 Restart=always
@@ -414,6 +416,18 @@ curl -fsS http://your-alb-dns-name/healthz
 ```bash
 # Automated daily backup script
 pg_dump -h your-rds-endpoint -U postgres market-mindset > backup_$(date +%Y%m%d).sql
+```
+
+### Configure Log Rotation
+```bash
+# Copy repo logrotate policy to system location
+sudo cp /home/ubuntu/app/market-mindset.logrotate /etc/logrotate.d/market-mindset
+
+# Validate configuration
+sudo logrotate -d /etc/logrotate.d/market-mindset
+
+# Optional: force one rotation now
+sudo logrotate -f /etc/logrotate.d/market-mindset
 ```
 
 ### Capacity Checks

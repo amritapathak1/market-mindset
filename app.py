@@ -9,10 +9,19 @@ import dash
 from dash import html, dcc, Input, Output
 import dash_bootstrap_components as dbc
 import os
+import logging
+import sys
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
+
+logging.basicConfig(
+    level=os.getenv('LOG_LEVEL', 'INFO').upper(),
+    format='%(asctime)s %(levelname)s [%(name)s] %(message)s',
+    stream=sys.stdout,
+)
+logger = logging.getLogger(__name__)
 
 # ============================================
 # DATABASE SETUP
@@ -40,7 +49,7 @@ try:
                 with conn.cursor() as cur:
                     cur.execute('SELECT 1')
             DB_ENABLED = True
-            print("✓ Database connection successful - using database for logging")
+            logger.info("Database connection successful - using database for logging")
             
             db_functions = {
                 'create_participant': create_participant,
@@ -53,15 +62,15 @@ try:
                 'update_participant_completion': update_participant_completion,
                 'update_participant_withdrawal': update_participant_withdrawal
             }
-        except Exception as conn_error:
-            print(f"✗ Database connection failed: {conn_error}")
+        except Exception:
+            logger.exception("Database connection failed; using file-based logging")
             DB_ENABLED = False
     else:
-        print("✗ No database credentials configured")
+        logger.warning("No database credentials configured; using file-based logging")
         DB_ENABLED = False
         
-except Exception as e:
-    print(f"✗ Database not configured: {e}")
+except Exception:
+    logger.exception("Database module initialization failed; using file-based logging")
     DB_ENABLED = False
 
 # ============================================
@@ -76,7 +85,7 @@ if not DB_ENABLED:
         update_participant_withdrawal,
         LOGS_DIR
     )
-    print(f"✓ File-based logging enabled. Logs directory: {LOGS_DIR.absolute()}")
+    logger.info("File-based logging enabled. Logs directory: %s", LOGS_DIR.absolute())
     
     db_functions = {
         'create_participant': create_participant,
@@ -202,5 +211,5 @@ if __name__ == '__main__':
     if debug_mode:
         app.run_server(debug=True, dev_tools_hot_reload=True, dev_tools_ui=True, port=port)
     else:
-        print("⚠️  For production, run with: gunicorn -w 6 -b 0.0.0.0:8050 application:application")
+        logger.warning("For production, run with Gunicorn via systemd service")
         app.run_server(debug=False, port=port)

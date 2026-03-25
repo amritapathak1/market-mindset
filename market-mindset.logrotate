@@ -1,0 +1,10 @@
+/home/ubuntu/app/logs/error.log /home/ubuntu/app/logs/access.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+    create 0640 ubuntu www-data
+}
