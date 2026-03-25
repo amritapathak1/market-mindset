@@ -1489,7 +1489,8 @@ def register_callbacks(app, db_enabled, db_functions):
             'stocks': [
                 {
                     'name': stock.get('name', ''),
-                    'ticker': stock.get('ticker', '')
+                    'ticker': stock.get('ticker', ''),
+                    'is_risky': bool(stock.get('is_risky', False))
                 }
                 for stock in task_data.get('stocks', [])
             ]

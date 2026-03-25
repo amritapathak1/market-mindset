@@ -769,22 +769,23 @@ def feedback_page(uninvested_amount, portfolio, info_cost_spent=0, task_order=No
         for stock in response.get('stocks', []):
             name = stock.get('name', '').strip()
             ticker = stock.get('ticker', '').strip()
+            risk_label = "Risky" if stock.get('is_risky') is True else "Safe"
             if name and ticker:
-                stock_labels.append(f"{name} ({ticker})")
+                stock_labels.append(f"{name} ({ticker}) - {risk_label}")
             elif name:
-                stock_labels.append(name)
+                stock_labels.append(f"{name} - {risk_label}")
             elif ticker:
-                stock_labels.append(ticker)
+                stock_labels.append(f"{ticker} - {risk_label}")
 
         if not stock_labels and invested_rows:
-            stock_labels = [f"{item.get('stock_name', '')} ({item.get('ticker', '')})".strip() for item in invested_rows]
+            stock_labels = [f"{item.get('stock_name', '')} ({item.get('ticker', '')}) - Risk unknown".strip() for item in invested_rows]
 
         stock_text = ", ".join(label for label in stock_labels if label) if stock_labels else "Not available"
         return_text = format_percentage(task_return_percent) if task_return_percent is not None else "No investment"
 
         task_title = f"Task {shown_task}"
         if actual_task_id is not None:
-            task_title += f" (Displayed as task {shown_task}, underlying task {actual_task_id})"
+            task_title += f""
 
         task_detail_cards.append(
             dbc.Card(

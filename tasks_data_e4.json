@@ -25,7 +25,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": true
       }
     ]
   },
@@ -55,7 +56,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": true
       }
     ]
   },
@@ -85,7 +87,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": false
       }
     ]
   },
@@ -115,7 +118,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": false
       }
     ]
   },
@@ -145,7 +149,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": false
       }
     ]
   },
@@ -175,7 +180,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": true
       }
     ]
   },
@@ -205,7 +211,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": false
       }
     ]
   },
@@ -235,7 +242,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": true
       }
     ]
   },
@@ -265,7 +273,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": true
       }
     ]
   },
@@ -295,7 +304,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": true
       }
     ]
   },
@@ -325,7 +335,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": true
       }
     ]
   },
@@ -355,7 +366,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": false
       }
     ]
   },
@@ -385,7 +397,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": false
       }
     ]
   },
@@ -415,7 +428,8 @@
         },
         "info_costs": {
           "purchase_bundle": 13.0
-        }
+        },
+        "is_risky": false
       }
     ]
   }
