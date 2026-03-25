@@ -412,7 +412,7 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
             else:
                 information_rules_text = (
                     f"Information pricing is fixed. "
-                    f"For this tutorial stock, purchasing information costs ${purchase_cost:,.2f}."
+                    f"For this tutorial, purchasing information costs ${purchase_cost:,.2f}."
                 )
         else:
             information_rules_text = (

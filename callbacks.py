@@ -1073,7 +1073,7 @@ def register_callbacks(app, db_enabled, db_functions):
             if not modal_is_open and purchased_info and len(purchased_info) > 0:
                 return False, dbc.Alert([
                     html.I(className="bi bi-check-circle me-2"),
-                    "Great! You've learned how to view information. Now enter an investment amount and click Continue. You can also choose to not invest, in which case enter 0 and click Continue."
+                    "Great! You've learned how to purchase information. Now, view some information, and then enter an investment amount and click Continue. You can also choose to not invest, in which case enter 0 and click Continue."
                 ], color="success", className="text-center mt-3")
         
         return dash.no_update, dash.no_update
@@ -1191,7 +1191,7 @@ def register_callbacks(app, db_enabled, db_functions):
                 else:
                     information_note = (
                         f"Information is available with fixed pricing. "
-                        f"In this tutorial stock, the information package costs ${tutorial_purchase_cost:,.2f}."
+                        f"In this tutorial, the information package costs ${tutorial_purchase_cost:,.2f}."
                     )
             else:
                 information_note = "Information panels are available directly from the stock card."
@@ -1431,6 +1431,8 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('current-page', 'data', allow_duplicate=True),
         Output('tutorial-completed', 'data'),
         Output('amount', 'data', allow_duplicate=True),
+        Output('pending-info-request', 'data', allow_duplicate=True),
+        Output('purchased-info', 'data', allow_duplicate=True),
         Input('tutorial-2-result-ok', 'n_clicks'),
         State('participant-id', 'data'),
         prevent_initial_call=True
@@ -1438,7 +1440,7 @@ def register_callbacks(app, db_enabled, db_functions):
     def tutorial_2_next(n_clicks, participant_id):
         """Navigate from tutorial 2 to first main task and reset amount to $1000."""
         if not n_clicks:
-            return dash.no_update, dash.no_update, dash.no_update
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
         
         if participant_id:
             try:
@@ -1454,7 +1456,7 @@ def register_callbacks(app, db_enabled, db_functions):
             except Exception as e:
                 print(f"Error logging event: {e}")
         
-        return PAGES['task'], True, INITIAL_AMOUNT
+        return PAGES['task'], True, INITIAL_AMOUNT, {}, []
     
     
     # ============================================

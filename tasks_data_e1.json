@@ -24,7 +24,7 @@
           "YTD": "+19.31%"
         },
         "info_costs": {
-          "purchase_bundle": 15.0
+          "purchase_bundle": 25.0
         },
         "is_risky": false
       }
@@ -117,7 +117,7 @@
           "YTD": "+10.70%"
         },
         "info_costs": {
-          "purchase_bundle": 40.0
+          "purchase_bundle": 25.0
         },
         "is_risky": false
       }
@@ -148,7 +148,7 @@
           "YTD": "-3.05%"
         },
         "info_costs": {
-          "purchase_bundle": 55.0
+          "purchase_bundle": 25.0
         },
         "is_risky": true
       }
@@ -179,7 +179,7 @@
           "YTD": "-26.62%"
         },
         "info_costs": {
-          "purchase_bundle": 40.0
+          "purchase_bundle": 25.0
         },
         "is_risky": true
       }
@@ -210,7 +210,7 @@
           "YTD": "-58.14%"
         },
         "info_costs": {
-          "purchase_bundle": 40
+          "purchase_bundle": 25.0
         },
         "is_risky": true
       }
@@ -272,7 +272,7 @@
           "YTD": "+25.45%"
         },
         "info_costs": {
-          "purchase_bundle": 15
+          "purchase_bundle": 25.0
         },
         "is_risky": false
       }
@@ -303,7 +303,7 @@
           "YTD": "+24.89%"
         },
         "info_costs": {
-          "purchase_bundle": 15.0
+          "purchase_bundle": 25.0
         },
         "is_risky": true
       }
