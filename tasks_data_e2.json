@@ -187,8 +187,8 @@
   },
   {
     "task_id": 7,
-    "show_profit_loss": false,
-    "show_information": false,
+    "show_profit_loss": true,
+    "show_information": true,
     "stocks": [
       {
         "name": "Company A7",
