@@ -82,6 +82,72 @@ Each link maps to a different condition and its own task/tutorial JSON files.
 - `DEPLOYMENT.md`: Complete AWS deployment guide
 - `README.md`: This file
 
+## Data Generation and Stimuli Construction
+
+The investment scenarios used in the application are generated from real-world financial data using a preprocessing pipeline implemented in `massive data.ipynb`.
+
+### Data Source
+
+- Financial data is retrieved using the **Massive API** (https://massive.com/)
+- Historical daily price data is collected for a predefined set of publicly traded stocks
+
+---
+
+### Initial Stock Selection
+
+- An initial pool of **14 stocks** is selected to ensure diversity across:
+  - industries
+  - sectors
+  - market capitalizations (large-cap, mid-cap, small-cap)
+
+---
+
+### Data Processing Pipeline
+
+The notebook (`massive data.ipynb`) performs the following steps:
+
+- Fetches historical price data using the Massive API
+- Computes daily returns
+- Calculates volatility and return-based metrics
+- Constructs structured datasets with:
+  - price series
+  - return distributions
+  - volatility estimates
+  - metadata (sector, market cap, exchange)
+
+---
+
+### Risk Classification and Selection
+
+- Stocks are classified based on computed volatility and return characteristics
+- From the initial pool, **10 stocks are selected**:
+  - 5 relatively **low-volatility (stable)** assets
+  - 5 relatively **high-volatility (risky)** assets
+
+---
+
+### Stimuli Construction
+
+- Each selected stock is:
+  - assigned a **pseudonymous identifier** (e.g., A1, A2)
+  - anonymized to remove company names and tickers
+
+- Each stimulus includes:
+  - a short company description
+  - sector classification
+  - summary characteristics derived from processed data
+
+---
+
+### Temporal Setup
+
+- Decision data corresponds to a fixed historical snapshot:
+  - **Decision date:** February 19
+
+- Outcomes are computed using forward price movement:
+  - **Outcome window:** ~1 month later (March)
+---
+
 ## Platform development
 
 ### System architecture
