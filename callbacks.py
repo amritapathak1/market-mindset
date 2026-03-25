@@ -128,6 +128,7 @@ def register_callbacks(app, db_enabled, db_functions):
         Output('current-page', 'data', allow_duplicate=True),
         Output('pending-info-request', 'data', allow_duplicate=True),
         Input('current-page', 'data'),
+        Input('experiment-key', 'data'),
         State('current-task', 'data'),
         State('task-order', 'data'),
         State('amount', 'data'),
@@ -136,10 +137,9 @@ def register_callbacks(app, db_enabled, db_functions):
         State('confidence-risk', 'data'),
         State('portfolio', 'data'),
         State('info-cost-spent', 'data'),
-        State('experiment-key', 'data'),
         prevent_initial_call='initial_duplicate'
     )
-    def display_page(page, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio, info_spent, experiment_key):
+    def display_page(page, experiment_key, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio, info_spent):
         """Display the appropriate page based on current page state with flow validation."""
         if not experiment_key:
             error_content = create_centered_card([
