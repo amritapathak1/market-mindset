@@ -7,24 +7,24 @@
       {
         "name": "Tutorial Company Alpha",
         "ticker": "TUT1",
-        "image": "/assets/images/a1_intraday.png",
-        "return_percent": 12.5,
-        "week_image": "/assets/images/a1_week.png",
-        "month_image": "/assets/images/a1_month.png",
-        "week_analysis": "This is a tutorial example. The stock showed steady upward movement throughout the week, with minor fluctuations. This demonstrates a typical positive trend pattern.",
-        "month_analysis": "This is a tutorial example. Over the month, the stock displayed moderate volatility with an overall upward trajectory. Notice how the price moved in both directions before settling at a higher level.",
-        "short_description": "Tutorial company for practice purposes - Technology sector.",
-        "detailed_description": "This is a practice round to help you become familiar with the interface. In actual tasks, you'll see real company information here. For this tutorial, focus on understanding how to: 1) View additional information by clicking the buttons, 2) See how information costs are deducted from your available amount, 3) Enter investment amounts in the input field. Your decisions in this tutorial will not affect your actual study data.",
+        "image": "/assets/images/p1_intraday.png",
+        "return_percent": -3.8,
+        "week_image": "/assets/images/p1_week.png",
+        "month_image": "/assets/images/p1_month.png",
+        "week_analysis": "The stock rose over the week from about 695.06 to 736.87 and ended near the recent high with little pullback. It traded in a moderate range with moderate volatility, up days slightly outnumbered down days, and volume increased while staying fairly even.",
+        "month_analysis": "Over the month, the stock rose from about 664.16 to 736.87, ending near the recent high with little late pullback. It traded in a wide range with high volatility, up days slightly outnumbered down days, volume stayed stable and fairly even, and the month finished up 10.95%.",
+        "short_description": "Large-cap industrials company providing aerospace and defense technology systems.",
+        "long_description": "The company operates as an aerospace and defense technology provider through multiple business segments focused on aircraft systems, defense systems, mission systems, and space systems. It designs, develops, manufactures, and supports aircraft platforms, including manned and unmanned systems, as well as strategic and tactical weapons and missile defense solutions. Its offerings include command, control, communication, intelligence, surveillance, and reconnaissance systems, along with advanced sensors, cybersecurity solutions, and network systems. The company also develops satellites, spacecraft, launch systems, and related propulsion technologies. In addition, it provides sustainment, modernization, training, and logistics support services across its product portfolio.",
         "performance_metrics": {
-          "5-day": "+2.15%",
-          "10-day": "+1.85%",
-          "1-month": "+3.20%",
-          "3-month": "+5.10%",
-          "6-month": "+12.50%",
-          "YTD": "+15.30%"
+          "5-day": "+8.55%",
+          "10-day": "+6.83%",
+          "1-month": "+10.49%",
+          "3-month": "+30.42%",
+          "6-month": "+25.70%",
+          "YTD": "+29.23%"
         },
         "info_costs": {
-          "purchase_bundle": 0
+          "purchase_bundle": 25.0
         },
         "is_risky": true
       }
@@ -38,24 +38,24 @@
       {
         "name": "Tutorial Company Beta",
         "ticker": "TUT2",
-        "image": "/assets/images/a2_intraday.png",
-        "return_percent": 8.75,
-        "week_image": "/assets/images/a2_week.png",
-        "month_image": "/assets/images/a2_month.png",
-        "week_analysis": "This is a tutorial example. The stock experienced mixed trading with both gains and losses during the week. This pattern shows how stocks can be volatile in the short term.",
-        "month_analysis": "This is a tutorial example. Monthly performance shows the stock had significant ups and downs but maintained a modest positive return overall. This illustrates typical market volatility.",
+        "image": "/assets/images/p2_intraday.png",
+        "return_percent": 4.35,
+        "week_image": "/assets/images/p2_week.png",
+        "month_image": "/assets/images/p2_month.png",
+        "week_analysis": "The stock rose modestly for the week, moving from about 637.43 to around 666.51 and closing near the weekâ€™s high with minimal pullback. Trading stayed in a fairly tight range with low volatility, up days slightly exceeded down days, and volume eased while remaining fairly balanced.",
+        "month_analysis": "Over the month, the stock rose 13.69% from about 586.23 to 666.51 and ended near its recent high with minimal late pullback. Trading was volatile with a wide range, up days slightly exceeded down days, and volume generally declined with mixed day-to-day readings.",
         "short_description": "Tutorial company for practice purposes - Healthcare sector.",
         "detailed_description": "This is the second practice round. By now, you should be familiar with: 1) Viewing different types of information and their costs, 2) How your available amount changes when you purchase information, 3) Entering investment amounts. Remember, you can invest any amount from $0 up to your available balance. After this tutorial, the main study tasks will begin, and your responses will be recorded for research purposes.",
         "performance_metrics": {
-          "5-day": "+0.95%",
-          "10-day": "+1.20%",
-          "1-month": "+2.40%",
-          "3-month": "+4.80%",
-          "6-month": "+8.75%",
-          "YTD": "+10.20%"
+          "5-day": "+6.01%",
+          "10-day": "+10.58%",
+          "1-month": "+14.44%",
+          "3-month": "+41.84%",
+          "6-month": "+51.10%",
+          "YTD": "+37.80%"
         },
         "info_costs": {
-          "purchase_bundle": 0
+          "purchase_bundle": 25.0
         },
         "is_risky": false
       }
