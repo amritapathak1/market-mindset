@@ -135,11 +135,12 @@ def register_callbacks(app, db_enabled, db_functions):
         State('consent-given', 'data'),
         State('demographics', 'data'),
         State('confidence-risk', 'data'),
+        State('task-responses', 'data'),
         State('portfolio', 'data'),
         State('info-cost-spent', 'data'),
         prevent_initial_call='initial_duplicate'
     )
-    def display_page(page, experiment_key, current_task, task_order, amount, consent_given, demographics, confidence_risk, portfolio, info_spent):
+    def display_page(page, experiment_key, current_task, task_order, amount, consent_given, demographics, confidence_risk, task_responses, portfolio, info_spent):
         """Display the appropriate page based on current page state with flow validation."""
         if not experiment_key:
             error_content = create_centered_card([
@@ -196,7 +197,13 @@ def register_callbacks(app, db_enabled, db_functions):
             completed_main_tasks = max(0, current_task - 1)
             return confidence_risk_page(completed_tasks=completed_main_tasks), False, dash.no_update, {}
         elif page == PAGES['feedback']:
-            return feedback_page(amount, portfolio or [], info_spent or 0), False, dash.no_update, {}
+            return feedback_page(
+                amount,
+                portfolio or [],
+                info_spent or 0,
+                task_order=task_order or [],
+                task_responses=task_responses or {}
+            ), False, dash.no_update, {}
         elif page == PAGES['debrief']:
             return debrief_page(amount, portfolio or [], info_spent or 0), False, dash.no_update, {}
         elif page == PAGES['thank_you']:
@@ -1477,7 +1484,15 @@ def register_callbacks(app, db_enabled, db_functions):
         total_investment = sum(validated_investments)
         response_entry = {
             'investments': validated_investments,
-            'total': total_investment
+            'total': total_investment,
+            'actual_task_id': actual_task_id,
+            'stocks': [
+                {
+                    'name': stock.get('name', ''),
+                    'ticker': stock.get('ticker', '')
+                }
+                for stock in task_data.get('stocks', [])
+            ]
         }
         
         # Update portfolio and calculate profit/loss

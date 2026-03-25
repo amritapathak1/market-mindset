@@ -13,6 +13,7 @@ A Python Dash web application for conducting investment decision research studie
   - Amount automatically updates after each task (fixed adjustments)
 - **Mid-Study Assessment**: After task 3, participants rate confidence and risk perception
 - **Final Results**: Shows starting amount, final amount, and net change
+- **Task-by-Task Summary**: Final feedback page includes a collapsible per-task results breakdown in participant shown order
 - **Feedback Collection**: Optional feedback form at the end
 - **Data Persistence**: Participant data is written to PostgreSQL (with JSONL file fallback when DB is unavailable)
 - **Loading States**: Smooth transitions with loading indicators
