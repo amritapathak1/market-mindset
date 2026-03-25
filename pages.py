@@ -14,7 +14,7 @@ from config import (
     SLIDER_CONFIG, GENDER_OPTIONS, EDUCATION_OPTIONS, EXPERIENCE_OPTIONS,
     AGE_RANGE_OPTIONS, INCOME_OPTIONS, HISPANIC_LATINO_OPTIONS, RACE_OPTIONS,
     EMPLOYMENT_OPTIONS, YES_NO_UNSURE_OPTIONS,
-    MIN_AGE, MAX_AGE, COLORS, ATTENTION_CHECK_TASKS
+    MIN_AGE, MAX_AGE, COLORS, ATTENTION_CHECK_TASKS, get_experiment_config
 )
 from utils import (
     get_task_data_safe, format_currency, format_percentage, calculate_profit_loss
@@ -392,12 +392,45 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
     
     stocks = task_data['stocks']
     show_information = task_data.get('show_information', True)  # Default to True for tutorials
+    show_profit_loss = task_data.get('show_profit_loss', True)
+    experiment_config = get_experiment_config(experiment_key) or {}
+    info_cost_mode = experiment_config.get('info_cost_mode', 'fixed')
+    purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
     
     # Check if tutorial 1 requires purchase (show_information=true AND cost > 0)
     requires_purchase = False
     if tutorial_num == 1 and show_information:
-        purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
         requires_purchase = purchase_cost > 0
+
+    if show_information:
+        if purchase_cost > 0:
+            if info_cost_mode == 'variable':
+                information_rules_text = (
+                    f"Information prices vary by stock. "
+                    f"For this tutorial stock, purchasing information costs ${purchase_cost:,.2f}."
+                )
+            else:
+                information_rules_text = (
+                    f"Information pricing is fixed. "
+                    f"For this tutorial stock, purchasing information costs ${purchase_cost:,.2f}."
+                )
+        else:
+            information_rules_text = (
+                "Information panels are available directly from the stock card."
+            )
+    else:
+        information_rules_text = (
+            "You will use the stock summary and investment input to make your decisions."
+        )
+
+    if show_profit_loss:
+        feedback_rules_text = (
+            "Task-level investment outcomes are shown immediately after each decision."
+        )
+    else:
+        feedback_rules_text = (
+            "Task-level investment outcomes are summarized in the final results section."
+        )
     
     # Important notice about real data (shown on first tutorial only)
     real_data_notice = None
@@ -410,11 +443,37 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
                 ". Your investment performance will be ",
                 html.Strong("evaluated based on how the stock actually performed after 1 month"),
                 "."
-            ], className="mb-0")
+            ], className="mb-2"),
+            html.P(information_rules_text, className="mb-2"),
+            html.P(feedback_rules_text, className="mb-0")
         ], color="info", className="mb-4")
     
     # Instructions for each tutorial
     if tutorial_num == 1:
+        if show_information and requires_purchase:
+            tutorial_1_step_1 = (
+                "Click on the 'Purchase Information' button to buy access to stock details. "
+                "The purchase amount is deducted from your available cash."
+            )
+            tutorial_1_step_2 = (
+                "After purchasing, the information buttons (Show More Details, Week's Chart, Month's Chart) become available. "
+                "Click them to review the stock information."
+            )
+        elif show_information:
+            tutorial_1_step_1 = (
+                "Click the information buttons directly to review stock details."
+            )
+            tutorial_1_step_2 = (
+                "Review the available information panels to understand how details are presented before moving on."
+            )
+        else:
+            tutorial_1_step_1 = (
+                "Use the stock summary and investment input to complete this practice decision."
+            )
+            tutorial_1_step_2 = (
+                "Focus on the basic stock card and investment input since decisions are made without extra information here."
+            )
+
         instructions = dbc.Alert([
             html.H4([html.I(className="bi bi-lightbulb me-2"), "Tutorial 1: Exploring Information"], className="mb-3"),
             html.P([
@@ -424,20 +483,34 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
             html.Hr(),
             html.P([
                 html.Strong("Step 1: "),
-                "Click on the 'Purchase Information' button to buy access to all information about this stock. ",
-                "Notice that purchasing information costs money and is deducted from your available amount."
+                tutorial_1_step_1
             ], className="mb-2"),
             html.P([
                 html.Strong("Step 2: "),
-                "After purchasing, the three information buttons (Show More Details, Week's Chart, Month's Chart) will be enabled. ",
-                "Click on them to view different types of information about the stock."
+                tutorial_1_step_2
             ], className="mb-2"),
             html.P([
                 html.Strong("Step 3: "),
                 "After viewing the information, click Continue to proceed to the next tutorial."
+            ], className="mb-2"),
+            html.P([
+                html.Strong("Reminder: "),
+                information_rules_text,
+                " ",
+                feedback_rules_text
             ], className="mb-0")
         ], color="primary", className="mb-4")
     else:  # tutorial_num == 2
+        if show_information:
+            info_tutorial_2_text = "You may use the available information options before submitting your investment."
+        else:
+            info_tutorial_2_text = "Use the stock summary and investment input before submitting your investment."
+
+        if show_profit_loss:
+            feedback_tutorial_2_text = "You will receive task-level outcome feedback after each decision."
+        else:
+            feedback_tutorial_2_text = "Task-level outcome feedback is provided in the final results section."
+
         instructions = dbc.Alert([
             html.H4([html.I(className="bi bi-lightbulb me-2"), "Tutorial 2: Making Investments"], className="mb-3"),
             html.P([
@@ -448,7 +521,9 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
             html.P([
                 "Enter an investment amount in the box below (you can enter $0 if you don't want to invest). ",
                 "Then click 'Start Main Study' to see the result and begin the actual study."
-            ], className="mb-0")
+            ], className="mb-2"),
+            html.P(info_tutorial_2_text, className="mb-2"),
+            html.P(feedback_tutorial_2_text, className="mb-0")
         ], color="primary", className="mb-4")
     
     return dbc.Container([

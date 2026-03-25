@@ -137,16 +137,16 @@ TUTORIAL_INITIAL_AMOUNT = 100
 NUM_TUTORIAL_TASKS = 2
 
 # Total number of investment tasks (main tasks, excluding tutorials)
-NUM_TASKS = 14
+NUM_TASKS = 10
 
 # Task numbers after which to show confidence/risk assessment
-# Note: Confidence and risk are shown after EVERY task (1-14)
+# Note: Confidence and risk are shown after EVERY task (1-NUM_TASKS)
 # These are relative to main tasks only (not including tutorial tasks)
-CONFIDENCE_RISK_CHECKPOINTS = [3, 9, 14]  # Deprecated - kept for compatibility
+CONFIDENCE_RISK_CHECKPOINTS = [3, 7, 10]  # Deprecated - kept for compatibility
 
 # Task numbers at which to show attention check questions
 # Note: These are relative to main tasks only (not including tutorial tasks)
-ATTENTION_CHECK_TASKS = [3, 9]
+ATTENTION_CHECK_TASKS = [3, 7]
 
 # ============================================
 # VALIDATION SETTINGS

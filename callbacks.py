@@ -1129,6 +1129,11 @@ def register_callbacks(app, db_enabled, db_functions):
         # Check if we should show profit/loss details (configurable via task data)
         show_profit_loss = task_data.get('show_profit_loss', True)  # Default to True for tutorials
         show_information = task_data.get('show_information', True)  # For logging purposes
+        experiment_config = get_experiment_config(experiment_key) or {}
+        main_show_profit_loss = experiment_config.get('show_profit_loss', show_profit_loss)
+        main_show_information = experiment_config.get('show_information', show_information)
+        info_cost_mode = experiment_config.get('info_cost_mode', 'fixed')
+        tutorial_purchase_cost = task_data['stocks'][0].get('info_costs', {}).get('purchase_bundle', 0)
         
         # Create result modal content
         # If show_profit_loss is True: show detailed breakdown with investment/profit amounts
@@ -1171,16 +1176,36 @@ def register_callbacks(app, db_enabled, db_functions):
                 result_content_parts = [html.P("Your investment has been recorded.", className="mb-0")]
         
         # Message for tutorial 1
+        if main_show_profit_loss:
+            feedback_note = "In the main study, you will continue to see task-level outcome feedback after each decision."
+        else:
+            feedback_note = "In the main study, task-level outcome feedback appears in the final results summary."
+
+        if main_show_information:
+            if tutorial_purchase_cost > 0:
+                if info_cost_mode == 'variable':
+                    information_note = (
+                        f"Information is available and prices vary by stock. "
+                        f"In this tutorial stock, the information package costs ${tutorial_purchase_cost:,.2f}."
+                    )
+                else:
+                    information_note = (
+                        f"Information is available with fixed pricing. "
+                        f"In this tutorial stock, the information package costs ${tutorial_purchase_cost:,.2f}."
+                    )
+            else:
+                information_note = "Information panels are available directly from the stock card."
+        else:
+            information_note = "You will make decisions using the stock summary and investment amount entry."
+
         result_content_parts.append(
             html.Div([
                 html.P([
                     html.I(className="bi bi-lightbulb-fill me-2"),
                     "Great job! You've completed the first tutorial."
                 ], className="mb-2"),
-                html.P([
-                    "Notice how the investment result is shown. ",
-                    "In the main study, you will NOT see profit/loss details after each task—only at the very end."
-                ], className="text-muted mb-0")
+                html.P(feedback_note, className="text-muted mb-2"),
+                html.P(information_note, className="text-muted mb-0")
             ], style={'backgroundColor': '#f8f9fa', 'padding': '15px', 'borderRadius': '8px'})
         )
         
@@ -1286,6 +1311,11 @@ def register_callbacks(app, db_enabled, db_functions):
         # Check if we should show profit/loss details (configurable via task data)
         show_profit_loss = task_data.get('show_profit_loss', True)  # Default to True for tutorials
         show_information = task_data.get('show_information', True)  # For logging purposes
+        experiment_config = get_experiment_config(experiment_key) or {}
+        main_show_profit_loss = experiment_config.get('show_profit_loss', show_profit_loss)
+        main_show_information = experiment_config.get('show_information', show_information)
+        info_cost_mode = experiment_config.get('info_cost_mode', 'fixed')
+        tutorial_purchase_cost = task_data['stocks'][0].get('info_costs', {}).get('purchase_bundle', 0)
         
         # Create result modal content
         # If show_profit_loss is True: show detailed breakdown with investment/profit amounts
@@ -1328,6 +1358,30 @@ def register_callbacks(app, db_enabled, db_functions):
                 result_content_parts = [html.P("Your investment has been recorded.", className="mb-0")]
         
         # Important note about main study
+        if main_show_profit_loss:
+            outcome_line_1 = "In the main study, you will see your task-level outcome after each investment decision."
+            outcome_line_2 = "Those outcomes are for feedback and still do not directly change your available cash balance."
+        else:
+            outcome_line_1 = "In the main study, task-level outcomes are presented in the final results summary."
+            outcome_line_2 = "Your available cash during tasks reflects your entered investments and information actions."
+
+        if main_show_information:
+            if tutorial_purchase_cost > 0:
+                if info_cost_mode == 'variable':
+                    info_line = (
+                        f"Information is available and prices vary by stock; this tutorial stock uses ${tutorial_purchase_cost:,.2f}."
+                    )
+                else:
+                    info_line = (
+                        f"Information is available with fixed pricing; this tutorial stock uses ${tutorial_purchase_cost:,.2f}."
+                    )
+            else:
+                info_line = "Information panels are available directly from the stock card."
+            balance_line = "Your available amount decreases by what you invest and any information purchases."
+        else:
+            info_line = "You will make decisions using the stock summary and investment amount entry."
+            balance_line = "Your available amount decreases with each investment amount you enter."
+
         result_content_parts.append(
             html.Div([
                 html.P([
@@ -1335,10 +1389,10 @@ def register_callbacks(app, db_enabled, db_functions):
                     html.Strong("Important:")
                 ], className="mb-2"),
                 html.Ul([
-                    html.Li("In the main study, you will NOT see your profit or loss after each task."),
-                    html.Li("Profit/loss will only be shown once at the very end of the study."),
-                    html.Li("The profit/loss is NOT added to or removed from your available amount."),
-                    html.Li("Your available amount only decreases based on what you invest and the information you purchase.")
+                    html.Li(outcome_line_1),
+                    html.Li(outcome_line_2),
+                    html.Li(info_line),
+                    html.Li(balance_line)
                 ], className="mb-3 text-start"),
                 html.P([
                     html.Strong("You're now ready for the main study!"),
