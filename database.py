@@ -4,12 +4,16 @@ Handles PostgreSQL connections and all data persistence.
 """
 
 import os
+import time
+import logging
 import psycopg2
 import psycopg2.extras
 from psycopg2.pool import ThreadedConnectionPool
 import json
 from contextlib import contextmanager
 from threading import Lock
+
+logger = logging.getLogger(__name__)
 
 # Database configuration from environment variables
 DB_CONFIG = {
@@ -23,9 +27,63 @@ DB_CONFIG = {
 
 DB_POOL_MIN_CONN = int(os.getenv('DB_POOL_MIN_CONN', '1'))
 DB_POOL_MAX_CONN = int(os.getenv('DB_POOL_MAX_CONN', '20'))
+DB_RETRY_ATTEMPTS = int(os.getenv('DB_RETRY_ATTEMPTS', '3'))
+DB_RETRY_BASE_DELAY = float(os.getenv('DB_RETRY_BASE_DELAY', '0.2'))
+DB_CONNECT_RETRY_ATTEMPTS = int(os.getenv('DB_CONNECT_RETRY_ATTEMPTS', '2'))
+
+TRANSIENT_SQLSTATES = {
+    '40001',  # serialization_failure
+    '40P01',  # deadlock_detected
+    '53300',  # too_many_connections
+    '57P01',  # admin_shutdown
+    '57P02',  # crash_shutdown
+    '57P03',  # cannot_connect_now
+    '08000',  # connection_exception
+    '08001',  # sqlclient_unable_to_establish_sqlconnection
+    '08003',  # connection_does_not_exist
+    '08006',  # connection_failure
+}
 
 _db_pool = None
 _db_pool_lock = Lock()
+
+
+def _is_transient_db_error(error):
+    """Return True when an error is likely transient and safe to retry."""
+    if isinstance(error, (psycopg2.OperationalError, psycopg2.InterfaceError)):
+        return True
+
+    if isinstance(error, psycopg2.pool.PoolError):
+        return True
+
+    sqlstate = getattr(error, 'pgcode', None)
+    return sqlstate in TRANSIENT_SQLSTATES
+
+
+def _run_db_write_with_retry(operation_name, operation):
+    """Run a DB write operation with small retry/backoff for transient failures."""
+    max_attempts = max(1, DB_RETRY_ATTEMPTS)
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return operation()
+        except Exception as exc:
+            is_retryable = _is_transient_db_error(exc)
+            is_last_attempt = attempt >= max_attempts
+
+            if (not is_retryable) or is_last_attempt:
+                raise
+
+            delay_seconds = DB_RETRY_BASE_DELAY * (2 ** (attempt - 1))
+            logger.warning(
+                "Transient DB error in %s (attempt %s/%s): %s. Retrying in %.2fs",
+                operation_name,
+                attempt,
+                max_attempts,
+                exc.__class__.__name__,
+                delay_seconds,
+            )
+            time.sleep(delay_seconds)
 
 
 def get_db_pool():
@@ -43,23 +101,75 @@ def get_db_pool():
     return _db_pool
 
 
+def reset_db_pool():
+    """Reset the connection pool so new connections are created on next checkout."""
+    global _db_pool
+
+    with _db_pool_lock:
+        old_pool = _db_pool
+        _db_pool = None
+
+        if old_pool is not None:
+            try:
+                old_pool.closeall()
+            except Exception:
+                logger.exception("Failed to close existing DB pool during reset")
+
+
+def _get_connection_with_reconnect():
+    """Get a pooled connection, resetting the pool and retrying on transient checkout errors."""
+    max_attempts = max(1, DB_CONNECT_RETRY_ATTEMPTS)
+
+    for attempt in range(1, max_attempts + 1):
+        pool = get_db_pool()
+        try:
+            return pool, pool.getconn()
+        except Exception as exc:
+            is_retryable = _is_transient_db_error(exc)
+            is_last_attempt = attempt >= max_attempts
+
+            if (not is_retryable) or is_last_attempt:
+                raise
+
+            delay_seconds = DB_RETRY_BASE_DELAY * (2 ** (attempt - 1))
+            logger.warning(
+                "DB connection checkout failed (attempt %s/%s): %s. Resetting pool and retrying in %.2fs",
+                attempt,
+                max_attempts,
+                exc.__class__.__name__,
+                delay_seconds,
+            )
+            reset_db_pool()
+            time.sleep(delay_seconds)
+
+
 @contextmanager
 def get_db_connection():
     """Context manager for pooled database connections."""
     conn = None
     pool = None
+    close_conn = False
     try:
-        pool = get_db_pool()
-        conn = pool.getconn()
+        pool, conn = _get_connection_with_reconnect()
         yield conn
         conn.commit()
     except Exception as e:
         if conn:
-            conn.rollback()
+            try:
+                conn.rollback()
+            except Exception:
+                close_conn = True
+
+        if _is_transient_db_error(e):
+            close_conn = True
+
         raise e
     finally:
         if pool and conn:
-            pool.putconn(conn)
+            try:
+                pool.putconn(conn, close=close_conn)
+            except Exception:
+                logger.exception("Failed to return DB connection to pool")
 
 
 def init_database():
@@ -154,20 +264,23 @@ def log_event(participant_id, event_type, event_category, page_name=None,
         stock_ticker: Stock ticker if applicable
         metadata: Additional data as dict
     """
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO events (
+    def _write():
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO events (
+                        participant_id, event_type, event_category, page_name,
+                        task_id, element_id, element_type, action,
+                        old_value, new_value, stock_ticker, metadata
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
                     participant_id, event_type, event_category, page_name,
                     task_id, element_id, element_type, action,
-                    old_value, new_value, stock_ticker, metadata
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                participant_id, event_type, event_category, page_name,
-                task_id, element_id, element_type, action,
-                old_value, new_value, stock_ticker,
-                json.dumps(metadata) if metadata else None
-            ))
+                    old_value, new_value, stock_ticker,
+                    json.dumps(metadata) if metadata else None
+                ))
+
+    _run_db_write_with_retry('log_event', _write)
 
 
 # ============================================
@@ -280,56 +393,62 @@ def save_task_response(participant_id, task_id, stock_1_ticker, stock_1_name,
                        show_profit_loss=True, show_information=True,
                        time_spent_seconds=None, experiment_key=None):
     """Save task response data."""
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO task_responses (
+    def _write():
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO task_responses (
+                        participant_id, task_id, stock_1_ticker, stock_1_name, stock_1_investment,
+                        stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
+                        remaining_amount, show_profit_loss, show_information, time_spent_seconds, experiment_key
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (participant_id, task_id) DO UPDATE
+                    SET stock_1_ticker = EXCLUDED.stock_1_ticker,
+                        stock_1_name = EXCLUDED.stock_1_name,
+                        stock_1_investment = EXCLUDED.stock_1_investment,
+                        stock_2_ticker = EXCLUDED.stock_2_ticker,
+                        stock_2_name = EXCLUDED.stock_2_name,
+                        stock_2_investment = EXCLUDED.stock_2_investment,
+                        total_investment = EXCLUDED.total_investment,
+                        remaining_amount = EXCLUDED.remaining_amount,
+                        show_profit_loss = EXCLUDED.show_profit_loss,
+                        show_information = EXCLUDED.show_information,
+                        experiment_key = EXCLUDED.experiment_key,
+                        time_spent_seconds = EXCLUDED.time_spent_seconds,
+                        submitted_at = CURRENT_TIMESTAMP
+                """, (
                     participant_id, task_id, stock_1_ticker, stock_1_name, stock_1_investment,
                     stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
                     remaining_amount, show_profit_loss, show_information, time_spent_seconds, experiment_key
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (participant_id, task_id) DO UPDATE
-                SET stock_1_ticker = EXCLUDED.stock_1_ticker,
-                    stock_1_name = EXCLUDED.stock_1_name,
-                    stock_1_investment = EXCLUDED.stock_1_investment,
-                    stock_2_ticker = EXCLUDED.stock_2_ticker,
-                    stock_2_name = EXCLUDED.stock_2_name,
-                    stock_2_investment = EXCLUDED.stock_2_investment,
-                    total_investment = EXCLUDED.total_investment,
-                    remaining_amount = EXCLUDED.remaining_amount,
-                    show_profit_loss = EXCLUDED.show_profit_loss,
-                    show_information = EXCLUDED.show_information,
-                    experiment_key = EXCLUDED.experiment_key,
-                    time_spent_seconds = EXCLUDED.time_spent_seconds,
-                    submitted_at = CURRENT_TIMESTAMP
-            """, (
-                participant_id, task_id, stock_1_ticker, stock_1_name, stock_1_investment,
-                stock_2_ticker, stock_2_name, stock_2_investment, total_investment,
-                remaining_amount, show_profit_loss, show_information, time_spent_seconds, experiment_key
-            ))
+                ))
+
+    _run_db_write_with_retry('save_task_response', _write)
 
 
 def save_portfolio_investment(participant_id, task_id, stock_name, ticker,
                                invested_amount, return_percent, final_value, profit_loss):
     """Save individual investment to portfolio."""
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO portfolio (
+    def _write():
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO portfolio (
+                        participant_id, task_id, stock_name, ticker, invested_amount,
+                        return_percent, final_value, profit_loss
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (participant_id, task_id, ticker) DO UPDATE
+                    SET stock_name = EXCLUDED.stock_name,
+                        invested_amount = EXCLUDED.invested_amount,
+                        return_percent = EXCLUDED.return_percent,
+                        final_value = EXCLUDED.final_value,
+                        profit_loss = EXCLUDED.profit_loss,
+                        created_at = CURRENT_TIMESTAMP
+                """, (
                     participant_id, task_id, stock_name, ticker, invested_amount,
                     return_percent, final_value, profit_loss
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (participant_id, task_id, ticker) DO UPDATE
-                SET stock_name = EXCLUDED.stock_name,
-                    invested_amount = EXCLUDED.invested_amount,
-                    return_percent = EXCLUDED.return_percent,
-                    final_value = EXCLUDED.final_value,
-                    profit_loss = EXCLUDED.profit_loss,
-                    created_at = CURRENT_TIMESTAMP
-            """, (
-                participant_id, task_id, stock_name, ticker, invested_amount,
-                return_percent, final_value, profit_loss
-            ))
+                ))
+
+    _run_db_write_with_retry('save_portfolio_investment', _write)
 
 
 def get_portfolio(participant_id):
