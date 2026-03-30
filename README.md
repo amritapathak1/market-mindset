@@ -38,15 +38,15 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The application will start on `http://127.0.0.1:8050/`
+The application will start on localhost
 
 Use one of the experiment-specific opaque links (not the root URL):
-- `http://127.0.0.1:8050/qvmtx`
-- `http://127.0.0.1:8050/nrpld`
-- `http://127.0.0.1:8050/kzwhc`
-- `http://127.0.0.1:8050/tbjsm`
-- `http://127.0.0.1:8050/fyqra`
-- `http://127.0.0.1:8050/mdxlu`
+- `http://13.63.182.207/qvmtx`
+- `http://13.63.182.207/nrpld`
+- `http://13.63.182.207/kzwhc`
+- `http://13.63.182.207/tbjsm`
+- `http://13.63.182.207/fyqra`
+- `http://13.63.182.207/mdxlu`
 
 Each link maps to a different condition and its own task/tutorial JSON files.
 
