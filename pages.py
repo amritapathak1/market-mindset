@@ -151,7 +151,7 @@ def consent_page():
         html.H3("University of Chicago Online Consent Form for Research Participation", className="mb-4 text-center"),
         
         html.Div([
-            html.P([html.Strong("Study Number: "), "IRB26-XXXX"]),
+            html.P([html.Strong("Study Number: "), "IRB26-0568"]),
             html.P([html.Strong("Study Title: "), "Investment Decisions in a Simulated Stock Market"]),
             html.P([html.Strong("Researcher(s): "), "Amrita Pathak, Henry K. Dambanemuya (PI)"])
         ], className="mb-4"),
@@ -244,7 +244,7 @@ def demographics_page():
         dbc.Row([
             dbc.Col([
                 html.H1("Demographic Survey", className="text-center mb-4"),
-                html.P("Study Number: IRB26-XXXX", className="text-center text-muted"),
+                html.P("Study Number: IRB26-0568", className="text-center text-muted"),
                 html.P("Study Title: Investment Decisions in a Simulated Stock Market", className="text-center text-muted"),
                 html.P("Researcher(s): Amrita Pathak, Henry K. Dambanemuya (PI)", className="text-center text-muted mb-4"),
                 dbc.Card([
@@ -933,42 +933,20 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
         html.H3("University of Chicago Debriefing Statement", className="text-center mb-4"),
         
         html.Div([
-            html.P([html.Strong("Study Number: "), "IRB26-XXXX"]),
-            html.P([html.Strong("Study Title: "), "How do online trading discussions reflect financial decision-making and risk-taking behavior?"]),
+            html.P([html.Strong("Study Number: "), "IRB26-0568"]),
+            html.P([html.Strong("Study Title: "), "Thinking Fast, Trading Slow: Confidence and Risk in Digital Investment Decisions"]),
             html.P([html.Strong("Researcher(s): "), "Amrita Pathak, Dr. Henry K. Dambanemuya (PI)"])
         ], className="mb-4"),
         
-        html.P([
-            html.Strong("Thank you for your participation. "), 
-            "We would now like to tell you a little more about the study."
-        ], className="mb-3"),
+        html.P("Thank you for your participation. We would now like to tell you a little more about the study.", className="mb-3"),
         
         html.H5("Purpose of the Study:", className="mt-3"),
-        html.Ul([
-            html.Li([
-                "The purpose of this study is to understand how people make investment decisions in a simulated market. ",
-                "The study looks at how participants choose between investment options, how they respond to gains and losses, ",
-                "how confident they feel about their decisions, and how they use available information while making choices over multiple rounds."
-            ]),
-            html.Li([
-                "At the beginning of the study, participants were told that they would take part in a simulated investment game using virtual money ",
-                "and that their decisions would be recorded for research purposes. This description accurately reflected the task."
-            ]),
-            html.Li([
-                "The study did not involve deception. However, specific details about the exact research questions and analyses were not described in advance ",
-                "in order to avoid influencing participants' natural decision-making."
-            ]),
-            html.Li([
-                "The study is designed to examine patterns in risk-taking, learning from feedback, confidence, and information use across repeated investment decisions. ",
-                "Providing full details in advance could have changed how participants approached the task, which is why some information was explained only after participation."
-            ])
-        ]),
+        html.P("The purpose of this study is to understand how people make investment decisions in a simulated market. The study examines how participants choose among investment options, how they respond to gains and losses, how confident they feel about their decisions, and how they use available information when making choices across multiple rounds."),
+        html.P("At the beginning of the study, participants were told that they would take part in a simulated investment game using virtual money and that their decisions would be recorded for research purposes. This description accurately reflected the task. The study did not involve deception. However, specific details about the research questions and analyses were not described in advance to avoid influencing participants’ natural decision-making."),
+        html.P("The study is designed to examine patterns in risk-taking, learning from feedback, confidence, and information use across repeated investment decisions. Providing full details in advance could have changed how participants approached the task, which is why some information was explained only after participation."),
         
         dbc.Alert([
-            html.P([
-                html.Strong("Important: "), 
-                "As this study is ongoing, we ask that you not discuss this study with anyone else who is currently participating or might participate at a future time."
-            ], className="mb-0")
+            html.P("As this study is ongoing, we ask that you not discuss it with anyone else who is currently participating or might participate in the future.", className="mb-0")
         ], color="info", className="my-3"),
         
         html.Hr(className="my-4"),
@@ -980,11 +958,7 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
         html.Hr(className="my-4"),
         
         html.H5("Data Withdrawal Option:", className="mt-4 mb-3"),
-        html.P([
-            "Now that we have explained this study more fully, you may request that your data be excluded from this research study. ",
-            "If you decide that you do not want the researchers to include your data in the analysis, your data will not be included in the analysis. ",
-            "Participants who choose to withdraw before completing the study will not receive payment."
-        ]),
+        html.P("Now that the purpose of the study has been explained more fully, you may request that your data be withdrawn from the research. If you wish to do so, please contact a member of the research team listed below."),
         
         html.P([html.Strong("Do you wish to exclude your data from the study?")], className="mt-3 mb-3"),
         
@@ -1001,7 +975,11 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
         html.Hr(className="my-4"),
         
         html.H5("Contacts & Questions:", className="mt-3"),
-        html.P("If you have questions or concerns about the study, you can contact the researchers at amritap1@uchicago.edu."),
+        html.P("If you have any questions or concerns about the study, you may contact the researchers:"),
+        html.Ul([
+            html.Li("Amrita Pathak at 773-406-4622 or amritap1@uchicago.edu"),
+            html.Li("Principal Investigator: Henry Dambanemuya at 773-834-6207 or hdambane@uchicago.edu")
+        ]),
         html.P([
             "If you have any questions about your rights as a participant in this research, or to discuss other study-related concerns with someone who is not part of the research team, ",
             "you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, or by email at sbs-irb@uchicago.edu."
