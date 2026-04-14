@@ -135,7 +135,11 @@ def create_stock_card(stock, stock_index, task_id, amount=None, show_information
                 # Left column - Image
                 dbc.Col([
                     html.Img(src=stock.get('image', ''), style={'width': '100%', 'height': 'auto'}, 
-                            className="d-block")
+                            className="d-block"),
+                    html.P(
+                        "This is an intraday chart.",
+                        className="text-muted text-center mt-2 mb-0 small"
+                    )
                 ], md=6),
                 
                 # Right column - Buttons and inputs
