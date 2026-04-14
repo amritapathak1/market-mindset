@@ -461,14 +461,19 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
             )
             tutorial_1_step_2 = (
                 "After purchasing, the information buttons (Show More Details, Week's Chart, Month's Chart) become available. "
-                "Click them to review the stock information."
+                "Show More Details gives a longer company overview and past performance metrics (e.g., 6-month and YTD trends), "
+                "Week's Chart shows recent short-term movement, "
+                "and Month's Chart shows a broader trend. Click them to review the stock information."
             )
         elif show_information:
             tutorial_1_step_1 = (
                 "Click the information buttons directly to review stock details."
             )
             tutorial_1_step_2 = (
-                "Review the available information panels to understand how details are presented before moving on."
+                "Review the available information panels to understand how details are presented before moving on. "
+                "Show More Details gives a longer company overview and past performance metrics (e.g., 6-month and YTD trends), "
+                "Week's Chart shows recent short-term movement, "
+                "and Month's Chart shows a broader trend."
             )
         else:
             tutorial_1_step_1 = (
