@@ -21,10 +21,10 @@ with open(TASKS_DATA_FILE, 'r') as f:
 
 # Experiment routing and condition configuration
 # Slug-based URLs:
-# /qvmtx, /nrpld, /kzwhc, /tbjsm, /fyqra, /mdxlu
+# /pfdkr, /ytnqm, /hcslv, /rbxjw, /mkgza, /uqnpe
 EXPERIMENTS = {
     'e1': {
-        'slug': 'qvmtx',
+        'slug': 'pfdkr',
         'task_file': 'tasks_data_e1.json',
         'tutorial_file': 'tutorial_tasks_data_e1.json',
         'target_participants': 100,
@@ -33,7 +33,7 @@ EXPERIMENTS = {
         'info_cost_mode': 'fixed'
     },
     'e2': {
-        'slug': 'nrpld',
+        'slug': 'ytnqm',
         'task_file': 'tasks_data_e2.json',
         'tutorial_file': 'tutorial_tasks_data_e2.json',
         'target_participants': 100,
@@ -42,7 +42,7 @@ EXPERIMENTS = {
         'info_cost_mode': 'variable'
     },
     'e3': {
-        'slug': 'kzwhc',
+        'slug': 'hcslv',
         'task_file': 'tasks_data_e3.json',
         'tutorial_file': 'tutorial_tasks_data_e3.json',
         'target_participants': 100,
@@ -51,7 +51,7 @@ EXPERIMENTS = {
         'info_cost_mode': 'none'
     },
     'e4': {
-        'slug': 'tbjsm',
+        'slug': 'rbxjw',
         'task_file': 'tasks_data_e4.json',
         'tutorial_file': 'tutorial_tasks_data_e4.json',
         'target_participants': 100,
@@ -60,7 +60,7 @@ EXPERIMENTS = {
         'info_cost_mode': 'fixed'
     },
     'e5': {
-        'slug': 'fyqra',
+        'slug': 'mkgza',
         'task_file': 'tasks_data_e5.json',
         'tutorial_file': 'tutorial_tasks_data_e5.json',
         'target_participants': 100,
@@ -69,7 +69,7 @@ EXPERIMENTS = {
         'info_cost_mode': 'variable'
     },
     'e6': {
-        'slug': 'mdxlu',
+        'slug': 'uqnpe',
         'task_file': 'tasks_data_e6.json',
         'tutorial_file': 'tutorial_tasks_data_e6.json',
         'target_participants': 100,
@@ -94,7 +94,7 @@ def _load_json_file(file_name):
 
 
 def get_experiment_key_from_path(pathname):
-    """Resolve experiment key from URL pathname like '/qvmtx'."""
+    """Resolve experiment key from URL pathname like '/pfdkr'."""
     if not pathname:
         return None
 
@@ -132,7 +132,6 @@ INITIAL_AMOUNT = 1000
 
 # Initial amount for tutorial tasks
 TUTORIAL_INITIAL_AMOUNT = 100
-
 # Number of tutorial rounds (practice tasks before main tasks)
 NUM_TUTORIAL_TASKS = 2
 

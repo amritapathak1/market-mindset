@@ -41,12 +41,12 @@ python app.py
 The application will start on localhost
 
 Use one of the experiment-specific opaque links (not the root URL):
-- `http://13.63.182.207/qvmtx`
-- `http://13.63.182.207/nrpld`
-- `http://13.63.182.207/kzwhc`
-- `http://13.63.182.207/tbjsm`
-- `http://13.63.182.207/fyqra`
-- `http://13.63.182.207/mdxlu`
+- `http://13.63.182.207/pfdkr`
+- `http://13.63.182.207/ytnqm`
+- `http://13.63.182.207/hcslv`
+- `http://13.63.182.207/rbxjw`
+- `http://13.63.182.207/mkgza`
+- `http://13.63.182.207/uqnpe`
 
 Each link maps to a different condition and its own task/tutorial JSON files.
 
