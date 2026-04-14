@@ -442,7 +442,7 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
                 html.Strong("investments will be based on real historical stock data"),
                 ". Your investment performance will be ",
                 html.Strong("evaluated based on how the stock actually performed after 1 month"),
-                "."
+                ". The money you invest is not returned to your available balance in later rounds, and profit/loss is feedback only (it is not added to or subtracted from your available balance)."
             ], className="mb-2"),
             html.P(information_rules_text, className="mb-2"),
             html.P(feedback_rules_text, className="mb-0")
