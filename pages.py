@@ -162,16 +162,16 @@ def consent_page():
         
         html.H5("Description:", className="mt-3"),
         html.P([
-            "We are researchers at the University of Chicago doing a research study on how people make investment decisions in a simulated market environment. ",
-            "If you agree to participate, you will complete an interactive online task in which you make a series of investment decisions using virtual money across multiple rounds, ",
-            "along with a short set of demographic questions (age, gender, education, income). ",
-            "The full study takes about 25 to 30 minutes to complete in a single session. Your participation is voluntary."
+            "We are researchers at the University of Chicago doing a research study on decision-making in a simulated stock market environment. ",
+            "If you agree to participate, you will complete an interactive online experiment in which you make a series of investment decisions using virtual money across multiple rounds, ",
+            "along with a short set of demographic questions. ",
+            "The full study takes about 10 to 15 minutes to complete in a single session. Your participation is voluntary."
         ]),
         
         html.H5("Incentives:", className="mt-3"),
         html.P([
             "Your participation in this study is entirely voluntary. While we welcome participants who are motivated by an interest in contributing to research, ",
-            "we also offer a small token of appreciation for your time. All participants who complete the study and pass the attention checks will receive a base payment of $5. ",
+            "we also offer a small token of appreciation for your time. All participants who complete the study and pass the attention checks will receive a base payment of $3. ",
             "An additional $10 bonus will be awarded to the top 10 participants whose investment decisions result in the highest overall returns during the task. ",
             "Participants will not lose any compensation if their task performance results in a loss, and no real money is at risk. ",
             "Participants who choose to withdraw before completing the study will not receive payment. ",
@@ -682,7 +682,7 @@ def confidence_risk_page(completed_tasks=None):
         content.extend([
             html.Div([
                 html.H5(f"Please select option {requested_option} for this item. This question is used to verify attentive responding.", 
-                       className="mt-5 mb-3", style={'color': '#0066cc'}),
+                       className="mt-5 mb-3"),
                 create_slider_with_labels(
                     'attention-slider',
                     1,
