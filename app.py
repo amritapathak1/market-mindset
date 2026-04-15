@@ -176,7 +176,7 @@ app.layout = dbc.Container([
             html.H6("How would you rate the overall risk of your investment strategy?", className="mt-4 mb-2"),
             create_slider_with_labels('cr-modal-risk', 1, 7, 4, 1, 'Very low risk', 'Very high risk'),
             html.Div([
-                html.H6(id='cr-modal-attention-prompt', className="mt-4 mb-2", style={'color': '#0066cc'}),
+                html.H6(id='cr-modal-attention-prompt', className="mt-4 mb-2", style={'color': '#000000'}),
                 create_slider_with_labels('cr-modal-attention', 1, 7, 4, 1, '1', '7'),
             ], id='cr-modal-attention-section', style={'display': 'none'}),
         ]),
