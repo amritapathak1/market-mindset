@@ -1849,8 +1849,8 @@ def register_callbacks(app, db_enabled, db_functions):
             else:
                 result_body = html.P("Your investment has been recorded.", className="mb-0")
         
-        # Reset all sliders to default (4) for next round
-        return False, True, result_body, confidence_risk_data, 4, 4, 4
+        # Reset sliders to defaults for next round
+        return False, True, result_body, confidence_risk_data, 50, 50, 4
     
     
     # ============================================

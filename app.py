@@ -172,9 +172,9 @@ app.layout = dbc.Container([
         dbc.ModalBody([
             html.P(id='cr-modal-message', className="mb-3 text-muted"),
             html.H6("How confident are you in the investment decisions you've made so far?", className="mt-3 mb-2"),
-            create_slider_with_labels('cr-modal-confidence', 1, 7, 4, 1, 'Not at all confident', 'Extremely confident'),
+            create_slider_with_labels('cr-modal-confidence', 0, 100, 50, 1, 'Not at all confident', 'Extremely confident'),
             html.H6("How would you rate the overall risk of your investment strategy?", className="mt-4 mb-2"),
-            create_slider_with_labels('cr-modal-risk', 1, 7, 4, 1, 'Very low risk', 'Very high risk'),
+            create_slider_with_labels('cr-modal-risk', 0, 100, 50, 1, 'Very low risk', 'Very high risk'),
             html.Div([
                 html.H6(id='cr-modal-attention-prompt', className="mt-4 mb-2", style={'color': '#000000'}),
                 create_slider_with_labels('cr-modal-attention', 1, 7, 4, 1, '1', '7'),

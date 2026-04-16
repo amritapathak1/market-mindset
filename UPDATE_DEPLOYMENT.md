@@ -36,6 +36,7 @@ cd /Users/amrita/uchicago/thesis/market-mindset
 scp -i ~/.ssh/market-mindset.pem app.py ubuntu@your-elastic-ip:/home/ubuntu/app/
 scp -i ~/.ssh/market-mindset.pem callbacks.py ubuntu@your-elastic-ip:/home/ubuntu/app/
 scp -i ~/.ssh/market-mindset.pem components.py ubuntu@your-elastic-ip:/home/ubuntu/app/
+scp -i ~/.ssh/market-mindset.pem assets/slider.css ubuntu@your-elastic-ip:/home/ubuntu/app/assets/
 
 # Or upload entire directory (overwrites everything)
 scp -i ~/.ssh/market-mindset.pem -r . ubuntu@your-elastic-ip:/home/ubuntu/app/
@@ -209,6 +210,7 @@ Before deploying:
 - [ ] Commit changes to git (if using git)
 - [ ] Backup current production (optional): `git log` to note current commit
 - [ ] Check [requirements.txt](requirements.txt) is up to date
+- [ ] Include any new static assets under [assets/](assets/) (e.g., [assets/slider.css](assets/slider.css))
 - [ ] Review error logs after deployment
 - [ ] Confirm `sudo nginx -t` passes
 - [ ] Confirm `curl -fsS http://localhost/healthz` succeeds

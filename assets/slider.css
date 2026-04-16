@@ -1,0 +1,4 @@
+/* Ensure the live selected-value bubble shows percent for 0-100 sliders. */
+.percent-slider .rc-slider-tooltip-inner::after {
+    content: "%";
+}

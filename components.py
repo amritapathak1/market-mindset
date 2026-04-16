@@ -178,6 +178,23 @@ def create_slider_with_labels(slider_id, min_val, max_val, default, step, label_
         html.Div containing slider and labels
     """
     from dash import dcc
+
+    tooltip = {"placement": "bottom", "always_visible": True}
+    slider_class = ""
+
+    # Use sparse marks for wide ranges so the slider remains readable and smooth.
+    if (max_val - min_val) > 20:
+        if min_val == 0 and max_val == 100:
+            marks = {i: f"{i}%" for i in range(min_val, max_val + 1, 10)}
+            marks[min_val] = f"{min_val}%"
+            marks[max_val] = f"{max_val}%"
+            slider_class = "percent-slider"
+        else:
+            marks = {i: str(i) for i in range(min_val, max_val + 1, 10)}
+            marks[min_val] = str(min_val)
+            marks[max_val] = str(max_val)
+    else:
+        marks = {i: str(i) for i in range(min_val, max_val + 1)}
     
     return html.Div([
         dcc.Slider(
@@ -185,9 +202,11 @@ def create_slider_with_labels(slider_id, min_val, max_val, default, step, label_
             min=min_val,
             max=max_val,
             step=step,
-            marks={i: str(i) for i in range(min_val, max_val + 1)},
+            marks=marks,
             value=default,
-            tooltip={"placement": "bottom", "always_visible": True}
+            className=slider_class,
+            updatemode="drag",
+            tooltip=tooltip
         ),
         html.Div([
             html.Span(label_min, className="float-start text-muted"),

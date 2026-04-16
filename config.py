@@ -241,18 +241,18 @@ PAGES = {
 
 SLIDER_CONFIG = {
     'confidence': {
-        'min': 1,
-        'max': 7,
+        'min': 0,
+        'max': 100,
         'step': 1,
-        'default': 4,
+        'default': 50,
         'label_min': 'Not at all confident',
         'label_max': 'Extremely confident',
     },
     'risk': {
-        'min': 1,
-        'max': 7,
+        'min': 0,
+        'max': 100,
         'step': 1,
-        'default': 4,
+        'default': 50,
         'label_min': 'Very low risk',
         'label_max': 'Very high risk',
     }
