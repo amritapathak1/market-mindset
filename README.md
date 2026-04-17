@@ -48,7 +48,15 @@ Use one of the experiment-specific opaque links (not the root URL):
 - `http://13.63.182.207/mkgza`
 - `http://13.63.182.207/uqnpe`
 
-Each link maps to a different condition and its own task/tutorial JSON files.
+Condition mapping:
+- `e1` -> `http://13.63.182.207/pfdkr`
+- `e2` -> `http://13.63.182.207/ytnqm`
+- `e3` -> `http://13.63.182.207/hcslv`
+- `e4` -> `http://13.63.182.207/rbxjw`
+- `e5` -> `http://13.63.182.207/mkgza`
+- `e6` -> `http://13.63.182.207/uqnpe`
+
+Each condition uses its own task/tutorial JSON files.
 
 ## Application Flow
 
