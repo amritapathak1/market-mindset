@@ -171,7 +171,7 @@ def consent_page():
         html.H5("Incentives:", className="mt-3"),
         html.P([
             "Your participation in this study is entirely voluntary. While we welcome participants who are motivated by an interest in contributing to research, ",
-            "we also offer a small token of appreciation for your time. All participants who complete the study and pass the attention checks will receive a base payment of $3. ",
+            "we also offer a small token of appreciation for your time. All participants who complete the study and pass the attention checks will receive a base payment of $2.50. ",
             "An additional $10 bonus will be awarded to the top 10 participants whose investment decisions result in the highest overall returns during the task. ",
             "Participants will not lose any compensation if their task performance results in a loss, and no real money is at risk. ",
             "Participants who choose to withdraw before completing the study will not receive payment. ",
@@ -1004,7 +1004,7 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
     ])
 
 
-def thank_you_page():
+def thank_you_page(completion_code=None):
     """Render the final thank you page."""
     return dbc.Container([
         dbc.Row([
@@ -1012,8 +1012,9 @@ def thank_you_page():
                 html.Div([
                     html.I(className="bi bi-check-circle", style={'fontSize': '5rem', 'color': 'green'}),
                     html.H1("Thank You!", className="mt-3 mb-4"),
-                    html.P("Your responses have been recorded. We appreciate your participation in this study.", 
+                    html.P("Your responses have been recorded. We appreciate your participation in this study.",
                            className="lead"),
+                    html.P(["Your completion code is: ", html.Strong(completion_code)], className="mt-3") if completion_code else None,
                     html.P("You may now close this window.", className="text-muted")
                 ], className="text-center", style={'marginTop': '100px'})
             ], width=12)

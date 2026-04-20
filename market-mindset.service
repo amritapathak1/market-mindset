@@ -12,7 +12,9 @@ EnvironmentFile=/home/ubuntu/app/.env
 
 # Gunicorn command
 ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
-    --workers 6 \
+    --worker-class gthread \
+    --workers 4 \
+    --threads 4 \
     --max-requests 1000 \
     --max-requests-jitter 100 \
     --graceful-timeout 60 \
@@ -22,6 +24,7 @@ ExecStart=/home/ubuntu/app/venv/bin/gunicorn \
     --timeout 120 \
     --access-logfile /home/ubuntu/app/logs/access.log \
     --error-logfile /home/ubuntu/app/logs/error.log \
+    --access-logformat '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s %(D)s' \
     --capture-output \
     application:application
 

@@ -30,7 +30,8 @@ EXPERIMENTS = {
         'target_participants': 100,
         'show_profit_loss': True,
         'show_information': True,
-        'info_cost_mode': 'fixed'
+        'info_cost_mode': 'fixed',
+        'completion_code': 'A3F91D6C24'
     },
     'e2': {
         'slug': 'ytnqm',
@@ -39,7 +40,8 @@ EXPERIMENTS = {
         'target_participants': 100,
         'show_profit_loss': True,
         'show_information': True,
-        'info_cost_mode': 'variable'
+        'info_cost_mode': 'variable',
+        'completion_code': 'F0D428EEAC'
     },
     'e3': {
         'slug': 'hcslv',
@@ -48,7 +50,8 @@ EXPERIMENTS = {
         'target_participants': 100,
         'show_profit_loss': True,
         'show_information': False,
-        'info_cost_mode': 'none'
+        'info_cost_mode': 'none',
+        'completion_code': '852242C9B0'
     },
     'e4': {
         'slug': 'rbxjw',
@@ -57,7 +60,8 @@ EXPERIMENTS = {
         'target_participants': 100,
         'show_profit_loss': False,
         'show_information': True,
-        'info_cost_mode': 'fixed'
+        'info_cost_mode': 'fixed',
+        'completion_code': '0BA073AFF8'
     },
     'e5': {
         'slug': 'mkgza',
@@ -66,7 +70,8 @@ EXPERIMENTS = {
         'target_participants': 100,
         'show_profit_loss': False,
         'show_information': True,
-        'info_cost_mode': 'variable'
+        'info_cost_mode': 'variable',
+        'completion_code': 'E77E5AC7D3'
     },
     'e6': {
         'slug': 'uqnpe',
@@ -75,7 +80,8 @@ EXPERIMENTS = {
         'target_participants': 100,
         'show_profit_loss': False,
         'show_information': False,
-        'info_cost_mode': 'none'
+        'info_cost_mode': 'none',
+        'completion_code': '720B2C10EB'
     },
 }
 

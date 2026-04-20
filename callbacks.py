@@ -210,7 +210,7 @@ def register_callbacks(app, db_enabled, db_functions):
         elif page == PAGES['debrief']:
             return debrief_page(amount, portfolio or [], info_spent or 0), False, dash.no_update, {}
         elif page == PAGES['thank_you']:
-            return thank_you_page(), False, dash.no_update, {}
+            return thank_you_page(experiment_config.get('completion_code', None)), False, dash.no_update, {}
         return html.Div("Page not found"), False, dash.no_update, {}
     
     
