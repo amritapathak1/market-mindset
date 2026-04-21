@@ -25,7 +25,7 @@ from config import (
 )
 from utils import (
     validate_investment, validate_total_investment, get_task_data_safe,
-    validate_demographics, validate_page_access
+    validate_demographics
 )
 from components import create_centered_card, create_error_alert
 from pages import (
@@ -135,16 +135,13 @@ def register_callbacks(app, db_enabled, db_functions):
         State('current-task', 'data'),
         State('task-order', 'data'),
         State('amount', 'data'),
-        State('consent-given', 'data'),
-        State('demographics', 'data'),
-        State('confidence-risk', 'data'),
         State('task-responses', 'data'),
         State('portfolio', 'data'),
         State('info-cost-spent', 'data'),
         prevent_initial_call='initial_duplicate'
     )
-    def display_page(page, experiment_key, current_task, task_order, amount, consent_given, demographics, confidence_risk, task_responses, portfolio, info_spent):
-        """Display the appropriate page based on current page state with flow validation."""
+    def display_page(page, experiment_key, current_task, task_order, amount, task_responses, portfolio, info_spent):
+        """Display the appropriate page based on current page state."""
         if not experiment_key:
             error_content = create_centered_card([
                 create_error_alert(
@@ -166,22 +163,6 @@ def register_callbacks(app, db_enabled, db_functions):
             ])
             return error_content, False, dash.no_update, {}
 
-        # Validate page access
-        demographics_completed = bool(demographics and demographics.get('age_range'))
-        confidence_risk_completed = bool(confidence_risk and confidence_risk.get('confidence'))
-        
-        is_allowed, redirect_page, error_msg = validate_page_access(
-            page, consent_given, demographics_completed, current_task, confidence_risk_completed
-        )
-        
-        # If access denied, redirect and show error
-        if not is_allowed:
-            error_content = create_centered_card([
-                create_error_alert("Access Denied", error_msg, "You will be redirected to the appropriate page."),
-                html.Script("setTimeout(function(){ window.location.reload(); }, 2000);")
-            ])
-            return error_content, False, redirect_page, {}
-        
         # Always close modal and clear pending requests when changing pages
         if page == PAGES['consent']:
             return consent_page(), False, dash.no_update, {}
