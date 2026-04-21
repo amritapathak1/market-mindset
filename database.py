@@ -11,7 +11,10 @@ import psycopg2.extras
 from psycopg2.pool import ThreadedConnectionPool
 import json
 from contextlib import contextmanager
-from threading import Lock, Thread
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+from zoneinfo import ZoneInfo
+from threading import Lock
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +49,8 @@ TRANSIENT_SQLSTATES = {
 
 _db_pool = None
 _db_pool_lock = Lock()
+_log_executor = None
+_log_executor_lock = Lock()
 
 
 def _is_transient_db_error(error):
@@ -114,6 +119,16 @@ def reset_db_pool():
                 old_pool.closeall()
             except Exception:
                 logger.exception("Failed to close existing DB pool during reset")
+
+
+def _get_log_executor():
+    """Get or initialize the bounded thread pool for async log_event writes."""
+    global _log_executor
+    if _log_executor is None:
+        with _log_executor_lock:
+            if _log_executor is None:
+                _log_executor = ThreadPoolExecutor(max_workers=2)
+    return _log_executor
 
 
 def _get_connection_with_reconnect():
@@ -250,9 +265,10 @@ def log_event(participant_id, event_type, event_category, page_name=None,
     """
     Log a user interaction event.
 
-    Writes immediately to the application log (file-backed, guaranteed) then
-    inserts into the database in a background daemon thread so the caller is
-    never blocked by DB latency.
+    Captures the event timestamp immediately, writes to the application log
+    (file-backed, guaranteed), then submits the DB INSERT to a bounded
+    ThreadPoolExecutor (max 2 workers) so the caller is never blocked and
+    the connection pool is never starved.
 
     Args:
         participant_id: UUID of participant
@@ -268,7 +284,8 @@ def log_event(participant_id, event_type, event_category, page_name=None,
         stock_ticker: Stock ticker if applicable
         metadata: Additional data as dict
     """
-    # Write to log file immediately — guaranteed record before any DB attempt
+    event_time = datetime.now(ZoneInfo('America/Chicago')).replace(tzinfo=None)
+
     logger.info("event: %s", json.dumps({
         'participant_id': str(participant_id) if participant_id else None,
         'event_type': event_type,
@@ -282,9 +299,9 @@ def log_event(participant_id, event_type, event_category, page_name=None,
         'new_value': new_value,
         'stock_ticker': stock_ticker,
         'metadata': metadata,
+        'timestamp': event_time.isoformat(),
     }, default=str))
 
-    # Insert into DB in a background daemon thread — non-blocking
     def _write():
         with get_db_connection() as conn:
             with conn.cursor() as cur:
@@ -292,22 +309,25 @@ def log_event(participant_id, event_type, event_category, page_name=None,
                     INSERT INTO events (
                         participant_id, event_type, event_category, page_name,
                         task_id, element_id, element_type, action,
-                        old_value, new_value, stock_ticker, metadata
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        old_value, new_value, stock_ticker, metadata, timestamp
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     participant_id, event_type, event_category, page_name,
                     task_id, element_id, element_type, action,
                     old_value, new_value, stock_ticker,
-                    json.dumps(metadata) if metadata else None
+                    json.dumps(metadata) if metadata else None,
+                    event_time,
                 ))
 
     def _write_with_logging():
         try:
             _run_db_write_with_retry('log_event', _write)
         except Exception:
-            logger.exception("log_event DB write failed permanently for participant %s", participant_id)
+            logger.exception(
+                "log_event DB write failed permanently for participant %s", participant_id
+            )
 
-    Thread(target=_write_with_logging, daemon=True).start()
+    _get_log_executor().submit(_write_with_logging)
 
 
 # ============================================
