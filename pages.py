@@ -564,7 +564,7 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
                     color="success" if tutorial_num < NUM_TUTORIAL_TASKS else "primary",
                     size="lg",
                     className="w-100",
-                    disabled=requires_purchase  # Tutorial 1 starts disabled only if purchase is required
+                    disabled=False
                 )
             ], md=6, className="mx-auto")
         ]),

@@ -11,7 +11,7 @@ import psycopg2.extras
 from psycopg2.pool import ThreadedConnectionPool
 import json
 from contextlib import contextmanager
-from threading import Lock
+from threading import Lock, Thread
 
 logger = logging.getLogger(__name__)
 
@@ -244,12 +244,16 @@ def update_participant_withdrawal(participant_id, withdrawn=True):
 # EVENT TRACKING
 # ============================================
 
-def log_event(participant_id, event_type, event_category, page_name=None, 
+def log_event(participant_id, event_type, event_category, page_name=None,
               task_id=None, element_id=None, element_type=None, action=None,
               old_value=None, new_value=None, stock_ticker=None, metadata=None):
     """
     Log a user interaction event.
-    
+
+    Writes immediately to the application log (file-backed, guaranteed) then
+    inserts into the database in a background daemon thread so the caller is
+    never blocked by DB latency.
+
     Args:
         participant_id: UUID of participant
         event_type: Type of event (e.g., 'button_click', 'modal_open', 'page_view')
@@ -264,6 +268,23 @@ def log_event(participant_id, event_type, event_category, page_name=None,
         stock_ticker: Stock ticker if applicable
         metadata: Additional data as dict
     """
+    # Write to log file immediately — guaranteed record before any DB attempt
+    logger.info("event: %s", json.dumps({
+        'participant_id': str(participant_id) if participant_id else None,
+        'event_type': event_type,
+        'event_category': event_category,
+        'page_name': page_name,
+        'task_id': task_id,
+        'element_id': element_id,
+        'element_type': element_type,
+        'action': action,
+        'old_value': old_value,
+        'new_value': new_value,
+        'stock_ticker': stock_ticker,
+        'metadata': metadata,
+    }, default=str))
+
+    # Insert into DB in a background daemon thread — non-blocking
     def _write():
         with get_db_connection() as conn:
             with conn.cursor() as cur:
@@ -280,7 +301,13 @@ def log_event(participant_id, event_type, event_category, page_name=None,
                     json.dumps(metadata) if metadata else None
                 ))
 
-    _run_db_write_with_retry('log_event', _write)
+    def _write_with_logging():
+        try:
+            _run_db_write_with_retry('log_event', _write)
+        except Exception:
+            logger.exception("log_event DB write failed permanently for participant %s", participant_id)
+
+    Thread(target=_write_with_logging, daemon=True).start()
 
 
 # ============================================

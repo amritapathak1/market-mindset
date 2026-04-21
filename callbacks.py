@@ -1042,72 +1042,17 @@ def register_callbacks(app, db_enabled, db_functions):
     # TUTORIAL CALLBACKS
     # ============================================
     
-    # Reset tutorial buttons to disabled when entering tutorial pages
+    # Reset purchased-info when entering tutorial pages
     @app.callback(
-        Output('tutorial-1-submit', 'disabled', allow_duplicate=True),
         Output('purchased-info', 'data', allow_duplicate=True),
         Input('current-page', 'data'),
-        State('experiment-key', 'data'),
         prevent_initial_call=True
     )
-    def reset_tutorial_1_button(current_page, experiment_key):
-        """Ensure tutorial 1 button starts disabled (if purchase required) and reset purchased info."""
-        if current_page == PAGES['tutorial_1']:
-            # Check if tutorial 1 requires purchase
-            task_data, error = get_task_data_safe('tutorial_1', experiment_key)
-            if not error and task_data:
-                show_information = task_data.get('show_information', True)
-                if show_information:
-                    stocks = task_data.get('stocks', [])
-                    if stocks:
-                        purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
-                        requires_purchase = purchase_cost > 0
-                        return requires_purchase, []  # Reset purchased-info to empty list
-            return False, []  # If no purchase required, button is enabled
-        elif current_page == PAGES['tutorial_2']:
-            return dash.no_update, []  # Reset purchased-info but don't touch tutorial 2 button
-        return dash.no_update, dash.no_update
-    
-    
-    # Simple tutorial 1 button enablement - enable button when info modal closes
-    @app.callback(
-        Output('tutorial-1-submit', 'disabled'),
-        Output('tutorial-1-status', 'children'),
-        Input('stock-modal', 'is_open'),
-        State('current-page', 'data'),
-        State('purchased-info', 'data'),
-        State('experiment-key', 'data'),
-        prevent_initial_call=True
-    )
-    def enable_tutorial_1_button(modal_is_open, current_page, purchased_info, experiment_key):
-        """Enable tutorial 1 button after viewing info (only if purchase is required)."""
-        # Only act on tutorial 1 page
-        if current_page != PAGES['tutorial_1']:
-            return dash.no_update, dash.no_update
-        
-        # Check if tutorial 1 requires purchase
-        task_data, error = get_task_data_safe('tutorial_1', experiment_key)
-        if error or not task_data:
-            return dash.no_update, dash.no_update
-        
-        show_information = task_data.get('show_information', True)
-        requires_purchase = False
-        if show_information:
-            stocks = task_data.get('stocks', [])
-            if stocks:
-                purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
-                requires_purchase = purchase_cost > 0
-        
-        # Only enable button after purchase if purchase is required
-        if requires_purchase:
-            # Check if modal just closed AND user has viewed at least one piece of info
-            if not modal_is_open and purchased_info and len(purchased_info) > 0:
-                return False, dbc.Alert([
-                    html.I(className="bi bi-check-circle me-2"),
-                    "Great! You've learned how to purchase information. Now, view some information, and then enter an investment amount and click Continue. You can also choose to not invest, in which case enter 0 and click Continue."
-                ], color="success", className="text-center mt-3")
-        
-        return dash.no_update, dash.no_update
+    def reset_tutorial_purchased_info(current_page):
+        """Reset purchased info when entering tutorial pages."""
+        if current_page in [PAGES['tutorial_1'], PAGES['tutorial_2']]:
+            return []
+        return dash.no_update
     
     
     @app.callback(
@@ -1120,13 +1065,25 @@ def register_callbacks(app, db_enabled, db_functions):
         State('amount', 'data'),
         State('participant-id', 'data'),
         State('experiment-key', 'data'),
+        State('purchased-info', 'data'),
         prevent_initial_call=True
     )
-    def submit_tutorial_1(n_clicks, investment_values, current_amount, participant_id, experiment_key):
+    def submit_tutorial_1(n_clicks, investment_values, current_amount, participant_id, experiment_key, purchased_info):
         """Handle tutorial 1 submission."""
         if not n_clicks:
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update
-        
+
+        # Check if purchase is required but info hasn't been purchased yet
+        task_data_check, _ = get_task_data_safe('tutorial_1', experiment_key)
+        if task_data_check:
+            show_information = task_data_check.get('show_information', True)
+            if show_information:
+                stocks = task_data_check.get('stocks', [])
+                if stocks:
+                    purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
+                    if purchase_cost > 0 and not purchased_info:
+                        return False, "", "Please purchase information before submitting.", dash.no_update
+
         # Validate investment
         validated_investments = []
         for i, value in enumerate(investment_values):
