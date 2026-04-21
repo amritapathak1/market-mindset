@@ -1715,7 +1715,7 @@ def register_callbacks(app, db_enabled, db_functions):
         message = f"You've completed {completed_task} investment {task_word}. Please take a moment to rate the following."
         
         if completed_task in ATTENTION_CHECK_TASKS:
-            requested_option = 2 if completed_task == 3 else 4
+            requested_option = 2 if completed_task == 3 else 5
             prompt = f"Please select option {requested_option} for this item. This question is used to verify attentive responding."
             return {'display': 'block'}, prompt, message
         
