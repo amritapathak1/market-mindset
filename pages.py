@@ -37,7 +37,7 @@ def create_amount_display(amount):
     ], color="success", className="text-center mb-4")
 
 
-def create_stock_card(stock, stock_index, task_id, amount=None, show_information=True):
+def create_stock_card(stock, stock_index, task_id, amount=None, show_information=True, show_investment_hint=False):
     """Create a card displaying information about a single stock."""
     
     # Check if purchase bundle cost is 0
@@ -57,8 +57,11 @@ def create_stock_card(stock, stock_index, task_id, amount=None, show_information
                     id={'type': 'purchase-info', 'task': task_id, 'stock': stock_index},
                     color="primary",
                     size="sm",
-                    className="w-100 mb-3"
+                    className="w-100 mb-1"
                 )
+            )
+            right_column_content.append(
+                html.Div(id='purchase-cancel-msg', className="mb-2")
             )
         
         # Add the three info buttons
@@ -118,7 +121,8 @@ def create_stock_card(stock, stock_index, task_id, amount=None, show_information
                 placeholder="0.00",
                 value=0
             )
-        ])
+        ]),
+        html.P("Enter a minimum of $0 and click Continue when ready.", className="text-muted small mt-2 mb-0") if show_investment_hint else None
     ])
     
     return dbc.Card([
@@ -545,10 +549,10 @@ def tutorial_page(tutorial_num, amount, experiment_key=None):
                className="text-center text-muted mb-4"),
         
         # Stock card
-        create_stock_card(stocks[0], 0, tutorial_task_id, amount, show_information=show_information),
+        create_stock_card(stocks[0], 0, tutorial_task_id, amount, show_information=show_information, show_investment_hint=True),
         
         html.Div(id="tutorial-error", className="text-danger text-center mb-3 mt-3"),
-        
+
         # Completion status
         html.Div(id=f'tutorial-{tutorial_num}-status', className="text-center mb-3"),
         

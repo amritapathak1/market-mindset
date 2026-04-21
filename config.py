@@ -209,7 +209,7 @@ ERROR_MESSAGES = {
     'education_required': 'Please select an education level',
     'experience_required': 'Please select your investment experience',
     'investment_negative': 'Investment amount cannot be negative',
-    'investment_exceeds': 'Total investment (${total:.2f}) exceeds available amount (${available:.2f})',
+    'investment_exceeds': 'Total investment (${total:.2f}) exceeds available amount. Please enter a minimum of $0 and a maximum of ${available:.2f} in total.',
     'investment_invalid': 'Please enter a valid investment amount',
     'investment_decimal': 'Investment amount can have at most 2 decimal places',
     'task_data_error': 'Error loading task data. Please refresh the page.',

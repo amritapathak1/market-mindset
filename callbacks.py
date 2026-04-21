@@ -422,6 +422,22 @@ def register_callbacks(app, db_enabled, db_functions):
     # ============================================
     # COST CONFIRMATION CALLBACKS
     # ============================================
+
+    @app.callback(
+        Output('purchase-cancel-msg', 'children'),
+        Input('cost-modal-cancel', 'n_clicks'),
+        Input('purchased-info', 'data'),
+        State('current-page', 'data'),
+        prevent_initial_call=True
+    )
+    def show_purchase_cancel_message(n_clicks, purchased_info, current_page):
+        triggered_id = ctx.triggered[0]['prop_id'] if ctx.triggered else ''
+        if 'purchased-info' in triggered_id:
+            return ""
+        if 'cost-modal-cancel' in triggered_id and current_page == PAGES['tutorial_1']:
+            return dbc.Alert("You must purchase information to proceed with this tutorial. You can choose not to for the remaining rounds.", color="warning", className="mb-0 mt-1")
+        return dash.no_update
+
     
     @app.callback(
         Output('cost-modal', 'is_open'),
@@ -437,10 +453,11 @@ def register_callbacks(app, db_enabled, db_functions):
         State('participant-id', 'data'),
         State('purchased-info', 'data'),
         State('experiment-key', 'data'),
+        State('amount', 'data'),
         prevent_initial_call=True
     )
-    def handle_cost_confirmation(purchase_info_clicks, show_more_clicks, show_week_clicks, show_month_clicks, 
-                                  cancel_clicks, pending_request, current_task, participant_id, purchased_info, experiment_key):
+    def handle_cost_confirmation(purchase_info_clicks, show_more_clicks, show_week_clicks, show_month_clicks,
+                                  cancel_clicks, pending_request, current_task, participant_id, purchased_info, experiment_key, amount):
         """Handle cost confirmation modal for information requests."""
         if not ctx.triggered:
             return dash.no_update, dash.no_update, dash.no_update
@@ -456,7 +473,7 @@ def register_callbacks(app, db_enabled, db_functions):
             show_month_clicks and any(c for c in show_month_clicks if c)
         ])) and 'cost-modal' not in triggered_id:
             return dash.no_update, dash.no_update, dash.no_update
-        
+
         # Handle cancel button
         if 'cost-modal-cancel' in triggered_id:
             if participant_id and pending_request:
@@ -480,33 +497,33 @@ def register_callbacks(app, db_enabled, db_functions):
                 except Exception:
                     logger.exception("Error logging event")
             return False, "", {}
-        
+
         # Handle information request buttons
         if isinstance(button_id, dict):
             info_type = button_id.get('type')
             task_id = button_id.get('task')
             stock_index = button_id.get('stock')
-            
+
             # Handle purchase-info button - bundle purchase
             if info_type == 'purchase-info':
                 # Get task data to retrieve stock info
                 task_data, error = get_task_data_safe(task_id, experiment_key)
                 if error:
                     return False, "", {}
-                
+
                 stock = task_data['stocks'][stock_index]
-                
+
                 # Get bundle cost from stock data
                 cost = stock.get('info_costs', {}).get('purchase_bundle', 0)
-                
+
                 # Check if bundle has already been purchased for this stock
                 info_identifier = f'bundle-{stock_index}'
                 already_purchased = info_identifier in (purchased_info or [])
-                
+
                 # If already purchased, treat as free (shouldn't happen since button should be disabled)
                 if already_purchased:
                     cost = 0
-                
+
                 # Log the initial request
                 if participant_id:
                     try:
@@ -529,7 +546,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         )
                     except Exception:
                         logger.exception("Error logging event")
-                
+
                 # Create pending request
                 pending = {
                     'info_type': info_type,
@@ -540,11 +557,18 @@ def register_callbacks(app, db_enabled, db_functions):
                     'cost': cost,
                     'element_id': f'purchase-info-{stock_index}'
                 }
-                
+
                 # If cost is $0, skip the confirmation modal
                 if cost == 0:
                     return False, "", pending
-                
+
+                # Check for sufficient funds
+                if amount is not None and cost > amount:
+                    return True, dbc.Alert(
+                        f"Insufficient funds. You have ${amount:.2f} available but this purchase costs ${cost:.2f}.",
+                        color="danger", className="mb-0"
+                    ), {}
+
                 # Create modal body for bundle purchase
                 modal_body = html.Div([
                     html.P([
@@ -557,9 +581,9 @@ def register_callbacks(app, db_enabled, db_functions):
                     html.P("This will enable all information buttons (Show More Details, Week's Chart, and Month's Chart).", className="mb-3"),
                     html.P("Do you want to proceed?", className="mb-0")
                 ])
-                
+
                 return True, modal_body, pending
-            
+
             if info_type in ['show-more', 'show-week', 'show-month']:
                 # Individual info buttons are now free after bundle purchase
                 # These buttons are only enabled after bundle is purchased
@@ -567,9 +591,9 @@ def register_callbacks(app, db_enabled, db_functions):
                 task_data, error = get_task_data_safe(task_id, experiment_key)
                 if error:
                     return False, "", {}
-                
+
                 stock = task_data['stocks'][stock_index]
-                
+
                 # Log the request
                 if participant_id:
                     try:
@@ -592,7 +616,7 @@ def register_callbacks(app, db_enabled, db_functions):
                         )
                     except Exception:
                         logger.exception("Error logging event")
-                
+
                 # Create pending request with $0 cost (already paid via bundle)
                 pending = {
                     'info_type': info_type,
@@ -603,10 +627,10 @@ def register_callbacks(app, db_enabled, db_functions):
                     'cost': 0,
                     'element_id': f'{info_type}-{stock_index}'
                 }
-                
+
                 # No confirmation modal needed - directly open info modal
                 return False, "", pending
-        
+
         return dash.no_update, dash.no_update, dash.no_update
     
     
@@ -823,6 +847,10 @@ def register_callbacks(app, db_enabled, db_functions):
                         html.P(stock.get('month_analysis', 'Monthly performance data for this stock.'))
                     ]), modal_ctx, dash.no_update, False, current_amount, info_spent, dash.no_update
         
+        # Handle OK button on cost modal - if no pending request, just close
+        if 'cost-modal-ok' in triggered_id and ok_clicks and not pending_request:
+            return False, "", "", {}, {}, False, dash.no_update, dash.no_update, dash.no_update
+
         # Handle OK button on cost modal - close cost modal and open info modal
         if 'cost-modal-ok' in triggered_id and pending_request and ok_clicks:
             # Deduct cost from available amount and add to spent tracker
