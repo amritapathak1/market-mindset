@@ -62,6 +62,7 @@ PY
 
 # Restart services
 echo "🔄 Restarting services..."
+sudo cp market-mindset.service /etc/systemd/system/market-mindset.service
 sudo systemctl daemon-reload
 sudo systemctl restart market-mindset
 
