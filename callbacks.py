@@ -1082,7 +1082,7 @@ def register_callbacks(app, db_enabled, db_functions):
                 if stocks:
                     purchase_cost = stocks[0].get('info_costs', {}).get('purchase_bundle', 0)
                     if purchase_cost > 0 and not purchased_info:
-                        return False, "", "Please purchase information before submitting.", dash.no_update
+                        return False, "", "For the purpose of this tutorial, please purchase information before submitting.", dash.no_update
 
         # Validate investment
         validated_investments = []
