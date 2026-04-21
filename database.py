@@ -13,7 +13,6 @@ import json
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from zoneinfo import ZoneInfo
 from threading import Lock
 
 logger = logging.getLogger(__name__)
@@ -284,7 +283,7 @@ def log_event(participant_id, event_type, event_category, page_name=None,
         stock_ticker: Stock ticker if applicable
         metadata: Additional data as dict
     """
-    event_time = datetime.now(ZoneInfo('America/Chicago')).replace(tzinfo=None)
+    event_time = datetime.utcnow()
 
     logger.info("event: %s", json.dumps({
         'participant_id': str(participant_id) if participant_id else None,
