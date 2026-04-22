@@ -67,6 +67,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart market-mindset
 
 echo "🧪 Validating nginx configuration..."
+sudo cp nginx.conf /etc/nginx/sites-available/market-mindset
 sudo nginx -t
 sudo systemctl restart nginx
 
