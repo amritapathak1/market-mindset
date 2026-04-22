@@ -1959,7 +1959,7 @@ def register_callbacks(app, db_enabled, db_functions):
                 update_participant_completion(participant_id)
                 
                 # Update withdrawal status based on user choice
-                if withdrawal_choice == 'yes':
+                if withdrawal_choice == 'no':
                     update_participant_withdrawal(participant_id, withdrawn=True)
                 else:
                     update_participant_withdrawal(participant_id, withdrawn=False)

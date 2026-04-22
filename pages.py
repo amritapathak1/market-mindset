@@ -970,18 +970,15 @@ def debrief_page(uninvested_amount, portfolio, info_cost_spent=0):
         
         html.Hr(className="my-4"),
         
-        html.H5("Data Withdrawal Option:", className="mt-4 mb-3"),
-        html.P("Now that the purpose of the study has been explained more fully, you may request that your data be withdrawn from the research. If you wish to do so, please contact a member of the research team listed below."),
-        
-        html.P([html.Strong("Do you wish to exclude your data from the study?")], className="mt-3 mb-3"),
+        html.P([html.Strong("Do you wish to include your data in the study?")], className="mt-3 mb-3"),
         
         dbc.RadioItems(
             id="withdrawal-choice",
             options=[
-                {"label": " Yes, please exclude my data from the study", "value": "yes"},
-                {"label": " No, you may include my data in the study", "value": "no"}
+                {"label": " Yes, please include my data in the study", "value": "yes"},
+                {"label": " No, you may not include my data in the study", "value": "no"}
             ],
-            value="no",
+            value="yes",
             className="mb-3"
         ),
         
