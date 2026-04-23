@@ -41,20 +41,20 @@ python app.py
 The application will start on localhost
 
 Use one of the experiment-specific opaque links (not the root URL):
-- `http://13.63.182.207/pfdkr`
-- `http://13.63.182.207/ytnqm`
-- `http://13.63.182.207/hcslv`
-- `http://13.63.182.207/rbxjw`
-- `http://13.63.182.207/mkgza`
-- `http://13.63.182.207/uqnpe`
+- `https://marketmindsetexperiment.com/pfdkr`
+- `https://marketmindsetexperiment.com/ytnqm`
+- `https://marketmindsetexperiment.com/hcslv`
+- `https://marketmindsetexperiment.com/rbxjw`
+- `https://marketmindsetexperiment.com/mkgza`
+- `https://marketmindsetexperiment.com/uqnpe`
 
 Condition mapping:
-- `e1` -> `http://13.63.182.207/pfdkr`
-- `e2` -> `http://13.63.182.207/ytnqm`
-- `e3` -> `http://13.63.182.207/hcslv`
-- `e4` -> `http://13.63.182.207/rbxjw`
-- `e5` -> `http://13.63.182.207/mkgza`
-- `e6` -> `http://13.63.182.207/uqnpe`
+- `e1` -> `https://marketmindsetexperiment.com/pfdkr`
+- `e2` -> `https://marketmindsetexperiment.com/ytnqm`
+- `e3` -> `https://marketmindsetexperiment.com/hcslv`
+- `e4` -> `https://marketmindsetexperiment.com/rbxjw`
+- `e5` -> `https://marketmindsetexperiment.com/mkgza`
+- `e6` -> `https://marketmindsetexperiment.com/uqnpe`
 
 Each condition uses its own task/tutorial JSON files.
 
